@@ -37,7 +37,7 @@ export default function Home() {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-600/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-      <nav className="w-full border-b border-pink-500/30 px-3 md:px-8 py-3 flex flex-col gap-3 relative z-50 bg-[#070514] md:bg-[#070514]/90 backdrop-blur-md shadow-[0_4px_25px_rgba(236,72,153,0.15)]">
+      <nav className="w-full border-b border-pink-500/30 px-3 md:px-8 py-3 flex flex-col gap-2.5 relative z-50 bg-[#070514] md:bg-[#070514]/90 backdrop-blur-md shadow-[0_4px_25px_rgba(236,72,153,0.15)]">
         
         {/* Top Row: Logo, Login, Get Started, and Menu Button */}
         <div className="w-full flex items-center justify-between">
@@ -55,17 +55,17 @@ export default function Home() {
           </div>
 
           {/* Right side buttons */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 md:gap-3">
             <Link 
               href="/login" 
-              className="px-2.5 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)]"
+              className="px-2.5 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium hover:from-pink-500 hover:to-purple-500 transition-all text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)]"
             >
               Login
             </Link>
             
             <Link 
               href="/signup"
-              className="px-2.5 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)]"
+              className="px-2.5 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium hover:from-pink-500 hover:to-purple-500 transition-all text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)]"
             >
               Get Started
             </Link>
@@ -82,8 +82,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Second Row: Navigation Links */}
-        <div className="w-full flex items-center justify-between px-1 text-xs md:text-sm font-medium text-slate-300">
+        {/* Second Row: Navigation Links (Clean spacing without extra gaps) */}
+        <div className="w-full flex items-center justify-around md:justify-center md:gap-8 px-1 text-xs md:text-sm font-medium text-slate-300">
           <a href="/discover" className="hover:text-pink-400 transition-colors">Discover</a>
           <a href="/community" className="hover:text-pink-400 transition-colors">Community</a>
           <a href="/leaderboard" className="hover:text-pink-400 transition-colors">Leaderboard</a>
