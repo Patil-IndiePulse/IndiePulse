@@ -37,25 +37,26 @@ export default function Home() {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-600/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-      <nav className="w-full border-b border-pink-500/30 px-8 py-4 flex items-center justify-between relative z-50 bg-[#070514]/90 backdrop-blur-md shadow-[0_4px_25px_rgba(236,72,153,0.15)]">
+      <nav className="w-full border-b border-pink-500/30 px-3 md:px-8 py-3 flex flex-wrap items-center justify-between gap-3 relative z-50 bg-[#070514]/90 backdrop-blur-md shadow-[0_4px_25px_rgba(236,72,153,0.15)]">
         
         {/* IndiePulse Logo with Normal Solid Orange Text & Yellow Smile Arrow */}
         <div className="flex flex-col items-center cursor-pointer group">
-          <div className="text-2xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.4)]">
+          <div className="text-xl md:text-2xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.4)]">
             IndiePulse
           </div>
           {/* Perfect Sized Bright Yellow Smile Arrow matching text width */}
           <div className="w-full flex justify-center -mt-0.5">
-            <svg className="w-32 h-3.5 text-yellow-400 drop-shadow-[0_0_12px_rgba(250,204,21,0.95)] transition-transform duration-300 group-hover:scale-105" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg className="w-24 md:w-32 h-3 text-yellow-400 drop-shadow-[0_0_12px_rgba(250,204,21,0.95)] transition-transform duration-300 group-hover:scale-105" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M4 2C38 16 102 16 136 4" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
               <path d="M122 2L136 4L128 13" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
         </div>
 
-        <div className="relative hidden lg:block w-72">
+        {/* Search Bar - Visible on Mobile and Desktop */}
+        <div className="relative w-full md:w-64 order-3 md:order-2">
           <div className="relative flex items-center">
-            <span className="absolute left-3 text-pink-400 text-sm">🔍</span>
+            <span className="absolute left-3 text-pink-400 text-xs">🔍</span>
             <input
               type="text"
               value={searchQuery}
@@ -65,7 +66,7 @@ export default function Home() {
               }}
               onFocus={() => setIsSearching(true)}
               placeholder="Search games, projects, creators..."
-              className="w-full bg-slate-900/90 border border-pink-500/40 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all shadow-lg"
+              className="w-full bg-slate-900/90 border border-pink-500/40 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all shadow-lg"
             />
           </div>
 
@@ -77,14 +78,14 @@ export default function Home() {
                     key={index}
                     href={item.link}
                     onClick={() => setIsSearching(false)}
-                    className="block px-4 py-2.5 hover:bg-pink-950/40 border-b border-slate-800/50 last:border-none transition-colors cursor-pointer"
+                    className="block px-3 py-2 hover:bg-pink-950/40 border-b border-slate-800/50 last:border-none transition-colors cursor-pointer"
                   >
                     <div className="text-xs font-semibold text-white">{item.title}</div>
-                    <div className="text-[10px] text-pink-400 uppercase tracking-wider">{item.type}</div>
+                    <div className="text-[9px] text-pink-400 uppercase tracking-wider">{item.type}</div>
                   </a>
                 ))
               ) : (
-                <div className="px-4 py-3 text-xs text-slate-400 text-center">
+                <div className="px-3 py-2 text-xs text-slate-400 text-center">
                   No results found for "{searchQuery}"
                 </div>
               )}
@@ -92,34 +93,36 @@ export default function Home() {
           )}
         </div>
 
-        <div className="hidden md:flex gap-8 text-sm font-medium text-slate-300">
+        {/* Navigation Links - Visible on both Mobile and Desktop */}
+        <div className="flex flex-wrap items-center justify-center gap-4 text-xs md:text-sm font-medium text-slate-300 order-2 md:order-3">
           <a href="/discover" className="hover:text-pink-400 transition-colors">Discover</a>
           <a href="/community" className="hover:text-pink-400 transition-colors">Community</a>
           <a href="/leaderboard" className="hover:text-pink-400 transition-colors">Leaderboard</a>
           <a href="/quests" className="hover:text-pink-400 transition-colors">Quests</a>
         </div>
 
-        <div className="flex items-center gap-4">
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2 md:gap-4 order-4">
           <Link 
             href="/login" 
-            className="px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-sm font-medium hover:from-pink-500 hover:to-purple-500 transition-all shadow-[0_0_15px_rgba(236,72,153,0.4)] text-white cursor-pointer border border-pink-400/40"
+            className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium hover:from-pink-500 hover:to-purple-500 transition-all shadow-[0_0_15px_rgba(236,72,153,0.4)] text-white cursor-pointer border border-pink-400/40"
           >
             Login
           </Link>
           
           <Link 
             href="/signup"
-            className="px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-sm font-medium hover:from-pink-500 hover:to-purple-500 transition-all shadow-[0_0_15px_rgba(236,72,153,0.4)] cursor-pointer inline-block text-center border border-pink-400/40 text-white"
+            className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium hover:from-pink-500 hover:to-purple-500 transition-all shadow-[0_0_15px_rgba(236,72,153,0.4)] cursor-pointer inline-block text-center border border-pink-400/40 text-white"
           >
             Get Started
           </Link>
 
           <Link 
             href="/menu" 
-            className="p-2.5 bg-slate-900 border border-pink-500/40 rounded-xl text-slate-300 hover:text-white hover:border-pink-400 transition-all flex items-center justify-center cursor-pointer shadow-md"
+            className="p-2 bg-slate-900 border border-pink-500/40 rounded-xl text-slate-300 hover:text-white hover:border-pink-400 transition-all flex items-center justify-center cursor-pointer shadow-md"
             aria-label="Open Menu"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
           </Link>
@@ -316,7 +319,7 @@ export default function Home() {
             </div>
             <div>
               <h3 className="text-xl font-bold text-white">Founder's Direct Note & Feedback</h3>
-              <p className="text-xs text-slate-300">Have a suggestion or thought? Send it directly to the founder!</p>
+             <p className="text-xs text-slate-300">Have a suggestion or thought? Send it directly to the founder!</p>
             </div>
           </div>
 
