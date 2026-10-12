@@ -82,8 +82,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Second Row: Navigation Links (Clean spacing without extra gaps) */}
-        <div className="w-full flex items-center justify-around md:justify-center md:gap-8 px-1 text-xs md:text-sm font-medium text-slate-300">
+        {/* Second Row: Navigation Links */}
+        <div className="w-full flex items-center justify-between px-2 text-xs md:text-sm font-medium text-slate-300">
           <a href="/discover" className="hover:text-pink-400 transition-colors">Discover</a>
           <a href="/community" className="hover:text-pink-400 transition-colors">Community</a>
           <a href="/leaderboard" className="hover:text-pink-400 transition-colors">Leaderboard</a>
