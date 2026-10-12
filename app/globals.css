@@ -9,67 +9,83 @@ body {
   width: 100%;
 }
 
-/* --- Mobile Clean & Responsive Customizations --- */
+/* --- Laptop & Default View --- */
+header, main, section, footer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- Mobile Responsive Navigation & Layout Fixes --- */
 @media screen and (max-width: 768px) {
-  /* Prevent content from sticking to the edges of the phone screen */
   body {
-    padding-left: 12px !important;
-    padding-right: 12px !important;
+    padding-left: 8px;
+    padding-right: 8px;
   }
 
-  /* Adjust header, main, and sections padding for mobile */
-  header, main, section, footer {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding-left: 4px !important;
-    padding-right: 4px !important;
+  /* Make header and navigation compact to fit all options nicely on mobile */
+  header nav, .navbar, header {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 6px 4px !important;
+    gap: 6px !important;
   }
 
-  /* Make main titles look clean and readable on small screens */
+  /* Adjust logo size for mobile screens */
+  header img, header .logo, .indie-logo {
+    max-height: 28px !important;
+    width: auto !important;
+  }
+
+  /* Make search bar compact and visible on mobile */
+  input[type="text"], .search-bar, nav input {
+    font-size: 0.8rem !important;
+    padding: 4px 8px !important;
+    max-width: 130px !important;
+  }
+
+  /* Fit navigation links neatly side-by-side */
+  header a, .nav-links a, nav ul li a {
+    font-size: 0.75rem !important;
+    padding: 2px 4px !important;
+    margin: 0 2px !important;
+    white-space: nowrap;
+  }
+
+  /* Scale down header buttons like Login and Get Started */
+  header button, header .btn, nav button {
+    font-size: 0.75rem !important;
+    padding: 4px 8px !important;
+    margin: 2px !important;
+    width: auto !important;
+    display: inline-block !important;
+  }
+
+  /* Adjust main headings for small screens */
   h1 {
-    font-size: 1.75rem !important;
-    line-height: 1.25 !important;
-    text-align: center;
-    word-break: break-word;
-  }
-
-  h2 {
-    font-size: 1.35rem !important;
+    font-size: 1.6rem !important;
     text-align: center;
   }
 
   p {
-    font-size: 0.92rem !important;
+    font-size: 0.9rem !important;
     text-align: center;
-    line-height: 1.4;
   }
 
-  /* Fix oversized buttons so they look professional and stacked nicely */
-  button, .btn, a.btn, input[type="submit"] {
+  /* Adjust primary body buttons width */
+  button:not(header button), .btn:not(header .btn) {
     width: 100% !important;
-    max-width: 100% !important;
-    display: block !important;
-    margin-top: 10px !important;
-    margin-bottom: 10px !important;
-    padding-top: 12px !important;
-    padding-bottom: 12px !important;
-    font-size: 1rem !important;
-    border-radius: 10px !important;
-    text-align: center;
+    padding: 10px !important;
+    font-size: 0.95rem !important;
+    margin: 6px 0 !important;
   }
 
-  /* Convert grids into a single clean column layout to avoid crowding */
+  /* Stack cards neatly in a single column */
   .grid, .card-container, .games-grid, div[class*="grid"] {
     display: flex !important;
     flex-direction: column !important;
-    gap: 16px !important;
-    width: 100% !important;
-  }
-
-  /* Ensure cards take full clean width without overflowing */
-  .card, div[class*="rounded-"] {
-    width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+    gap: 12px !important;
   }
 }
