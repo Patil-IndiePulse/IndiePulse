@@ -54,18 +54,18 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right side buttons for mobile and desktop */}
+          {/* Right side buttons */}
           <div className="flex items-center gap-2">
             <Link 
               href="/login" 
-              className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium hover:from-pink-500 hover:to-purple-500 transition-all text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)]"
+              className="px-2.5 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)]"
             >
               Login
             </Link>
             
             <Link 
               href="/signup"
-              className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium hover:from-pink-500 hover:to-purple-500 transition-all text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)]"
+              className="px-2.5 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)]"
             >
               Get Started
             </Link>
@@ -83,7 +83,7 @@ export default function Home() {
         </div>
 
         {/* Second Row: Navigation Links */}
-        <div className="flex flex-wrap items-center justify-between px-1 text-xs md:text-sm font-medium text-slate-300">
+        <div className="w-full flex items-center justify-between px-1 text-xs md:text-sm font-medium text-slate-300">
           <a href="/discover" className="hover:text-pink-400 transition-colors">Discover</a>
           <a href="/community" className="hover:text-pink-400 transition-colors">Community</a>
           <a href="/leaderboard" className="hover:text-pink-400 transition-colors">Leaderboard</a>
@@ -92,7 +92,7 @@ export default function Home() {
 
         {/* Full-width Search Bar */}
         <div className="relative w-full">
-          <div className="relative flex items-center">
+          <div className="relative flex items-center w-full">
             <span className="absolute left-3 text-pink-400 text-xs">🔍</span>
             <input
               type="text"
