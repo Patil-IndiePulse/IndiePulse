@@ -33,13 +33,14 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#070514] text-white flex flex-col relative select-none overflow-x-hidden">
-      {/* Background Neon Glow Effects - Restored Pink Theme */}
+      {/* Background Neon Glow Effects */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-600/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-      <nav className="w-full border-b border-pink-500/30 px-3 md:px-8 py-3 flex flex-col gap-2.5 relative z-50 bg-[#070514] md:bg-[#070514]/90 backdrop-blur-md shadow-[0_4px_25px_rgba(236,72,153,0.15)]">
+      {/* Fully Matched Pink Theme Navigation Bar with Zero Gap */}
+      <nav className="w-full border-b border-pink-500/30 px-3 md:px-8 py-3 flex flex-col gap-2.5 relative z-50 bg-[#070514] backdrop-blur-md shadow-[0_4px_25px_rgba(236,72,153,0.15)]">
         
-        {/* Top Row: Logo, Login, Get Started, and Menu Button */}
+        {/* Top Row: Logo and Right Buttons tightly packed without empty middle space */}
         <div className="w-full flex items-center justify-between">
           {/* IndiePulse Logo */}
           <div className="flex flex-col items-center cursor-pointer group">
@@ -90,7 +91,7 @@ export default function Home() {
           <a href="/quests" className="hover:text-pink-400 transition-colors">Quests</a>
         </div>
 
-        {/* Full-width Search Bar (Fixed Layout) */}
+        {/* Full-width Search Bar */}
         <div className="w-full relative">
           <div className="w-full relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-400 text-xs z-10">🔍</span>
