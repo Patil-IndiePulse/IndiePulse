@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 body {
-  background-color: #030014;
+  background-color: #070514 !important;
   color: #ffffff;
   min-height: 100vh;
   margin: 0;
@@ -9,6 +9,11 @@ body {
   width: 100%;
   -webkit-user-select: none; /* Prevents unwanted mobile text selection/highlighting */
   user-select: none;
+}
+
+/* Ensure navbar and body share the exact same background color */
+nav, header {
+  background-color: #070514 !important;
 }
 
 footer {
@@ -20,47 +25,47 @@ footer {
 /* --- Mobile Responsive Navigation & Layout Fixes --- */
 @media screen and (max-width: 768px) {
   body {
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-left: 6px;
+    padding-right: 6px;
   }
 
-  /* Make header and navigation compact to fit all options nicely on mobile */
-  header nav, .navbar, header {
+  /* Make header and navigation compact and remove extra gaps between logo and buttons */
+  header nav, .navbar, header, nav {
     display: flex !important;
     flex-wrap: wrap !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 6px 4px !important;
-    gap: 6px !important;
+    padding: 6px 2px !important;
+    gap: 4px !important;
   }
 
   /* Adjust logo size for mobile screens */
   header img, header .logo, .indie-logo {
-    max-height: 28px !important;
+    max-height: 26px !important;
     width: auto !important;
   }
 
   /* Make search bar full-width with clean padding so icon doesn't overlap text */
   nav input[type="text"] {
     font-size: 0.8rem !important;
-    padding: 6px 10px 6px 32px !important; /* Left padding leaves clean space for search icon */
+    padding: 6px 10px 6px 34px !important; /* Left padding leaves clean space for search icon */
     width: 100% !important;
     max-width: 100% !important;
   }
 
   /* Fit navigation links neatly side-by-side */
   header a, .nav-links a, nav ul li a {
-    font-size: 0.75rem !important;
-    padding: 2px 4px !important;
-    margin: 0 2px !important;
+    font-size: 0.72rem !important;
+    padding: 2px 3px !important;
+    margin: 0 1px !important;
     white-space: nowrap;
   }
 
-  /* Scale down header buttons like Login and Get Started */
-  header button, header .btn, nav button {
-    font-size: 0.75rem !important;
-    padding: 4px 8px !important;
-    margin: 2px !important;
+  /* Scale down header buttons like Login and Get Started to eliminate spacing gaps */
+  header button, header .btn, nav button, nav a[href="/login"], nav a[href="/signup"] {
+    font-size: 0.7rem !important;
+    padding: 3px 6px !important;
+    margin: 0 1px !important;
     width: auto !important;
     display: inline-block !important;
   }
