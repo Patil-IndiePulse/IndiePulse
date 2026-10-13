@@ -90,10 +90,10 @@ export default function Home() {
           <a href="/quests" className="hover:text-pink-400 transition-colors">Quests</a>
         </div>
 
-        {/* Full-width Search Bar */}
-        <div className="relative w-full">
-          <div className="relative flex items-center w-full">
-            <span className="absolute left-3 text-pink-400 text-xs">🔍</span>
+        {/* Full-width Search Bar (Fixed Layout) */}
+        <div className="w-full relative">
+          <div className="w-full relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-400 text-xs z-10">🔍</span>
             <input
               type="text"
               value={searchQuery}
@@ -103,7 +103,7 @@ export default function Home() {
               }}
               onFocus={() => setIsSearching(true)}
               placeholder="Search games, projects, creators..."
-              className="w-full bg-slate-900/90 border border-pink-500/40 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all shadow-lg"
+              className="w-full bg-slate-900/90 border border-pink-500/40 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all shadow-lg block"
             />
           </div>
 
