@@ -7,12 +7,10 @@ body {
   margin: 0;
   overflow-x: hidden;
   width: 100%;
-  -webkit-user-select: none; /* Prevents unwanted mobile text selection/highlighting */
-  user-select: none;
 }
 
-/* Ensure navbar and body share the exact same background color */
-nav, header {
+/* Ensure navbar background matches the main page background perfectly */
+nav {
   background-color: #070514 !important;
 }
 
@@ -29,45 +27,40 @@ footer {
     padding-right: 6px;
   }
 
-  /* Make header and navigation compact and remove extra gaps between logo and buttons */
-  header nav, .navbar, header, nav {
+  /* Compact navigation layout without shrinking logo or main buttons */
+  nav.w-full {
     display: flex !important;
-    flex-wrap: wrap !important;
+    flex-direction: column !important;
+    padding: 8px 4px !important;
+    gap: 8px !important;
+  }
+
+  /* Keep top row tightly packed so logo and login buttons sit nicely */
+  nav > div:first-child {
+    display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 6px 2px !important;
-    gap: 4px !important;
+    width: 100% !important;
   }
 
-  /* Adjust logo size for mobile screens */
-  header img, header .logo, .indie-logo {
-    max-height: 26px !important;
-    width: auto !important;
-  }
-
-  /* Make search bar full-width with clean padding so icon doesn't overlap text */
+  /* Search bar full width with clean icon padding */
   nav input[type="text"] {
-    font-size: 0.8rem !important;
-    padding: 6px 10px 6px 34px !important; /* Left padding leaves clean space for search icon */
+    font-size: 0.85rem !important;
+    padding: 8px 12px 8px 36px !important;
     width: 100% !important;
     max-width: 100% !important;
   }
 
-  /* Fit navigation links neatly side-by-side */
-  header a, .nav-links a, nav ul li a {
-    font-size: 0.72rem !important;
-    padding: 2px 3px !important;
-    margin: 0 1px !important;
-    white-space: nowrap;
+  /* Keep navigation links readable */
+  nav div.flex.items-center.justify-between.px-2 {
+    padding: 0 4px !important;
+    font-size: 0.8rem !important;
   }
 
-  /* Scale down header buttons like Login and Get Started to eliminate spacing gaps */
-  header button, header .btn, nav button, nav a[href="/login"], nav a[href="/signup"] {
-    font-size: 0.7rem !important;
-    padding: 3px 6px !important;
-    margin: 0 1px !important;
-    width: auto !important;
-    display: inline-block !important;
+  /* Standard size for header buttons like Login and Get Started */
+  nav a.px-2\.5, nav a.rounded-lg {
+    font-size: 0.75rem !important;
+    padding: 6px 10px !important;
   }
 
   /* Adjust main headings for small screens */
@@ -87,12 +80,5 @@ footer {
     padding: 10px !important;
     font-size: 0.95rem !important;
     margin: 6px 0 !important;
-  }
-
-  /* Stack cards neatly in a single column */
-  .grid, .card-container, .games-grid, div[class*="grid"] {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 12px !important;
   }
 }
