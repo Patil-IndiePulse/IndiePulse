@@ -7,6 +7,8 @@ body {
   margin: 0;
   overflow-x: hidden;
   width: 100%;
+  -webkit-user-select: none; /* Prevents unwanted mobile text selection/highlighting */
+  user-select: none;
 }
 
 footer {
@@ -38,10 +40,10 @@ footer {
     width: auto !important;
   }
 
-  /* Make search bar full-width and properly padded on mobile */
-  input[type="text"], .search-bar, nav input {
+  /* Make search bar full-width with clean padding so icon doesn't overlap text */
+  nav input[type="text"] {
     font-size: 0.8rem !important;
-    padding: 6px 10px !important;
+    padding: 6px 10px 6px 32px !important; /* Left padding leaves clean space for search icon */
     width: 100% !important;
     max-width: 100% !important;
   }
