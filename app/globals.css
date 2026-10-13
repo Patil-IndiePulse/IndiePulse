@@ -9,8 +9,7 @@ body {
   width: 100%;
 }
 
-/* --- Laptop & Default View --- */
-header, main, section, footer {
+footer {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -39,11 +38,12 @@ header, main, section, footer {
     width: auto !important;
   }
 
-  /* Make search bar compact and visible on mobile */
+  /* Make search bar full-width and properly padded on mobile */
   input[type="text"], .search-bar, nav input {
     font-size: 0.8rem !important;
-    padding: 4px 8px !important;
-    max-width: 130px !important;
+    padding: 6px 10px !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
   /* Fit navigation links neatly side-by-side */
