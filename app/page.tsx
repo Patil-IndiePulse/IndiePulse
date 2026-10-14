@@ -32,18 +32,18 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#070514] text-white flex flex-col relative overflow-x-hidden">
+    <main className="min-h-screen bg-[#030014] text-white flex flex-col relative overflow-x-hidden select-none">
       {/* Background Neon Glow Effects */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-600/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-      {/* Navigation Bar */}
-      <nav className="w-full border-b border-pink-500/30 px-4 py-3 flex flex-col gap-2.5 relative z-50 bg-[#070514]">
+      {/* Navigation Bar - Background color unified to #030014 */}
+      <nav className="w-full border-b border-pink-500/30 px-4 py-3 flex flex-col gap-2.5 relative z-50 bg-[#030014]">
         
-        {/* Top Row: Logo and Buttons with proper padding so logo isn't clipped */}
+        {/* Top Row: Logo with safe padding and Buttons */}
         <div className="w-full flex items-center justify-between">
-          {/* IndiePulse Logo */}
-          <div className="flex flex-col items-start cursor-pointer group pl-1">
+          {/* IndiePulse Logo - Fixed clipping issue */}
+          <div className="flex flex-col items-start cursor-pointer group pl-2 md:pl-1">
             <div className="text-xl md:text-2xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.4)]">
               IndiePulse
             </div>
@@ -155,7 +155,8 @@ export default function Home() {
             </span>
           </h1>
           
-          <p className="text-slate-300 text-sm md:text-base mb-8 max-w-2xl font-normal leading-relaxed">
+          {/* Prevented auto text selection and highlighting */}
+          <p className="text-slate-300 text-sm md:text-base mb-8 max-w-2xl font-normal leading-relaxed select-none">
             A globally scalable platform powered by Octalysis gamification. Connect with passionate creators, play unique indie titles, and fuel your intrinsic motivation.
           </p>
 
@@ -363,7 +364,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="w-full border-t border-pink-500/30 bg-[#070514] py-8 px-8 mt-auto relative z-10">
+      <footer className="w-full border-t border-pink-500/30 bg-[#030014] py-8 px-8 mt-auto relative z-10">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <div>© {new Date().getFullYear()} IndiePulse. All rights reserved.</div>
           <div className="flex gap-6">
