@@ -37,36 +37,36 @@ export default function Home() {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-600/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-      {/* Navigation Bar - Background color completely matched with main body, gap eliminated */}
-      <nav className="w-full border-b border-pink-500/30 px-3 py-3 flex flex-col gap-2.5 relative z-50 bg-[#070514]">
+      {/* Navigation Bar */}
+      <nav className="w-full border-b border-pink-500/30 px-4 py-3 flex flex-col gap-2.5 relative z-50 bg-[#070514]">
         
-        {/* Top Row: Logo and Buttons with tight spacing (removed excess gap) */}
+        {/* Top Row: Logo and Buttons with proper padding so logo isn't clipped */}
         <div className="w-full flex items-center justify-between">
           {/* IndiePulse Logo */}
-          <div className="flex flex-col items-center cursor-pointer group">
+          <div className="flex flex-col items-start cursor-pointer group pl-1">
             <div className="text-xl md:text-2xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.4)]">
               IndiePulse
             </div>
             <div className="w-full flex justify-center -mt-0.5">
-              <svg className="w-24 md:w-32 h-3 text-yellow-400 drop-shadow-[0_0_12px_rgba(250,204,21,0.95)] transition-transform duration-300 group-hover:scale-105" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg className="w-24 md:w-32 h-3 text-yellow-400 drop-shadow-[0_0_12px_rgba(250,204,21,0.95)]" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4 2C38 16 102 16 136 4" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
                 <path d="M122 2L136 4L128 13" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
           </div>
 
-          {/* Right side buttons - Tightly grouped to remove space */}
-          <div className="flex items-center gap-1.5 md:gap-3">
+          {/* Right side buttons */}
+          <div className="flex items-center gap-2 md:gap-3 pr-1">
             <Link 
               href="/login" 
-              className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium hover:from-pink-500 hover:to-purple-500 transition-all text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)]"
+              className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)]"
             >
               Login
             </Link>
             
             <Link 
               href="/signup"
-              className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium hover:from-pink-500 hover:to-purple-500 transition-all text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)]"
+              className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)]"
             >
               Get Started
             </Link>
@@ -91,7 +91,7 @@ export default function Home() {
           <a href="/quests" className="hover:text-pink-400 transition-colors">Quests</a>
         </div>
 
-        {/* Full-width Search Bar with clean padding for icon */}
+        {/* Full-width Search Bar */}
         <div className="w-full relative">
           <div className="w-full relative flex items-center">
             <span className="absolute left-3 text-pink-400 text-xs z-10 pointer-events-none">🔍</span>
