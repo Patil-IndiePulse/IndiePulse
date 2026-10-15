@@ -40,26 +40,26 @@ export default function Home() {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-600/15 rounded-full blur-[140px] pointer-events-none"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-[140px] pointer-events-none"></div>
 
-      {/* Navigation Bar - Steam Style Single Line Layout */}
-      <nav className="w-full border-b border-pink-500/20 px-3 py-2.5 flex items-center justify-between gap-2.5 relative z-50 bg-[#030014]">
+      {/* Navigation Bar - Strictly Single Line Steam Style Layout */}
+      <nav className="w-full border-b border-pink-500/20 px-2.5 py-2 flex items-center justify-between gap-2 relative z-50 bg-[#030014]">
         
-        {/* Left: Slimmer IndiePulse Logo */}
+        {/* Left: Slim IndiePulse Logo */}
         <div className="flex flex-col items-start cursor-pointer group shrink-0">
-          <div className="text-base md:text-lg font-black tracking-wider text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]">
+          <div className="text-sm md:text-base font-black tracking-wider text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]">
             IndiePulse
           </div>
           <div className="w-full flex justify-center -mt-1.5">
-            <svg className="w-16 md:w-24 h-2 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.9)]" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg className="w-14 md:w-20 h-2 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.9)]" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M4 2C38 16 102 16 136 4" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
               <path d="M122 2L136 4L128 13" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
         </div>
 
-        {/* Center/Left: Steam-style Search Bar in the same single line */}
-        <div className="relative flex-1 max-w-md mx-1">
+        {/* Center: Search Bar in the exact same single line */}
+        <div className="relative flex-1 max-w-xs mx-1">
           <div className="relative flex items-center">
-            <span className="absolute left-3 text-pink-400 text-xs z-10 pointer-events-none">🔍</span>
+            <span className="absolute left-2.5 text-pink-400 text-[10px] z-10 pointer-events-none">🔍</span>
             <input
               type="text"
               value={searchQuery}
@@ -68,8 +68,8 @@ export default function Home() {
                 setIsSearching(true);
               }}
               onFocus={() => setIsSearching(true)}
-              placeholder="Search the store..."
-              className="w-full bg-[#0b071e] border border-pink-500/30 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-500/30 transition-all shadow-md block"
+              placeholder="Search store..."
+              className="w-full bg-[#0b071e] border border-pink-500/30 rounded-lg pl-7 pr-2.5 py-1 text-[11px] text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-500/30 transition-all shadow-md block"
             />
           </div>
 
@@ -96,14 +96,14 @@ export default function Home() {
           )}
         </div>
 
-        {/* Right side: Only Hamburger Menu on Extreme Right Corner */}
+        {/* Right: Hamburger Menu Button */}
         <div className="shrink-0 relative">
           <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 bg-slate-900 border border-pink-500/30 rounded-xl text-slate-300 hover:text-white transition-all cursor-pointer shadow-[0_0_10px_rgba(236,72,153,0.2)] flex items-center justify-center"
+            className="p-1.5 bg-slate-900 border border-pink-500/30 rounded-lg text-slate-300 hover:text-white transition-all cursor-pointer shadow-[0_0_8px_rgba(236,72,153,0.2)] flex items-center justify-center"
             aria-label="Toggle Menu"
           >
-            <svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
           </button>
@@ -153,7 +153,7 @@ export default function Home() {
               </a>
 
               <a href="/menu" onClick={() => setIsMenuOpen(false)} className="mt-1 px-3.5 py-3 bg-gradient-to-r from-pink-600/30 to-purple-600/30 hover:from-pink-600/50 hover:to-purple-600/50 border border-pink-500/50 rounded-xl text-xs font-bold text-pink-300 transition-colors flex items-center justify-between shadow-[0_0_15px_rgba(236,72,153,0.3)]">
-                <span>⚙️ Settings and Activity </span> <span>→</span>
+                <span>⚙️ Settings and Activity (Laptop View)</span> <span>→</span>
               </a>
             </div>
           )}
