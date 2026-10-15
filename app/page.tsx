@@ -40,124 +40,124 @@ export default function Home() {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-600/15 rounded-full blur-[140px] pointer-events-none"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-[140px] pointer-events-none"></div>
 
-      {/* Navigation Bar - Steam Style Unified Layout */}
-      <nav className="w-full border-b border-pink-500/20 px-3 py-2 flex items-center justify-between gap-3 relative z-50 bg-[#030014]">
+      {/* Navigation Bar - Steam Style Single Line Layout */}
+      <nav className="w-full border-b border-pink-500/20 px-3 py-2.5 flex items-center justify-between gap-2.5 relative z-50 bg-[#030014]">
         
-        {/* Left: IndiePulse Logo & Search Box together like Steam */}
-        <div className="flex items-center gap-3 flex-1">
-          <div className="flex flex-col items-start cursor-pointer group shrink-0">
-            <div className="text-lg md:text-xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.4)]">
-              IndiePulse
-            </div>
-            <div className="w-full flex justify-center -mt-1">
-              <svg className="w-20 md:w-28 h-2.5 text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.9)]" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 2C38 16 102 16 136 4" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
-                <path d="M122 2L136 4L128 13" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
+        {/* Left: Slimmer IndiePulse Logo */}
+        <div className="flex flex-col items-start cursor-pointer group shrink-0">
+          <div className="text-base md:text-lg font-black tracking-wider text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]">
+            IndiePulse
           </div>
-
-          {/* Steam-style Search Bar right next to Logo */}
-          <div className="relative flex-1 max-w-md">
-            <div className="relative flex items-center">
-              <span className="absolute left-3 text-pink-400 text-xs z-10 pointer-events-none">🔍</span>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setIsSearching(true);
-                }}
-                onFocus={() => setIsSearching(true)}
-                placeholder="Search the store..."
-                className="w-full bg-[#0b071e] border border-pink-500/30 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-500/30 transition-all shadow-md block"
-              />
-            </div>
-
-            {isSearching && searchQuery.trim().length > 0 && (
-              <div className="absolute top-full mt-2 left-0 w-full bg-[#070514] border border-pink-500/50 rounded-xl shadow-2xl overflow-hidden z-50">
-                {mockSearchResults.length > 0 ? (
-                  mockSearchResults.map((item, index) => (
-                    <a
-                      key={index}
-                      href={item.link}
-                      onClick={() => setIsSearching(false)}
-                      className="block px-3 py-2 hover:bg-pink-950/40 border-b border-slate-800/50 last:border-none transition-colors cursor-pointer"
-                    >
-                      <div className="text-xs font-semibold text-white">{item.title}</div>
-                      <div className="text-[9px] text-pink-400 uppercase tracking-wider">{item.type}</div>
-                    </a>
-                  ))
-                ) : (
-                  <div className="px-3 py-2 text-xs text-slate-400 text-center">
-                    No results found for "{searchQuery}"
-                  </div>
-                )}
-              </div>
-            )}
+          <div className="w-full flex justify-center -mt-1.5">
+            <svg className="w-16 md:w-24 h-2 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.9)]" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 2C38 16 102 16 136 4" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+              <path d="M122 2L136 4L128 13" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </div>
         </div>
 
-        {/* Right side: Pink Login button & Hamburger Menu on Extreme Right */}
-        <div className="flex items-center gap-2 shrink-0">
-          <Link 
-            href="/login" 
-            className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 rounded-lg text-xs font-bold text-white border border-pink-400/40 shadow-[0_0_12px_rgba(236,72,153,0.4)] transition-all"
-          >
-            Login
-          </Link>
+        {/* Center/Left: Steam-style Search Bar in the same single line */}
+        <div className="relative flex-1 max-w-md mx-1">
+          <div className="relative flex items-center">
+            <span className="absolute left-3 text-pink-400 text-xs z-10 pointer-events-none">🔍</span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setIsSearching(true);
+              }}
+              onFocus={() => setIsSearching(true)}
+              placeholder="Search the store..."
+              className="w-full bg-[#0b071e] border border-pink-500/30 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-500/30 transition-all shadow-md block"
+            />
+          </div>
 
+          {isSearching && searchQuery.trim().length > 0 && (
+            <div className="absolute top-full mt-2 left-0 w-full bg-[#070514] border border-pink-500/50 rounded-xl shadow-2xl overflow-hidden z-50">
+              {mockSearchResults.length > 0 ? (
+                mockSearchResults.map((item, index) => (
+                  <a
+                    key={index}
+                    href={item.link}
+                    onClick={() => setIsSearching(false)}
+                    className="block px-3 py-2 hover:bg-pink-950/40 border-b border-slate-800/50 last:border-none transition-colors cursor-pointer"
+                  >
+                    <div className="text-xs font-semibold text-white">{item.title}</div>
+                    <div className="text-[9px] text-pink-400 uppercase tracking-wider">{item.type}</div>
+                  </a>
+                ))
+              ) : (
+                <div className="px-3 py-2 text-xs text-slate-400 text-center">
+                  No results found for "{searchQuery}"
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Right side: Only Hamburger Menu on Extreme Right Corner */}
+        <div className="shrink-0 relative">
           <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 bg-slate-900 border border-pink-500/30 rounded-xl text-slate-300 hover:text-white transition-all cursor-pointer"
+            className="p-2 bg-slate-900 border border-pink-500/30 rounded-xl text-slate-300 hover:text-white transition-all cursor-pointer shadow-[0_0_10px_rgba(236,72,153,0.2)] flex items-center justify-center"
             aria-label="Toggle Menu"
           >
-            <svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
           </button>
+
+          {/* Hamburger Menu Drawer containing Login & Get Started in Pink */}
+          {isMenuOpen && (
+            <div className="absolute top-full right-0 mt-2 w-72 bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-3 shadow-2xl transition-all animate-in fade-in slide-in-from-top-2 z-50">
+              
+              {/* Login & Get Started Buttons in Pink inside Hamburger Menu */}
+              <div className="flex gap-2 w-full mb-1">
+                <Link 
+                  href="/login"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex-1 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-center rounded-xl text-xs font-bold text-white border border-pink-400/40 shadow-[0_0_12px_rgba(236,72,153,0.4)] transition-all"
+                >
+                  Login
+                </Link>
+                <Link 
+                  href="/signup"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex-1 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-center rounded-xl text-xs font-bold text-white border border-pink-400/40 shadow-[0_0_12px_rgba(236,72,153,0.4)] transition-all"
+                >
+                  Get Started
+                </Link>
+              </div>
+
+              <div className="text-[10px] uppercase tracking-widest text-pink-400 font-bold px-1 mt-1">Navigation & Control</div>
+              
+              <a href="/discover" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
+                <span>🧭 Discover Games & Projects</span> <span>→</span>
+              </a>
+
+              <a href="/community" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
+                <span>💬 Community Feed</span> <span>→</span>
+              </a>
+
+              <a href="/leaderboard" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
+                <span>🏆 Leaderboard & Rankings</span> <span>→</span>
+              </a>
+
+              <a href="/quests" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
+                <span>⚡ Quests & Rewards</span> <span>→</span>
+              </a>
+
+              <a href="/profile" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
+                <span>👤 My Profile</span> <span>→</span>
+              </a>
+
+              <a href="/menu" onClick={() => setIsMenuOpen(false)} className="mt-1 px-3.5 py-3 bg-gradient-to-r from-pink-600/30 to-purple-600/30 hover:from-pink-600/50 hover:to-purple-600/50 border border-pink-500/50 rounded-xl text-xs font-bold text-pink-300 transition-colors flex items-center justify-between shadow-[0_0_15px_rgba(236,72,153,0.3)]">
+                <span>⚙️ Settings and Activity </span> <span>→</span>
+              </a>
+            </div>
+          )}
         </div>
-
-        {/* Hamburger Menu Drawer with Pink Get Started button inside */}
-        {isMenuOpen && (
-          <div className="absolute top-full right-3 mt-2 w-72 bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-3 shadow-2xl transition-all animate-in fade-in slide-in-from-top-2 z-50">
-            
-            {/* Get Started Button inside Hamburger Menu */}
-            <Link 
-              href="/signup"
-              onClick={() => setIsMenuOpen(false)}
-              className="w-full py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-center rounded-xl text-xs font-bold text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)] transition-all"
-            >
-              Get Started 🚀
-            </Link>
-
-            <div className="text-[10px] uppercase tracking-widest text-pink-400 font-bold px-2 mt-1 mb-1">Navigation & Control</div>
-            
-            <a href="/discover" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-sm font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
-              <span>🧭 Discover Games & Projects</span> <span>→</span>
-            </a>
-
-            <a href="/community" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-sm font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
-              <span>💬 Community Feed</span> <span>→</span>
-            </a>
-
-            <a href="/leaderboard" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-sm font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
-              <span>🏆 Leaderboard & Rankings</span> <span>→</span>
-            </a>
-
-            <a href="/quests" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-sm font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
-              <span>⚡ Quests & Rewards</span> <span>→</span>
-            </a>
-
-            <a href="/profile" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-sm font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
-              <span>👤 My Profile</span> <span>→</span>
-            </a>
-
-            <a href="/menu" onClick={() => setIsMenuOpen(false)} className="mt-1 px-4 py-3.5 bg-gradient-to-r from-pink-600/30 to-purple-600/30 hover:from-pink-600/50 hover:to-purple-600/50 border border-pink-500/50 rounded-xl text-sm font-bold text-pink-300 transition-colors flex items-center justify-between shadow-[0_0_15px_rgba(236,72,153,0.3)]">
-              <span>⚙️ Settings and Activity (Laptop View)</span> <span>→</span>
-            </a>
-          </div>
-        )}
       </nav>
 
       {/* Hero Section */}
