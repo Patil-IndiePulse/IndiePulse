@@ -90,7 +90,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Hamburger Menu Drawer with Direct Sub-pages Links */}
+        {/* Hamburger Menu Drawer Direct to Real Pages (No Dummy Save Changes pages) */}
         {isMenuOpen && (
           <div className="w-full bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-4 shadow-2xl transition-all animate-in fade-in slide-in-from-top-2 z-50 max-h-[80vh] overflow-y-auto">
             
@@ -116,41 +116,41 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Section 2: Settings and Activity (Direct Destination Pages) */}
+            {/* Section 2: Settings and Activity (Mapped directly to Real Functional Pages) */}
             <div>
               <div className="text-[10px] uppercase tracking-widest text-pink-400 font-bold px-2 mb-2">Settings and Activity</div>
               <div className="flex flex-col gap-1.5">
-                <a href="/settings/account/profile" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                <a href="/profile" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
                   <span>🔒 Accounts Center</span> <span>→</span>
                 </a>
-                <a href="/settings/profile" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                <a href="/profile" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
                   <span>👤 Edit Profile</span> <span>→</span>
                 </a>
-                <a href="/settings/saved" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                <a href="/development" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
                   <span>⭐ Saved Games / Projects</span> <span>→</span>
                 </a>
-                <a href="/settings/activity" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                <a href="/community/feed" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
                   <span>📊 Your Activity</span> <span>→</span>
                 </a>
-                <a href="/settings/notifications" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                <a href="/community" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
                   <span>🔔 Notifications</span> <span>→</span>
                 </a>
-                <a href="/settings/privacy" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                <a href="/profile" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
                   <span>🛡️ Account Privacy</span> <span>→</span>
                 </a>
-                <a href="/settings/blocked" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                <a href="/profile" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
                   <span>🚫 Blocked Users / Restricted</span> <span>→</span>
                 </a>
-                <a href="/settings/theme" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                <a href="/discover" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
                   <span>🎨 Dark / Light Theme</span> <span className="text-[10px] text-pink-400 font-bold">Dark</span>
                 </a>
-                <a href="/settings/support" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                <a href="/contact" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
                   <span>🐛 Bug Report / Support Ticket</span> <span>→</span>
                 </a>
-                <a href="/settings/language" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                <a href="/discover" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
                   <span>🌐 Language & Region</span> <span>→</span>
                 </a>
-                <a href="/settings/data-download" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                <a href="/profile" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
                   <span>📥 Download Data & Account Deactivation</span> <span>→</span>
                 </a>
               </div>
@@ -395,7 +395,7 @@ export default function Home() {
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 rows={3}
-                className="w-xl bg-slate-800/90 border border-pink-500/40 rounded-xl p-4 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 mb-4 transition-all shadow-inner"
+                className="w-full bg-slate-800/90 border border-pink-500/40 rounded-xl p-4 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 mb-4 transition-all shadow-inner"
                 placeholder="Write your note or feedback here (e.g., Amazing platform! Would love a dark mode toggle)..."
                 required
               />
