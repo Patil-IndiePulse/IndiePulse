@@ -11,7 +11,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   
-  // Steam-style mobile menu drawer state
+  // Menu drawer state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const mockSearchResults = [
@@ -40,13 +40,13 @@ export default function Home() {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-600/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-      {/* Steam-Style Clean Top Navigation Bar */}
+      {/* Navigation Bar */}
       <nav className="w-full border-b border-pink-500/30 px-4 py-3 flex flex-col gap-2.5 relative z-50 bg-[#030014]">
         
         {/* Top Row: Hamburger Menu, Logo, and Quick Actions */}
         <div className="w-full flex items-center justify-between">
           
-          {/* Left: Hamburger Menu Button (Steam Style) & Logo */}
+          {/* Left: Hamburger Menu Button & Logo */}
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -90,31 +90,70 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Steam-Style Slide-down / Dropdown Menu containing ALL navigation options securely */}
+        {/* Hamburger Menu Drawer containing Navigation & Settings & Activity features */}
         {isMenuOpen && (
-          <div className="w-full bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-3 shadow-2xl transition-all animate-in fade-in slide-in-from-top-2 z-50">
-            <div className="text-[10px] uppercase tracking-widest text-pink-400 font-bold px-2">Navigation Menu</div>
-            <div className="flex flex-col gap-1.5">
-              <a href="/discover" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-sm font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
-                <span>Discover</span> <span>→</span>
-              </a>
-              <a href="/community" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-sm font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
-                <span>Community</span> <span>→</span>
-              </a>
-              <a href="/leaderboard" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-sm font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
-                <span>Leaderboard</span> <span>→</span>
-              </a>
-              <a href="/quests" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-sm font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
-                <span>Quests</span> <span>→</span>
-              </a>
-              <a href="/profile" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-sm font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
-                <span>My Profile</span> <span>→</span>
-              </a>
+          <div className="w-full bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-4 shadow-2xl transition-all animate-in fade-in slide-in-from-top-2 z-50 max-h-[80vh] overflow-y-auto">
+            
+            {/* Section 1: Navigation Menu */}
+            <div>
+              <div className="text-[10px] uppercase tracking-widest text-pink-400 font-bold px-2 mb-2">Navigation Menu</div>
+              <div className="flex flex-col gap-1.5">
+                <a href="/discover" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-sm font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
+                  <span>Discover</span> <span>→</span>
+                </a>
+                <a href="/community" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-sm font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
+                  <span>Community</span> <span>→</span>
+                </a>
+                <a href="/leaderboard" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-sm font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
+                  <span>Leaderboard</span> <span>→</span>
+                </a>
+                <a href="/quests" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-sm font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
+                  <span>Quests</span> <span>→</span>
+                </a>
+                <a href="/profile" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-sm font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
+                  <span>My Profile</span> <span>→</span>
+                </a>
+              </div>
             </div>
+
+            {/* Section 2: Settings and Activity */}
+            <div>
+              <div className="text-[10px] uppercase tracking-widest text-pink-400 font-bold px-2 mb-2">Settings and Activity</div>
+              <div className="flex flex-col gap-1.5">
+                <a href="/settings/account" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                  <span>🔒 Accounts Center</span> <span>→</span>
+                </a>
+                <a href="/settings/profile" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                  <span>👤 Edit Profile</span> <span>→</span>
+                </a>
+                <a href="/settings/saved" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                  <span>⭐ Saved Games / Projects</span> <span>→</span>
+                </a>
+                <a href="/settings/activity" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                  <span>📊 Your Activity</span> <span>→</span>
+                </a>
+                <a href="/settings/notifications" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                  <span>🔔 Notifications</span> <span>→</span>
+                </a>
+                <a href="/settings/privacy" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                  <span>🛡️ Account Privacy</span> <span>→</span>
+                </a>
+                <a href="/settings/theme" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                  <span>🎨 Dark / Light Theme</span> <span className="text-[10px] text-pink-400 font-bold">Dark</span>
+                </a>
+                <a href="/settings/support" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                  <span>🐛 Bug Report / Support Ticket</span> <span>→</span>
+                </a>
+                <a href="/settings/language" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                  <span>🌐 Language & Region</span> <span>→</span>
+                </a>
+              </div>
+            </div>
+
           </div>
         )}
 
-        {/* Full-width Clean Search Bar */}
+        {/* Full-width Search Bar */}
         <div className="w-full relative">
           <div className="w-full relative flex items-center">
             <span className="absolute left-3 text-pink-400 text-xs z-10 pointer-events-none">🔍</span>
