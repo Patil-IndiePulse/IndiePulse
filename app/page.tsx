@@ -40,25 +40,92 @@ export default function Home() {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-600/15 rounded-full blur-[140px] pointer-events-none"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-[140px] pointer-events-none"></div>
 
-      {/* Navigation Bar - Steam Style Single Line Layout with Zero Dead Space */}
-      <nav className="w-full border-b border-pink-500/25 px-3 py-2.5 flex items-center justify-between gap-2.5 relative z-50 bg-[#030014]">
+      {/* Navigation Bar - 2-Line Professional Layout like Major Platforms */}
+      <nav className="w-full border-b border-pink-500/25 px-4 py-3 flex flex-col gap-3 relative z-50 bg-[#030014]">
         
-        {/* Left: IndiePulse Logo properly sized & aligned inside */}
-        <div className="flex flex-col items-start cursor-pointer group shrink-0 pl-1">
-          <div className="text-lg font-black tracking-wider text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.4)]">
-            IndiePulse
+        {/* Line 1: IndiePulse Logo on Left, Hamburger Menu on Right */}
+        <div className="w-full flex items-center justify-between">
+          
+          {/* IndiePulse Logo (Properly sized and aligned) */}
+          <div className="flex flex-col items-start cursor-pointer group shrink-0">
+            <div className="text-lg md:text-xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.4)]">
+              IndiePulse
+            </div>
+            <div className="w-full flex justify-center -mt-1">
+              <svg className="w-24 h-2.5 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.9)]" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 2C38 16 102 16 136 4" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+                <path d="M122 2L136 4L128 13" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
           </div>
-          <div className="w-full flex justify-center -mt-1">
-            <svg className="w-20 h-2.5 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.9)]" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 2C38 16 102 16 136 4" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-              <path d="M122 2L136 4L128 13" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+
+          {/* Three Lines (Hamburger Menu Button) */}
+          <div className="shrink-0 relative">
+            <button 
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2.5 bg-slate-900/90 border border-pink-500/30 rounded-xl text-slate-300 hover:text-white transition-all cursor-pointer shadow-[0_0_10px_rgba(236,72,153,0.2)] flex items-center justify-center"
+              aria-label="Toggle Menu"
+            >
+              <svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
+
+            {/* Hamburger Menu Drawer containing Login & Get Started in Pink */}
+            {isMenuOpen && (
+              <div className="absolute top-full right-0 mt-2 w-72 bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-3 shadow-2xl transition-all animate-in fade-in slide-in-from-top-2 z-50">
+                
+                {/* Login & Get Started Buttons in Pink inside Hamburger Menu */}
+                <div className="flex gap-2 w-full mb-1">
+                  <Link 
+                    href="/login"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex-1 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-center rounded-xl text-xs font-bold text-white border border-pink-400/40 shadow-[0_0_12px_rgba(236,72,153,0.4)] transition-all"
+                  >
+                    Login
+                  </Link>
+                  <Link 
+                    href="/signup"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex-1 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-center rounded-xl text-xs font-bold text-white border border-pink-400/40 shadow-[0_0_12px_rgba(236,72,153,0.4)] transition-all"
+                  >
+                    Get Started
+                  </Link>
+                </div>
+
+                <div className="text-[10px] uppercase tracking-widest text-pink-400 font-bold px-1 mt-1">Navigation & Control</div>
+                
+                <a href="/discover" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
+                  <span>🧭 Discover Games & Projects</span> <span>→</span>
+                </a>
+
+                <a href="/community" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
+                  <span>💬 Community Feed</span> <span>→</span>
+                </a>
+
+                <a href="/leaderboard" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
+                  <span>🏆 Leaderboard & Rankings</span> <span>→</span>
+                </a>
+
+                <a href="/quests" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
+                  <span>⚡ Quests & Rewards</span> <span>→</span>
+                </a>
+
+                <a href="/profile" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
+                  <span>👤 My Profile</span> <span>→</span>
+                </a>
+
+                <a href="/menu" onClick={() => setIsMenuOpen(false)} className="mt-1 px-3.5 py-3 bg-gradient-to-r from-pink-600/30 to-purple-600/30 hover:from-pink-600/50 hover:to-purple-600/50 border border-pink-500/50 rounded-xl text-xs font-bold text-pink-300 transition-colors flex items-center justify-between shadow-[0_0_15px_rgba(236,72,153,0.3)]">
+                  <span>⚙️ Settings and Activity (Laptop View)</span> <span>→</span>
+                </a>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Center: Accurate Steam-Style Search Bar with Dark Body & Blue Search Button on Right */}
-        <div className="relative flex-1 max-w-md mx-2">
-          <div className="relative flex items-center bg-[#1a1b26] border border-slate-700 rounded-md overflow-hidden shadow-inner">
+        {/* Line 2: Steam-Style Accurate Search Bar (Dark Box with Blue Search Button on Right) */}
+        <div className="w-full relative">
+          <div className="relative flex items-center bg-[#1a1b26] border border-slate-700/80 rounded-lg overflow-hidden shadow-md">
             <input
               type="text"
               value={searchQuery}
@@ -68,11 +135,11 @@ export default function Home() {
               }}
               onFocus={() => setIsSearching(true)}
               placeholder="Search the store"
-              className="w-full bg-transparent px-3 py-1.5 text-xs text-white placeholder-slate-400 italic focus:outline-none"
+              className="w-full bg-transparent px-4 py-2 text-xs text-white placeholder-slate-400 italic focus:outline-none"
             />
             <button 
               type="button"
-              className="bg-[#0098ff] hover:bg-[#007acc] px-3.5 py-1.5 flex items-center justify-center transition-colors shrink-0 cursor-pointer"
+              className="bg-[#0098ff] hover:bg-[#007acc] px-4 py-2 flex items-center justify-center transition-colors shrink-0 cursor-pointer"
               aria-label="Search"
             >
               <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -81,6 +148,7 @@ export default function Home() {
             </button>
           </div>
 
+          {/* Search Results Dropdown */}
           {isSearching && searchQuery.trim().length > 0 && (
             <div className="absolute top-full mt-2 left-0 w-full bg-[#070514] border border-pink-500/50 rounded-xl shadow-2xl overflow-hidden z-50">
               {mockSearchResults.length > 0 ? (
@@ -104,68 +172,6 @@ export default function Home() {
           )}
         </div>
 
-        {/* Right: Hamburger Menu Button */}
-        <div className="shrink-0 relative">
-          <button 
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 bg-slate-900 border border-pink-500/30 rounded-xl text-slate-300 hover:text-white transition-all cursor-pointer shadow-[0_0_10px_rgba(236,72,153,0.2)] flex items-center justify-center"
-            aria-label="Toggle Menu"
-          >
-            <svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
-            </svg>
-          </button>
-
-          {/* Hamburger Menu Drawer containing Login & Get Started in Pink */}
-          {isMenuOpen && (
-            <div className="absolute top-full right-0 mt-2 w-72 bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-3 shadow-2xl transition-all animate-in fade-in slide-in-from-top-2 z-50">
-              
-              {/* Login & Get Started Buttons in Pink inside Hamburger Menu */}
-              <div className="flex gap-2 w-full mb-1">
-                <Link 
-                  href="/login"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="flex-1 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-center rounded-xl text-xs font-bold text-white border border-pink-400/40 shadow-[0_0_12px_rgba(236,72,153,0.4)] transition-all"
-                >
-                  Login
-                </Link>
-                <Link 
-                  href="/signup"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="flex-1 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-center rounded-xl text-xs font-bold text-white border border-pink-400/40 shadow-[0_0_12px_rgba(236,72,153,0.4)] transition-all"
-                >
-                  Get Started
-                </Link>
-              </div>
-
-              <div className="text-[10px] uppercase tracking-widest text-pink-400 font-bold px-1 mt-1">Navigation & Control</div>
-              
-              <a href="/discover" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
-                <span>🧭 Discover Games & Projects</span> <span>→</span>
-              </a>
-
-              <a href="/community" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
-                <span>💬 Community Feed</span> <span>→</span>
-              </a>
-
-              <a href="/leaderboard" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
-                <span>🏆 Leaderboard & Rankings</span> <span>→</span>
-              </a>
-
-              <a href="/quests" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
-                <span>⚡ Quests & Rewards</span> <span>→</span>
-              </a>
-
-              <a href="/profile" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
-                <span>👤 My Profile</span> <span>→</span>
-              </a>
-
-              <a href="/menu" onClick={() => setIsMenuOpen(false)} className="mt-1 px-3.5 py-3 bg-gradient-to-r from-pink-600/30 to-purple-600/30 hover:from-pink-600/50 hover:to-purple-600/50 border border-pink-500/50 rounded-xl text-xs font-bold text-pink-300 transition-colors flex items-center justify-between shadow-[0_0_15px_rgba(236,72,153,0.3)]">
-                <span>⚙️ Settings and Activity (Laptop View)</span> <span>→</span>
-              </a>
-            </div>
-          )}
-        </div>
       </nav>
 
       {/* Hero Section */}
