@@ -40,14 +40,41 @@ export default function Home() {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-600/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-      {/* Navigation Bar */}
-      <nav className="w-full border-b border-pink-500/30 px-4 py-3 flex flex-col gap-2.5 relative z-50 bg-[#030014]">
+      {/* Navigation Bar - Steam Style Unified Layout */}
+      <nav className="w-full border-b border-pink-500/30 px-4 py-3 flex flex-col gap-2.5 relative z-50 bg-[#030014]/95 backdrop-blur-md">
         
-        {/* Top Row: Hamburger Menu, Logo, and Quick Actions */}
+        {/* Top Row: Logo on Left Corner, Login/Get Started, and Three Lines on Right Corner */}
         <div className="w-full flex items-center justify-between">
           
-          {/* Left: Hamburger Menu Button & Logo */}
-          <div className="flex items-center gap-3">
+          {/* Left: IndiePulse Logo */}
+          <div className="flex flex-col items-start cursor-pointer group">
+            <div className="text-xl md:text-2xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.4)]">
+              IndiePulse
+            </div>
+            <div className="w-full flex justify-center -mt-0.5">
+              <svg className="w-24 md:w-32 h-3 text-yellow-400 drop-shadow-[0_0_12px_rgba(250,204,21,0.95)]" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 2C38 16 102 16 136 4" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
+                <path d="M122 2L136 4L128 13" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Right side: Login, Get Started & Hamburger Menu on Extreme Right Corner */}
+          <div className="flex items-center gap-2.5">
+            <Link 
+              href="/login" 
+              className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)] transition-all"
+            >
+              Login
+            </Link>
+            
+            <Link 
+              href="/signup"
+              className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)] transition-all"
+            >
+              Get Started
+            </Link>
+
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 bg-slate-900 border border-pink-500/40 rounded-xl text-slate-300 hover:text-white transition-all cursor-pointer shadow-[0_0_10px_rgba(236,72,153,0.2)]"
@@ -57,36 +84,6 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
               </svg>
             </button>
-
-            {/* IndiePulse Logo */}
-            <div className="flex flex-col items-start cursor-pointer group pl-1">
-              <div className="text-xl md:text-2xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.4)]">
-                IndiePulse
-              </div>
-              <div className="w-full flex justify-center -mt-0.5">
-                <svg className="w-24 md:w-32 h-3 text-yellow-400 drop-shadow-[0_0_12px_rgba(250,204,21,0.95)]" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 2C38 16 102 16 136 4" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
-                  <path d="M122 2L136 4L128 13" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          {/* Right side quick buttons */}
-          <div className="flex items-center gap-2">
-            <Link 
-              href="/login" 
-              className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)]"
-            >
-              Login
-            </Link>
-            
-            <Link 
-              href="/signup"
-              className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)]"
-            >
-              Get Started
-            </Link>
           </div>
         </div>
 
@@ -117,7 +114,7 @@ export default function Home() {
 
             {/* Direct Link to Full Laptop-Style Settings & Activity Page */}
             <a href="/menu" onClick={() => setIsMenuOpen(false)} className="mt-2 px-4 py-3.5 bg-gradient-to-r from-pink-600/30 to-purple-600/30 hover:from-pink-600/50 hover:to-purple-600/50 border border-pink-500/50 rounded-xl text-sm font-bold text-pink-300 transition-colors flex items-center justify-between shadow-[0_0_15px_rgba(236,72,153,0.3)]">
-              <span>⚙️ Settings and Activity </span> <span>→</span>
+              <span>⚙️ Settings and Activity (Laptop View)</span> <span>→</span>
             </a>
           </div>
         )}
