@@ -117,7 +117,7 @@ export default function Home() {
 
             {/* Direct Link to Full Laptop-Style Settings & Activity Page */}
             <a href="/menu" onClick={() => setIsMenuOpen(false)} className="mt-2 px-4 py-3.5 bg-gradient-to-r from-pink-600/30 to-purple-600/30 hover:from-pink-600/50 hover:to-purple-600/50 border border-pink-500/50 rounded-xl text-sm font-bold text-pink-300 transition-colors flex items-center justify-between shadow-[0_0_15px_rgba(236,72,153,0.3)]">
-              <span>⚙️ Settings and Activity (Laptop View)</span> <span>→</span>
+              <span>⚙️ Settings and Activity </span> <span>→</span>
             </a>
           </div>
         )}
