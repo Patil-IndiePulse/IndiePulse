@@ -40,13 +40,13 @@ export default function Home() {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-600/15 rounded-full blur-[140px] pointer-events-none"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-[140px] pointer-events-none"></div>
 
-      {/* Navigation Bar - 2-Line Professional Layout like Major Platforms */}
+      {/* Navigation Bar - 2-Line Professional Layout */}
       <nav className="w-full border-b border-pink-500/25 px-4 py-3 flex flex-col gap-3 relative z-50 bg-[#030014]">
         
         {/* Line 1: IndiePulse Logo on Left, Hamburger Menu on Right */}
         <div className="w-full flex items-center justify-between">
           
-          {/* IndiePulse Logo (Properly sized and aligned) */}
+          {/* IndiePulse Logo */}
           <div className="flex flex-col items-start cursor-pointer group shrink-0">
             <div className="text-lg md:text-xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.4)]">
               IndiePulse
@@ -71,11 +71,11 @@ export default function Home() {
               </svg>
             </button>
 
-            {/* Hamburger Menu Drawer containing Login & Get Started in Pink */}
+            {/* Hamburger Menu Drawer */}
             {isMenuOpen && (
               <div className="absolute top-full right-0 mt-2 w-72 bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-3 shadow-2xl transition-all animate-in fade-in slide-in-from-top-2 z-50">
                 
-                {/* Login & Get Started Buttons in Pink inside Hamburger Menu */}
+                {/* Login & Get Started Buttons in Pink */}
                 <div className="flex gap-2 w-full mb-1">
                   <Link 
                     href="/login"
@@ -123,9 +123,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Line 2: Steam-Style Accurate Search Bar (Dark Box with Blue Search Button on Right) */}
+        {/* Line 2: Fixed Steam-Style Search Bar (Dark Box with ONLY Blue Search Button on Right) */}
         <div className="w-full relative">
-          <div className="relative flex items-center bg-[#1a1b26] border border-slate-700/80 rounded-lg overflow-hidden shadow-md">
+          <div className="w-full flex items-center bg-[#1a1b26] border border-slate-700/80 rounded-lg overflow-hidden shadow-md">
             <input
               type="text"
               value={searchQuery}
@@ -135,7 +135,7 @@ export default function Home() {
               }}
               onFocus={() => setIsSearching(true)}
               placeholder="Search the store"
-              className="w-full bg-transparent px-4 py-2 text-xs text-white placeholder-slate-400 italic focus:outline-none"
+              className="flex-1 w-full bg-transparent px-4 py-2 text-xs text-white placeholder-slate-400 italic focus:outline-none min-w-0"
             />
             <button 
               type="button"
