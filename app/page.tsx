@@ -40,44 +40,44 @@ export default function Home() {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-600/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-      {/* Navigation Bar - Steam Style Unified Layout */}
-      <nav className="w-full border-b border-pink-500/30 px-4 py-3 flex flex-col gap-2.5 relative z-50 bg-[#030014]/95 backdrop-blur-md">
+      {/* Navigation Bar - Fully Unified Steam-like Compact Layout */}
+      <nav className="w-full border-b border-pink-500/20 px-3 py-2 flex flex-col gap-2 relative z-50 bg-[#030014]">
         
-        {/* Top Row: Logo on Left Corner, Login/Get Started, and Three Lines on Right Corner */}
+        {/* Top Row: Logo on Left, Tight Right-aligned Login, Get Started & Hamburger Menu */}
         <div className="w-full flex items-center justify-between">
           
           {/* Left: IndiePulse Logo */}
           <div className="flex flex-col items-start cursor-pointer group">
-            <div className="text-xl md:text-2xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.4)]">
+            <div className="text-lg md:text-xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.4)]">
               IndiePulse
             </div>
-            <div className="w-full flex justify-center -mt-0.5">
-              <svg className="w-24 md:w-32 h-3 text-yellow-400 drop-shadow-[0_0_12px_rgba(250,204,21,0.95)]" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <div className="w-full flex justify-center -mt-1">
+              <svg className="w-20 md:w-28 h-2.5 text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.9)]" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4 2C38 16 102 16 136 4" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
                 <path d="M122 2L136 4L128 13" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
           </div>
 
-          {/* Right side: Login, Get Started & Hamburger Menu on Extreme Right Corner */}
-          <div className="flex items-center gap-2.5">
+          {/* Right side: Compact buttons with matching unified colors and no excess spacing */}
+          <div className="flex items-center gap-1.5">
             <Link 
               href="/login" 
-              className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)] transition-all"
+              className="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 rounded-md text-[11px] font-medium text-slate-200 border border-pink-500/30 transition-all"
             >
               Login
             </Link>
             
             <Link 
               href="/signup"
-              className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg text-xs md:text-sm font-medium text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)] transition-all"
+              className="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 rounded-md text-[11px] font-medium text-slate-200 border border-pink-500/30 transition-all"
             >
               Get Started
             </Link>
 
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 bg-slate-900 border border-pink-500/40 rounded-xl text-slate-300 hover:text-white transition-all cursor-pointer shadow-[0_0_10px_rgba(236,72,153,0.2)]"
+              className="p-1.5 bg-slate-900 border border-pink-500/30 rounded-lg text-slate-300 hover:text-white transition-all cursor-pointer"
               aria-label="Toggle Menu"
             >
               <svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -87,7 +87,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Hamburger Menu Drawer - Direct Link to Full Laptop-Style Menu Page */}
+        {/* Hamburger Menu Drawer */}
         {isMenuOpen && (
           <div className="w-full bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-3 shadow-2xl transition-all animate-in fade-in slide-in-from-top-2 z-50">
             <div className="text-[10px] uppercase tracking-widest text-pink-400 font-bold px-2 mb-1">Navigation & Control</div>
@@ -112,7 +112,6 @@ export default function Home() {
               <span>👤 My Profile</span> <span>→</span>
             </a>
 
-            {/* Direct Link to Full Laptop-Style Settings & Activity Page */}
             <a href="/menu" onClick={() => setIsMenuOpen(false)} className="mt-2 px-4 py-3.5 bg-gradient-to-r from-pink-600/30 to-purple-600/30 hover:from-pink-600/50 hover:to-purple-600/50 border border-pink-500/50 rounded-xl text-sm font-bold text-pink-300 transition-colors flex items-center justify-between shadow-[0_0_15px_rgba(236,72,153,0.3)]">
               <span>⚙️ Settings and Activity (Laptop View)</span> <span>→</span>
             </a>
@@ -132,7 +131,7 @@ export default function Home() {
               }}
               onFocus={() => setIsSearching(true)}
               placeholder="Search games, projects, creators..."
-              className="w-full bg-slate-900/90 border border-pink-500/40 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all shadow-lg block"
+              className="w-full bg-slate-900/90 border border-pink-500/30 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all shadow-md block"
             />
           </div>
 
@@ -161,23 +160,23 @@ export default function Home() {
       </nav>
 
       <div className="flex-1 px-8 py-6 max-w-6xl mx-auto w-full flex flex-col relative z-10">
-        <div className="flex flex-col items-center justify-center text-center max-w-4xl mx-auto pt-6 pb-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-pink-500/50 bg-pink-500/15 text-pink-300 text-xs font-bold tracking-wide uppercase mb-6 shadow-[0_0_20px_rgba(236,72,153,0.3)]">
+        <div className="flex flex-col items-center justify-center text-center max-w-4xl mx-auto pt-4 pb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-pink-500/40 bg-pink-500/10 text-pink-300 text-xs font-bold tracking-wide uppercase mb-4 shadow-[0_0_20px_rgba(236,72,153,0.3)]">
             <span>✦</span> NEXT-GEN INDIE GAME ECOSYSTEM
           </div>
           
-          <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-6 leading-tight">
+          <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4 leading-tight">
             Where Indie Games <br />
             <span className="bg-gradient-to-r from-pink-400 via-fuchsia-400 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(236,72,153,0.5)]">
               Come Alive & Thrive
             </span>
           </h1>
           
-          <p className="text-slate-300 text-sm md:text-base mb-8 max-w-2xl font-normal leading-relaxed select-none">
+          <p className="text-slate-300 text-sm md:text-base mb-6 max-w-2xl font-normal leading-relaxed select-none">
             A globally scalable platform powered by Octalysis gamification. Connect with passionate creators, play unique indie titles, and fuel your intrinsic motivation.
           </p>
 
-          <div className="mb-10 flex flex-wrap items-center justify-center gap-4">
+          <div className="mb-8 flex flex-wrap items-center justify-center gap-4">
             <a 
               href="/submit" 
               className="px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white rounded-xl text-sm font-bold shadow-[0_0_20px_rgba(236,72,153,0.5)] transition-all inline-flex items-center gap-2 border border-pink-400/40 cursor-pointer"
@@ -194,7 +193,7 @@ export default function Home() {
           </div>
 
           <div className="flex flex-wrap justify-center gap-4">
-            <a href="/community" className="px-6 py-3 bg-slate-900/90 hover:bg-slate-800 text-pink-300 font-medium rounded-xl border border-pink-500/40 shadow-[0_0_15px_rgba(236,72,153,0.2)] transition-all">
+            <a href="/community" className="px-6 py-3 bg-slate-900/90 hover:bg-slate-800 text-pink-300 font-medium rounded-xl border border-pink-500/30 shadow-[0_0_15px_rgba(236,72,153,0.2)] transition-all">
               Explore Community Feed
             </a>
             <a href="/quests" className="px-6 py-3 bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white font-medium rounded-xl border border-slate-700 transition-all">
@@ -204,24 +203,24 @@ export default function Home() {
         </div>
       </div>
 
-      <section className="px-8 py-10 max-w-6xl mx-auto w-full relative z-10">
+      <section className="px-8 py-8 max-w-6xl mx-auto w-full relative z-10">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <span className="text-xs font-bold px-3 py-1 bg-pink-500/20 text-pink-300 rounded-md uppercase tracking-wider border border-pink-500/40 shadow-[0_0_10px_rgba(236,72,153,0.2)]">Live & Hot</span>
+            <span className="text-xs font-bold px-3 py-1 bg-pink-500/20 text-pink-300 rounded-md uppercase tracking-wider border border-pink-500/30 shadow-[0_0_10px_rgba(236,72,153,0.2)]">Live & Hot</span>
             <h2 className="text-2xl font-bold mt-2 text-white">Trending Indie Games</h2>
           </div>
           <div className="flex gap-2">
-            <button className="w-9 h-9 rounded-xl bg-slate-900 border border-pink-500/40 flex items-center justify-center text-pink-400 hover:text-white hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_10px_rgba(236,72,153,0.2)]">
+            <button className="w-9 h-9 rounded-xl bg-slate-900 border border-pink-500/30 flex items-center justify-center text-pink-400 hover:text-white transition-all cursor-pointer shadow-[0_0_10px_rgba(236,72,153,0.2)]">
               ←
             </button>
-            <button className="w-9 h-9 rounded-xl bg-slate-900 border border-pink-500/40 flex items-center justify-center text-pink-400 hover:text-white hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_10px_rgba(236,72,153,0.2)]">
+            <button className="w-9 h-9 rounded-xl bg-slate-900 border border-pink-500/30 flex items-center justify-center text-pink-400 hover:text-white transition-all cursor-pointer shadow-[0_0_10px_rgba(236,72,153,0.2)]">
               →
             </button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-slate-900/90 border border-pink-500/40 rounded-2xl overflow-hidden hover:border-pink-400 transition-all group shadow-[0_0_20px_rgba(236,72,153,0.2)]">
+          <div className="bg-slate-900/90 border border-pink-500/30 rounded-2xl overflow-hidden hover:border-pink-400 transition-all group shadow-[0_0_20px_rgba(236,72,153,0.2)]">
             <div className="h-40 bg-gradient-to-br from-pink-950 via-purple-950 to-slate-950 flex items-center justify-center relative overflow-hidden">
               <span className="text-4xl group-hover:scale-110 transition-transform duration-300">🎮</span>
               <span className="absolute top-3 right-3 px-2 py-0.5 bg-black/70 backdrop-blur-md text-[10px] text-pink-300 rounded-md font-semibold border border-pink-500/40">
@@ -241,7 +240,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="bg-slate-900/90 border border-pink-500/40 rounded-2xl overflow-hidden hover:border-pink-400 transition-all group shadow-[0_0_20px_rgba(236,72,153,0.2)]">
+          <div className="bg-slate-900/90 border border-pink-500/30 rounded-2xl overflow-hidden hover:border-pink-400 transition-all group shadow-[0_0_20px_rgba(236,72,153,0.2)]">
             <div className="h-40 bg-gradient-to-br from-purple-950 via-pink-950 to-slate-950 flex items-center justify-center relative overflow-hidden">
               <span className="text-4xl group-hover:scale-110 transition-transform duration-300">🧩</span>
               <span className="absolute top-3 right-3 px-2 py-0.5 bg-black/70 backdrop-blur-md text-[10px] text-purple-300 rounded-md font-semibold border border-purple-500/40">
@@ -261,7 +260,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="bg-slate-900/90 border border-pink-500/40 rounded-2xl overflow-hidden hover:border-pink-400 transition-all group shadow-[0_0_20px_rgba(236,72,153,0.2)]">
+          <div className="bg-slate-900/90 border border-pink-500/30 rounded-2xl overflow-hidden hover:border-pink-400 transition-all group shadow-[0_0_20px_rgba(236,72,153,0.2)]">
             <div className="h-40 bg-gradient-to-br from-indigo-950 via-pink-950 to-slate-950 flex items-center justify-center relative overflow-hidden">
               <span className="text-4xl group-hover:scale-110 transition-transform duration-300">🚀</span>
               <span className="absolute top-3 right-3 px-2 py-0.5 bg-black/70 backdrop-blur-md text-[10px] text-indigo-300 rounded-md font-semibold border border-pink-500/40">
@@ -286,37 +285,37 @@ export default function Home() {
       <section className="px-8 py-12 max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
         <Link 
           href="/development" 
-          className="block bg-slate-900/90 border border-pink-500/40 p-6 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_20px_rgba(236,72,153,0.15)]"
+          className="block bg-slate-900/90 border border-pink-500/30 p-6 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_20px_rgba(236,72,153,0.15)]"
         >
-          <span className="text-xs font-bold px-2.5 py-1 bg-pink-500/20 text-pink-300 rounded-md border border-pink-500/40">Core Drive 2</span>
+          <span className="text-xs font-bold px-2.5 py-1 bg-pink-500/20 text-pink-300 rounded-md border border-pink-500/30">Core Drive 2</span>
           <h3 className="text-lg font-bold mt-4 mb-2 text-white">Development & Accomplishment</h3>
           <p className="text-sm text-slate-300">Earn points by uploading game builds, completing milestones, and reviewing indie projects.</p>
         </Link>
 
         <Link 
           href="/social-influence" 
-          className="block bg-slate-900/90 border border-pink-500/40 p-6 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_20px_rgba(236,72,153,0.15)]"
+          className="block bg-slate-900/90 border border-pink-500/30 p-6 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_20px_rgba(236,72,153,0.15)]"
         >
-          <span className="text-xs font-bold px-2.5 py-1 bg-purple-500/20 text-purple-300 rounded-md border border-pink-500/40">Core Drive 5</span>
+          <span className="text-xs font-bold px-2.5 py-1 bg-purple-500/20 text-purple-300 rounded-md border border-pink-500/30">Core Drive 5</span>
           <h3 className="text-lg font-bold mt-4 mb-2 text-white">Social Influence & Peer Praise</h3>
           <p className="text-sm text-slate-300">Gain badges, unlock special creator status, and receive peer validation from global gamers.</p>
         </Link>
         
         <Link 
           href="/curiosity" 
-          className="block bg-slate-900/90 border border-pink-500/40 p-6 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_20px_rgba(236,72,153,0.15)]"
+          className="block bg-slate-900/90 border border-pink-500/30 p-6 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_20px_rgba(236,72,153,0.15)]"
         >
-          <span className="text-xs font-bold px-2.5 py-1 bg-indigo-500/20 text-indigo-300 rounded-md border border-pink-500/40">Core Drive 7</span>
+          <span className="text-xs font-bold px-2.5 py-1 bg-indigo-500/20 text-indigo-300 rounded-md border border-pink-500/30">Core Drive 7</span>
           <h3 className="text-lg font-bold mt-4 mb-2 text-white">Unpredictability & Curiosity</h3>
           <p className="text-sm text-slate-300">Unlock secret community drops, mystery game tests, and surprise rewards as you level up.</p>
         </Link>
 
         <Link 
           href="/community/feed" 
-          className="block bg-slate-900/90 border border-pink-500/40 p-6 rounded-2xl hover:border-pink-400 transition-all cursor-pointer md:col-span-3 shadow-[0_0_20px_rgba(236,72,153,0.15)]"
+          className="block bg-slate-900/90 border border-pink-500/30 p-6 rounded-2xl hover:border-pink-400 transition-all cursor-pointer md:col-span-3 shadow-[0_0_20px_rgba(236,72,153,0.15)]"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold px-2.5 py-1 bg-pink-500/20 text-pink-300 rounded-md border border-pink-500/40">Live Feed</span>
+            <span className="text-xs font-bold px-2.5 py-1 bg-pink-500/20 text-pink-300 rounded-md border border-pink-500/30">Live Feed</span>
             <span className="text-[10px] px-2 py-0.5 bg-slate-800 text-pink-300 rounded-md">DevLog #4</span>
           </div>
           <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-white">
@@ -333,7 +332,7 @@ export default function Home() {
       </section>
 
       <section className="px-8 pb-16 max-w-6xl mx-auto w-full relative z-10">
-        <div className="bg-slate-900/95 border border-pink-500/50 rounded-2xl p-8 shadow-[0_0_30px_rgba(236,72,153,0.25)] transition-all">
+        <div className="bg-slate-900/95 border border-pink-500/40 rounded-2xl p-8 shadow-[0_0_30px_rgba(236,72,153,0.2)] transition-all">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 flex items-center justify-center font-bold text-xl text-white shadow-[0_0_15px_rgba(236,72,153,0.5)] border border-pink-400/40">
               BP
@@ -381,7 +380,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="w-full border-t border-pink-500/30 bg-[#030014] py-8 px-8 mt-auto relative z-10">
+      <footer className="w-full border-t border-pink-500/20 bg-[#030014] py-8 px-8 mt-auto relative z-10">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <div>© {new Date().getFullYear()} IndiePulse. All rights reserved.</div>
           <div className="flex gap-6">
