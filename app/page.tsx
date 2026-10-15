@@ -90,7 +90,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Hamburger Menu Drawer containing Navigation & Settings & Activity features */}
+        {/* Hamburger Menu Drawer containing ALL Navigation & Settings features matching Laptop view */}
         {isMenuOpen && (
           <div className="w-full bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-4 shadow-2xl transition-all animate-in fade-in slide-in-from-top-2 z-50 max-h-[80vh] overflow-y-auto">
             
@@ -116,7 +116,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Section 2: Settings and Activity */}
+            {/* Section 2: Settings and Activity (Complete with all features including Blocked Users and Data Deactivation) */}
             <div>
               <div className="text-[10px] uppercase tracking-widest text-pink-400 font-bold px-2 mb-2">Settings and Activity</div>
               <div className="flex flex-col gap-1.5">
@@ -138,6 +138,9 @@ export default function Home() {
                 <a href="/settings/privacy" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
                   <span>🛡️ Account Privacy</span> <span>→</span>
                 </a>
+                <a href="/settings/blocked" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                  <span>🚫 Blocked Users / Restricted</span> <span>→</span>
+                </a>
                 <a href="/settings/theme" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
                   <span>🎨 Dark / Light Theme</span> <span className="text-[10px] text-pink-400 font-bold">Dark</span>
                 </a>
@@ -146,6 +149,9 @@ export default function Home() {
                 </a>
                 <a href="/settings/language" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
                   <span>🌐 Language & Region</span> <span>→</span>
+                </a>
+                <a href="/settings/data-download" onClick={() => setIsMenuOpen(false)} className="px-3 py-2 bg-slate-900/80 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between">
+                  <span>📥 Download Data & Account Deactivation</span> <span>→</span>
                 </a>
               </div>
             </div>
@@ -401,7 +407,7 @@ export default function Home() {
                 {isSending ? (
                   <>
                     <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <circle className="opacity-25" cy="12" cx="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     Sending to Founder...
