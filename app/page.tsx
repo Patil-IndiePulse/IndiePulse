@@ -73,7 +73,7 @@ export default function Home() {
 
             {/* Hamburger Menu Drawer */}
             {isMenuOpen && (
-              <div className="absolute top-full right-0 mt-2 w-72 bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-3 shadow-2xl transition-all animate-in fade-in slide-in-from-top-2 z-50">
+              <div className="absolute top-full right-0 mt-2 w-72 bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-3 shadow-2xl transition-all z-50">
                 
                 {/* Login & Get Started Buttons in Pink */}
                 <div className="flex gap-2 w-full mb-1">
@@ -123,9 +123,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Line 2: Fixed Steam-Style Search Bar (Dark Box with ONLY Blue Search Button on Right) */}
+        {/* Line 2: Forced Steam-Style Search Bar using Inline CSS to bypass Cache */}
         <div className="w-full relative">
-          <div className="w-full flex items-center bg-[#1a1b26] border border-slate-700/80 rounded-lg overflow-hidden shadow-md">
+          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#1a1b26', border: '1px solid #334155', borderRadius: '8px', overflow: 'hidden', width: '100%' }}>
             <input
               type="text"
               value={searchQuery}
@@ -135,14 +135,14 @@ export default function Home() {
               }}
               onFocus={() => setIsSearching(true)}
               placeholder="Search the store"
-              className="flex-1 w-full bg-transparent px-4 py-2 text-xs text-white placeholder-slate-400 italic focus:outline-none min-w-0"
+              style={{ flex: 1, backgroundColor: 'transparent', padding: '8px 14px', fontSize: '12px', color: '#ffffff', fontStyle: 'italic', outline: 'none', border: 'none' }}
             />
             <button 
               type="button"
-              className="bg-[#0098ff] hover:bg-[#007acc] px-4 py-2 flex items-center justify-center transition-colors shrink-0 cursor-pointer"
+              style={{ backgroundColor: '#0098ff', border: 'none', padding: '8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
               aria-label="Search"
             >
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <svg style={{ width: '16px', height: '16px', color: '#ffffff' }} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
             </button>
@@ -313,7 +313,7 @@ export default function Home() {
         <Link 
           href="/social-influence" 
           className="block bg-slate-900/90 border border-pink-500/30 p-6 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_20px_rgba(236,72,153,0.15)]"
-        >
+          >
           <span className="text-xs font-bold px-2.5 py-1 bg-purple-500/20 text-purple-300 rounded-md border border-pink-500/30">Core Drive 5</span>
           <h3 className="text-lg font-bold mt-4 mb-2 text-white">Social Influence & Peer Praise</h3>
           <p className="text-sm text-slate-300">Gain badges, unlock special creator status, and receive peer validation from global gamers.</p>
