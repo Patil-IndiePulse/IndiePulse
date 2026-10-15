@@ -41,7 +41,7 @@ export default function Home() {
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-[140px] pointer-events-none"></div>
 
       {/* Navigation Bar - Strictly Single Line Steam Style Layout */}
-      <nav className="w-full border-b border-pink-500/20 px-2.5 py-2 flex items-center justify-between gap-2 relative z-50 bg-[#030014]">
+      <nav className="w-full border-b border-pink-500/20 px-3 py-2 flex items-center justify-between gap-2 relative z-50 bg-[#030014]">
         
         {/* Left: Slim IndiePulse Logo */}
         <div className="flex flex-col items-start cursor-pointer group shrink-0">
@@ -56,10 +56,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Center: Search Bar in the exact same single line */}
-        <div className="relative flex-1 max-w-xs mx-1">
-          <div className="relative flex items-center">
-            <span className="absolute left-2.5 text-pink-400 text-[10px] z-10 pointer-events-none">🔍</span>
+        {/* Center: Steam-Style Search Bar with Blue Search Button on Right */}
+        <div className="relative flex-1 max-w-sm mx-1.5">
+          <div className="relative flex items-center bg-[#1a1b26] border border-slate-700 rounded-md overflow-hidden shadow-inner">
             <input
               type="text"
               value={searchQuery}
@@ -68,9 +67,18 @@ export default function Home() {
                 setIsSearching(true);
               }}
               onFocus={() => setIsSearching(true)}
-              placeholder="Search store..."
-              className="w-full bg-[#0b071e] border border-pink-500/30 rounded-lg pl-7 pr-2.5 py-1 text-[11px] text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-500/30 transition-all shadow-md block"
+              placeholder="Search the store"
+              className="w-full bg-transparent px-3 py-1.5 text-xs text-white placeholder-slate-400 italic focus:outline-none"
             />
+            <button 
+              type="button"
+              className="bg-[#0098ff] hover:bg-[#007acc] px-3 py-1.5 flex items-center justify-center transition-colors shrink-0 cursor-pointer"
+              aria-label="Search"
+            >
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </button>
           </div>
 
           {isSearching && searchQuery.trim().length > 0 && (
