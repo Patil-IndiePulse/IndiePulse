@@ -40,10 +40,10 @@ export default function Home() {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-600/15 rounded-full blur-[140px] pointer-events-none"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-[140px] pointer-events-none"></div>
 
-      {/* Navigation Bar - Strictly Single Line Steam Style Layout */}
-      <nav className="w-full border-b border-pink-500/20 px-3 py-2 flex items-center justify-between gap-2 relative z-50 bg-[#030014]">
+      {/* Navigation Bar - Steam Style Single Line Layout filling all gaps */}
+      <nav className="w-full border-b border-pink-500/25 px-2.5 py-2 flex items-center justify-between gap-2 relative z-50 bg-[#030014]">
         
-        {/* Left: Slim IndiePulse Logo */}
+        {/* Left: IndiePulse Logo */}
         <div className="flex flex-col items-start cursor-pointer group shrink-0">
           <div className="text-sm md:text-base font-black tracking-wider text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]">
             IndiePulse
@@ -56,8 +56,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Center: Steam-Style Search Bar with Blue Search Button on Right */}
-        <div className="relative flex-1 max-w-sm mx-1.5">
+        {/* Center: Steam-Style Search Bar filling the middle gap perfectly */}
+        <div className="relative flex-1 mx-2">
           <div className="relative flex items-center bg-[#1a1b26] border border-slate-700 rounded-md overflow-hidden shadow-inner">
             <input
               type="text"
