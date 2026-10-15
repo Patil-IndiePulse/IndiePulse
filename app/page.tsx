@@ -90,7 +90,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Hamburger Menu Drawer with Direct Laptop-style Sub-page Links */}
+        {/* Hamburger Menu Drawer with Direct Sub-pages Links */}
         {isMenuOpen && (
           <div className="w-full bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-4 shadow-2xl transition-all animate-in fade-in slide-in-from-top-2 z-50 max-h-[80vh] overflow-y-auto">
             
@@ -116,7 +116,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Section 2: Settings and Activity (Direct Links to Sub-pages) */}
+            {/* Section 2: Settings and Activity (Direct Destination Pages) */}
             <div>
               <div className="text-[10px] uppercase tracking-widest text-pink-400 font-bold px-2 mb-2">Settings and Activity</div>
               <div className="flex flex-col gap-1.5">
@@ -395,7 +395,7 @@ export default function Home() {
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 rows={3}
-                className="w-full bg-slate-800/90 border border-pink-500/40 rounded-xl p-4 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 mb-4 transition-all shadow-inner"
+                className="w-xl bg-slate-800/90 border border-pink-500/40 rounded-xl p-4 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 mb-4 transition-all shadow-inner"
                 placeholder="Write your note or feedback here (e.g., Amazing platform! Would love a dark mode toggle)..."
                 required
               />
@@ -407,7 +407,7 @@ export default function Home() {
                 {isSending ? (
                   <>
                     <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <circle className="opacity-25" cy="12" cx="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     Sending to Founder...
