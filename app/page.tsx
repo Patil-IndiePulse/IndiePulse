@@ -36,18 +36,16 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#030014] text-white flex flex-col relative overflow-x-hidden select-none">
-      {/* Background Neon Glow Effects */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-600/20 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+      {/* Background Unified Glow Effects */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-600/15 rounded-full blur-[140px] pointer-events-none"></div>
+      <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-[140px] pointer-events-none"></div>
 
-      {/* Navigation Bar - Fully Unified Steam-like Compact Layout */}
-      <nav className="w-full border-b border-pink-500/20 px-3 py-2 flex flex-col gap-2 relative z-50 bg-[#030014]">
+      {/* Navigation Bar - Steam Style Unified Layout */}
+      <nav className="w-full border-b border-pink-500/20 px-3 py-2 flex items-center justify-between gap-3 relative z-50 bg-[#030014]">
         
-        {/* Top Row: Logo on Left, Tight Right-aligned Login, Get Started & Hamburger Menu */}
-        <div className="w-full flex items-center justify-between">
-          
-          {/* Left: IndiePulse Logo */}
-          <div className="flex flex-col items-start cursor-pointer group">
+        {/* Left: IndiePulse Logo & Search Box together like Steam */}
+        <div className="flex items-center gap-3 flex-1">
+          <div className="flex flex-col items-start cursor-pointer group shrink-0">
             <div className="text-lg md:text-xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.4)]">
               IndiePulse
             </div>
@@ -59,38 +57,81 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right side: Compact buttons with matching unified colors and no excess spacing */}
-          <div className="flex items-center gap-1.5">
-            <Link 
-              href="/login" 
-              className="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 rounded-md text-[11px] font-medium text-slate-200 border border-pink-500/30 transition-all"
-            >
-              Login
-            </Link>
-            
-            <Link 
-              href="/signup"
-              className="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 rounded-md text-[11px] font-medium text-slate-200 border border-pink-500/30 transition-all"
-            >
-              Get Started
-            </Link>
+          {/* Steam-style Search Bar right next to Logo */}
+          <div className="relative flex-1 max-w-md">
+            <div className="relative flex items-center">
+              <span className="absolute left-3 text-pink-400 text-xs z-10 pointer-events-none">🔍</span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setIsSearching(true);
+                }}
+                onFocus={() => setIsSearching(true)}
+                placeholder="Search the store..."
+                className="w-full bg-[#0b071e] border border-pink-500/30 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-500/30 transition-all shadow-md block"
+              />
+            </div>
 
-            <button 
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-1.5 bg-slate-900 border border-pink-500/30 rounded-lg text-slate-300 hover:text-white transition-all cursor-pointer"
-              aria-label="Toggle Menu"
-            >
-              <svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
-              </svg>
-            </button>
+            {isSearching && searchQuery.trim().length > 0 && (
+              <div className="absolute top-full mt-2 left-0 w-full bg-[#070514] border border-pink-500/50 rounded-xl shadow-2xl overflow-hidden z-50">
+                {mockSearchResults.length > 0 ? (
+                  mockSearchResults.map((item, index) => (
+                    <a
+                      key={index}
+                      href={item.link}
+                      onClick={() => setIsSearching(false)}
+                      className="block px-3 py-2 hover:bg-pink-950/40 border-b border-slate-800/50 last:border-none transition-colors cursor-pointer"
+                    >
+                      <div className="text-xs font-semibold text-white">{item.title}</div>
+                      <div className="text-[9px] text-pink-400 uppercase tracking-wider">{item.type}</div>
+                    </a>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-xs text-slate-400 text-center">
+                    No results found for "{searchQuery}"
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Hamburger Menu Drawer */}
+        {/* Right side: Pink Login button & Hamburger Menu on Extreme Right */}
+        <div className="flex items-center gap-2 shrink-0">
+          <Link 
+            href="/login" 
+            className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 rounded-lg text-xs font-bold text-white border border-pink-400/40 shadow-[0_0_12px_rgba(236,72,153,0.4)] transition-all"
+          >
+            Login
+          </Link>
+
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-2 bg-slate-900 border border-pink-500/30 rounded-xl text-slate-300 hover:text-white transition-all cursor-pointer"
+            aria-label="Toggle Menu"
+          >
+            <svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+
+        {/* Hamburger Menu Drawer with Pink Get Started button inside */}
         {isMenuOpen && (
-          <div className="w-full bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-3 shadow-2xl transition-all animate-in fade-in slide-in-from-top-2 z-50">
-            <div className="text-[10px] uppercase tracking-widest text-pink-400 font-bold px-2 mb-1">Navigation & Control</div>
+          <div className="absolute top-full right-3 mt-2 w-72 bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-3 shadow-2xl transition-all animate-in fade-in slide-in-from-top-2 z-50">
+            
+            {/* Get Started Button inside Hamburger Menu */}
+            <Link 
+              href="/signup"
+              onClick={() => setIsMenuOpen(false)}
+              className="w-full py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-center rounded-xl text-xs font-bold text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.4)] transition-all"
+            >
+              Get Started 🚀
+            </Link>
+
+            <div className="text-[10px] uppercase tracking-widest text-pink-400 font-bold px-2 mt-1 mb-1">Navigation & Control</div>
             
             <a href="/discover" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-sm font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
               <span>🧭 Discover Games & Projects</span> <span>→</span>
@@ -112,53 +153,14 @@ export default function Home() {
               <span>👤 My Profile</span> <span>→</span>
             </a>
 
-            <a href="/menu" onClick={() => setIsMenuOpen(false)} className="mt-2 px-4 py-3.5 bg-gradient-to-r from-pink-600/30 to-purple-600/30 hover:from-pink-600/50 hover:to-purple-600/50 border border-pink-500/50 rounded-xl text-sm font-bold text-pink-300 transition-colors flex items-center justify-between shadow-[0_0_15px_rgba(236,72,153,0.3)]">
+            <a href="/menu" onClick={() => setIsMenuOpen(false)} className="mt-1 px-4 py-3.5 bg-gradient-to-r from-pink-600/30 to-purple-600/30 hover:from-pink-600/50 hover:to-purple-600/50 border border-pink-500/50 rounded-xl text-sm font-bold text-pink-300 transition-colors flex items-center justify-between shadow-[0_0_15px_rgba(236,72,153,0.3)]">
               <span>⚙️ Settings and Activity (Laptop View)</span> <span>→</span>
             </a>
           </div>
         )}
-
-        {/* Full-width Search Bar */}
-        <div className="w-full relative">
-          <div className="w-full relative flex items-center">
-            <span className="absolute left-3 text-pink-400 text-xs z-10 pointer-events-none">🔍</span>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setIsSearching(true);
-              }}
-              onFocus={() => setIsSearching(true)}
-              placeholder="Search games, projects, creators..."
-              className="w-full bg-slate-900/90 border border-pink-500/30 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-500/30 transition-all shadow-md block"
-            />
-          </div>
-
-          {isSearching && searchQuery.trim().length > 0 && (
-            <div className="absolute top-full mt-2 left-0 w-full bg-slate-900 border border-pink-500/50 rounded-xl shadow-2xl overflow-hidden z-50">
-              {mockSearchResults.length > 0 ? (
-                mockSearchResults.map((item, index) => (
-                  <a
-                    key={index}
-                    href={item.link}
-                    onClick={() => setIsSearching(false)}
-                    className="block px-3 py-2 hover:bg-pink-950/40 border-b border-slate-800/50 last:border-none transition-colors cursor-pointer"
-                  >
-                    <div className="text-xs font-semibold text-white">{item.title}</div>
-                    <div className="text-[9px] text-pink-400 uppercase tracking-wider">{item.type}</div>
-                  </a>
-                ))
-              ) : (
-                <div className="px-3 py-2 text-xs text-slate-400 text-center">
-                  No results found for "{searchQuery}"
-                </div>
-              )}
-            </div>
-          )}
-        </div>
       </nav>
 
+      {/* Hero Section */}
       <div className="flex-1 px-8 py-6 max-w-6xl mx-auto w-full flex flex-col relative z-10">
         <div className="flex flex-col items-center justify-center text-center max-w-4xl mx-auto pt-4 pb-4">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-pink-500/40 bg-pink-500/10 text-pink-300 text-xs font-bold tracking-wide uppercase mb-4 shadow-[0_0_20px_rgba(236,72,153,0.3)]">
@@ -203,6 +205,7 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Trending Section */}
       <section className="px-8 py-8 max-w-6xl mx-auto w-full relative z-10">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -282,6 +285,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Core Drives Section */}
       <section className="px-8 py-12 max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
         <Link 
           href="/development" 
@@ -331,6 +335,7 @@ export default function Home() {
         </Link>
       </section>
 
+      {/* Founder's Note Section */}
       <section className="px-8 pb-16 max-w-6xl mx-auto w-full relative z-10">
         <div className="bg-slate-900/95 border border-pink-500/40 rounded-2xl p-8 shadow-[0_0_30px_rgba(236,72,153,0.2)] transition-all">
           <div className="flex items-center gap-4 mb-4">
@@ -380,6 +385,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Footer */}
       <footer className="w-full border-t border-pink-500/20 bg-[#030014] py-8 px-8 mt-auto relative z-10">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <div>© {new Date().getFullYear()} IndiePulse. All rights reserved.</div>
