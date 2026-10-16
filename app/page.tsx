@@ -44,7 +44,7 @@ export default function Home() {
       <nav className="w-full bg-[#171a21] border-b border-[#2a475e] px-4 py-3 flex flex-col gap-2.5 relative z-50">
         
         {/* Line 1: Hamburger Menu & Stable Steam Search Bar */}
-        <div className="w-full flex items-center gap-2">
+        <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', alignItems: 'center', width: '100%', gap: '8px', boxSizing: 'border-box' }} className="relative">
           
           {/* Three Lines (Hamburger Menu Button) */}
           <div className="relative shrink-0">
@@ -109,8 +109,8 @@ export default function Home() {
             )}
           </div>
 
-          {/* Stable Steam-Style Search Bar (Fixed Layout) */}
-          <div className="flex-1 flex items-center bg-[#313843] border border-[#000000] rounded overflow-hidden w-full max-w-full">
+          {/* Stable Steam-Style Grid Search Bar (Fixed Layout) */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', backgroundColor: '#313843', border: '1px solid #000000', borderRadius: '4px', overflow: 'hidden', width: '100%', boxSizing: 'border-box' }}>
             <input
               type="text"
               value={searchQuery}
@@ -120,14 +120,14 @@ export default function Home() {
               }}
               onFocus={() => setIsSearching(true)}
               placeholder="Search the store"
-              className="w-full bg-transparent px-3 py-2 text-xs text-white italic outline-none border-none min-w-0"
+              style={{ width: '100%', backgroundColor: 'transparent', padding: '8px 10px', fontSize: '12px', color: '#ffffff', fontStyle: 'italic', outline: 'none', border: 'none', boxSizing: 'border-box', minWidth: 0 }}
             />
             <button 
               type="button"
-              className="bg-[#0098ff] border-none px-3.5 py-2 flex items-center justify-center cursor-pointer shrink-0"
+              style={{ backgroundColor: '#0098ff', border: 'none', padding: '8px 14px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
               aria-label="Search"
             >
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <svg style={{ width: '16px', height: '16px', color: '#ffffff' }} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
             </button>
@@ -330,7 +330,7 @@ export default function Home() {
           href="/curiosity" 
           className="block bg-slate-900/90 border border-pink-500/30 p-6 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_20px_rgba(236,72,153,0.15)]"
         >
-          <span className="text-xs font-bold px-2.5 py-1 bg-indigo-500/20 text-indigo-300 rounded-md border border-pink-500/30">Core Drive 7</span>
+          <span className="text-xs font-bold px-2.5 py-1 bg-indigo-500/20 text-indigo-300 rounded-md border border-indigo-500/30">Core Drive 7</span>
           <h3 className="text-lg font-bold mt-4 mb-2 text-white">Unpredictability & Curiosity</h3>
           <p className="text-sm text-slate-300">Unlock secret community drops, mystery game tests, and surprise rewards as you level up.</p>
         </Link>
