@@ -40,77 +40,77 @@ export default function Home() {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-600/15 rounded-full blur-[140px] pointer-events-none"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-[140px] pointer-events-none"></div>
 
-      {/* Navigation Bar - Exact Steam Platform Layout with All Original Features Kept */}
-      <nav style={{ width: '100%', backgroundColor: '#171a21', borderBottom: '1px solid #2a475e', padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative', zIndex: 50 }}>
+      {/* Navigation Bar - Steam Compact Style without Logo */}
+      <nav className="w-full bg-[#171a21] border-b border-[#2a475e] px-4 py-2.5 flex flex-col gap-2 relative z-50">
         
-        {/* Line 1: Hamburger Menu (Three Lines) on Left & Steam-Style Search Bar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
+        {/* Line 1: Hamburger Menu & Search Bar */}
+        <div className="w-full flex items-center gap-3">
           
-          {/* Three Lines (Hamburger Menu Button) */}
-          <div style={{ position: 'relative', flexShrink: 0 }}>
+          {/* Hamburger Menu Button */}
+          <div className="relative shrink-0">
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              style={{ background: '#21242d', border: '1px solid #32353c', borderRadius: '3px', padding: '7px 10px', color: '#c7d5e0', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              className="p-2 bg-[#21242d] border border-[#32353c] rounded text-[#c7d5e0] hover:text-white transition-all cursor-pointer flex items-center justify-center"
               aria-label="Toggle Menu"
             >
-              <svg style={{ width: '18px', height: '18px' }} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
               </svg>
             </button>
 
             {/* Hamburger Menu Drawer */}
             {isMenuOpen && (
-              <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: '8px', width: '280px', backgroundColor: '#070514', border: '1px solid rgba(236,72,153,0.4)', borderRadius: '16px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)', zIndex: 100 }}>
+              <div className="absolute top-full left-0 mt-2 w-72 bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-3 shadow-2xl transition-all z-50">
                 
                 {/* Login & Get Started Buttons in Pink */}
-                <div style={{ display: 'flex', gap: '8px', width: '100%', marginBottom: '4px' }}>
+                <div className="flex gap-2 w-full mb-1">
                   <Link 
                     href="/login"
                     onClick={() => setIsMenuOpen(false)}
-                    style={{ flex: 1, padding: '10px 0', background: 'linear-gradient(to right, #db2777, #9333ea)', textAlign: 'center', borderRadius: '10px', fontSize: '12px', fontWeight: 'bold', color: '#fff', border: '1px solid rgba(236,72,153,0.4)', textDecoration: 'none' }}
+                    className="flex-1 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-center rounded-xl text-xs font-bold text-white border border-pink-400/40 shadow-[0_0_12px_rgba(236,72,153,0.4)] transition-all"
                   >
                     Login
                   </Link>
                   <Link 
                     href="/signup"
                     onClick={() => setIsMenuOpen(false)}
-                    style={{ flex: 1, padding: '10px 0', background: 'linear-gradient(to right, #db2777, #9333ea)', textAlign: 'center', borderRadius: '10px', fontSize: '12px', fontWeight: 'bold', color: '#fff', border: '1px solid rgba(236,72,153,0.4)', textDecoration: 'none' }}
+                    className="flex-1 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-center rounded-xl text-xs font-bold text-white border border-pink-400/40 shadow-[0_0_12px_rgba(236,72,153,0.4)] transition-all"
                   >
                     Get Started
                   </Link>
                 </div>
 
-                <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#ec4899', fontWeight: 'bold', paddingLeft: '4px' }}>Navigation & Control</div>
+                <div className="text-[10px] uppercase tracking-widest text-pink-400 font-bold px-1 mt-1">Navigation & Control</div>
                 
-                <a href="/discover" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 12px', backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid #1e293b', borderRadius: '10px', fontSize: '12px', color: '#e2e8f0', textDecoration: 'none', display: 'flex', justifyContent: 'space-between' }}>
+                <a href="/discover" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
                   <span>🧭 Discover Games & Projects</span> <span>→</span>
                 </a>
 
-                <a href="/community" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 12px', backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid #1e293b', borderRadius: '10px', fontSize: '12px', color: '#e2e8f0', textDecoration: 'none', display: 'flex', justifyContent: 'space-between' }}>
+                <a href="/community" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
                   <span>💬 Community Feed</span> <span>→</span>
                 </a>
 
-                <a href="/leaderboard" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 12px', backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid #1e293b', borderRadius: '10px', fontSize: '12px', color: '#e2e8f0', textDecoration: 'none', display: 'flex', justifyContent: 'space-between' }}>
+                <a href="/leaderboard" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
                   <span>🏆 Leaderboard & Rankings</span> <span>→</span>
                 </a>
 
-                <a href="/quests" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 12px', backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid #1e293b', borderRadius: '10px', fontSize: '12px', color: '#e2e8f0', textDecoration: 'none', display: 'flex', justifyContent: 'space-between' }}>
+                <a href="/quests" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
                   <span>⚡ Quests & Rewards</span> <span>→</span>
                 </a>
 
-                <a href="/profile" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 12px', backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid #1e293b', borderRadius: '10px', fontSize: '12px', color: '#e2e8f0', textDecoration: 'none', display: 'flex', justifyContent: 'space-between' }}>
+                <a href="/profile" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-2.5 bg-slate-900/90 hover:bg-pink-950/40 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 hover:text-pink-300 transition-colors flex items-center justify-between">
                   <span>👤 My Profile</span> <span>→</span>
                 </a>
 
-                <a href="/menu" onClick={() => setIsMenuOpen(false)} style={{ marginTop: '4px', padding: '12px', background: 'linear-gradient(to right, rgba(219,39,119,0.3), rgba(147,51,234,0.3))', border: '1px solid rgba(236,72,153,0.5)', borderRadius: '10px', fontSize: '12px', fontWeight: 'bold', color: '#f472b6', textDecoration: 'none', display: 'flex', justifyContent: 'space-between' }}>
+                <a href="/menu" onClick={() => setIsMenuOpen(false)} className="mt-1 px-3.5 py-3 bg-gradient-to-r from-pink-600/30 to-purple-600/30 hover:from-pink-600/50 hover:to-purple-600/50 border border-pink-500/50 rounded-xl text-xs font-bold text-pink-300 transition-colors flex items-center justify-between shadow-[0_0_15px_rgba(236,72,153,0.3)]">
                   <span>⚙️ Settings and Activity (Laptop View)</span> <span>→</span>
                 </a>
               </div>
             )}
           </div>
 
-          {/* Steam-Style Exact Search Bar (Dark box with only blue search button on right) */}
-          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#313843', border: '1px solid #000000', borderRadius: '3px', overflow: 'hidden', flex: 1, boxSizing: 'border-box' }}>
+          {/* Steam-Style Search Bar */}
+          <div className="w-full flex items-center bg-[#313843] border border-black rounded overflow-hidden">
             <input
               type="text"
               value={searchQuery}
@@ -120,14 +120,14 @@ export default function Home() {
               }}
               onFocus={() => setIsSearching(true)}
               placeholder="Search the store"
-              style={{ flex: 1, width: '100%', backgroundColor: 'transparent', padding: '6px 10px', fontSize: '12px', color: '#ffffff', fontStyle: 'italic', outline: 'none', border: 'none', minWidth: 0 }}
+              className="flex-1 bg-transparent px-3 py-1.5 text-xs text-white italic outline-none border-none min-w-0"
             />
             <button 
               type="button"
-              style={{ backgroundColor: '#0098ff', border: 'none', padding: '6px 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
+              className="bg-[#0098ff] border-none px-3 py-1.5 flex items-center justify-center cursor-pointer shrink-0"
               aria-label="Search"
             >
-              <svg style={{ width: '14px', height: '14px', color: '#ffffff' }} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
             </button>
@@ -157,19 +157,33 @@ export default function Home() {
           )}
         </div>
 
-        {/* Line 2: Steam Quick Links (Browse, Recommendations, More) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '11px', color: '#c7d5e0', paddingLeft: '2px', overflowX: 'auto', whiteSpace: 'nowrap', paddingBottom: '2px' }}>
-          <a href="/discover" style={{ color: '#c7d5e0', textDecoration: 'none' }}>Browse ▾</a>
-          <a href="/quests" style={{ color: '#c7d5e0', textDecoration: 'none' }}>Recommendations ▾</a>
-          <a href="/community" style={{ color: '#c7d5e0', textDecoration: 'none' }}>More ▾</a>
-          <a href="/profile" style={{ color: '#66c0f4', textDecoration: 'none', marginLeft: 'auto' }}>IndiePulse Store</a>
+        {/* Line 2: Steam Quick Links */}
+        <div className="w-full flex items-center gap-4 text-xs text-[#c7d5e0] overflow-x-auto whitespace-nowrap pb-1">
+          <a href="/discover" className="hover:text-white">Browse ▾</a>
+          <a href="/quests" className="hover:text-white">Recommendations ▾</a>
+          <a href="/community" className="hover:text-white">More ▾</a>
+          <a href="/profile" className="text-[#66c0f4] ml-auto">IndiePulse Store</a>
         </div>
 
       </nav>
 
       {/* Hero Section */}
       <div className="flex-1 px-8 py-6 max-w-6xl mx-auto w-full flex flex-col relative z-10">
-        <div className="flex flex-col items-center justify-center text-center max-w-4xl mx-auto pt-4 pb-4">
+        
+        {/* IndiePulse Logo Placed on Left Corner of Main Page */}
+        <div className="flex flex-col items-start cursor-pointer group mb-6">
+          <div className="text-2xl md:text-3xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_12px_rgba(249,115,22,0.5)]">
+            IndiePulse
+          </div>
+          <div className="w-full flex justify-start -mt-1">
+            <svg className="w-28 h-3 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.9)]" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 2C38 16 102 16 136 4" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+              <path d="M122 2L136 4L128 13" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-center text-center max-w-4xl mx-auto pt-2 pb-4">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-pink-500/40 bg-pink-500/10 text-pink-300 text-xs font-bold tracking-wide uppercase mb-4 shadow-[0_0_20px_rgba(236,72,153,0.3)]">
             <span>✦</span> NEXT-GEN INDIE GAME ECOSYSTEM
           </div>
@@ -305,7 +319,7 @@ export default function Home() {
 
         <Link 
           href="/social-influence" 
-          className="block bg-slate-900/90 border border-pink-500/30 p-6 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_20px_rgba(236,72,153,0.15)]"
+          className="block bg-slate-900/90 border border-pink-500/30 p-6 rounded-2xl hover:border-pink-400 transition-allcursor-pointer shadow-[0_0_20px_rgba(236,72,153,0.15)]"
         >
           <span className="text-xs font-bold px-2.5 py-1 bg-purple-500/20 text-purple-300 rounded-md border border-pink-500/30">Core Drive 5</span>
           <h3 className="text-lg font-bold mt-4 mb-2 text-white">Social Influence & Peer Praise</h3>
@@ -405,4 +419,4 @@ export default function Home() {
       </footer>
     </main>
   );
-}
+} 
