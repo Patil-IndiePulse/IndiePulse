@@ -40,8 +40,8 @@ export default function Home() {
       <div className="absolute top-0 left-1/4. w-96 h-96 bg-pink-600/15 rounded-full blur-[140px] pointer-events-none"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-[140px] pointer-events-none"></div>
 
-      {/* Navigation Bar - Steam Mobile Platform Style (Without Quick Links Line) */}
-      <nav className="w-full bg-[#171a21] border-b border-[#2a475e] px-4 py-3 flex flex-col gap-2 relative z-50">
+      {/* Navigation Bar - Steam Mobile Platform Style */}
+      <nav className="w-full bg-[#171a21] border-b border-[#2a475e] px-4 py-3 flex flex-col gap-2.5 relative z-50">
         
         {/* Line 1: Hamburger Menu & Stable Steam Search Bar */}
         <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', alignItems: 'center', width: '100%', gap: '8px', boxSizing: 'border-box' }} className="relative">
@@ -109,7 +109,7 @@ export default function Home() {
             )}
           </div>
 
-          {/* Stable Steam-Style Grid Search Bar (Fixed Layout) */}
+          {/* Stable Steam-Style Grid Search Bar */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', backgroundColor: '#313843', border: '1px solid #000000', borderRadius: '4px', overflow: 'hidden', width: '100%', boxSizing: 'border-box' }}>
             <input
               type="text"
@@ -162,32 +162,30 @@ export default function Home() {
       {/* Hero Section */}
       <div className="flex-1 px-6 py-6 max-w-6xl mx-auto w-full flex flex-col relative z-10">
         
-        {/* Top Header Row: Compact IndiePulse Logo on Left & Instagram-Style Profile DP Circle on Right Corner */}
+        {/* Top Header Row: Compact IndiePulse Logo on Left & WhatsApp-Style Medium Profile Avatar on Right Corner */}
         <div className="w-full flex items-center justify-between mb-6">
           
-          {/* Compact IndiePulse Logo */}
+          {/* Compact IndiePulse Logo with Perfectly Aligned Bottom Curve */}
           <div className="flex flex-col items-start cursor-pointer group">
-            <div className="text-2xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]">
+            <div className="text-xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]">
               IndiePulse
             </div>
             <div className="w-full flex justify-start -mt-1">
-              <svg className="w-24 h-2.5 text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.9)]" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 2C38 16 102 16 136 4" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-                <path d="M122 2L136 4L128 13" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+              <svg className="w-20 h-2 text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.9)]" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 2C38 16 102 16 136 4" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" />
+                <path d="M122 2L136 4L128 13" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
           </div>
 
-          {/* Instagram-Style User Profile DP Circle on Right Corner */}
+          {/* WhatsApp-Style Default User Avatar (Medium Size) on Right Corner */}
           <Link href="/profile" className="relative group cursor-pointer" aria-label="User Profile">
-            <div className="w-11 h-11 rounded-full p-[2px] bg-gradient-to-tr from-pink-500 via-purple-500 to-yellow-400 shadow-[0_0_12px_rgba(236,72,153,0.5)] transition-transform group-hover:scale-105">
-              <div className="w-full h-full rounded-full bg-slate-900 overflow-hidden flex items-center justify-center border-2 border-[#030014]">
-                {/* Replace src with actual user profile image state/prop if available */}
-                <img 
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" 
-                  alt="User Profile" 
-                  className="w-full h-full object-cover"
-                />
+            <div className="w-12 h-12 rounded-full p-[2px] bg-gradient-to-tr from-pink-500 via-purple-500 to-yellow-400 shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-transform group-hover:scale-105">
+              <div className="w-full h-full rounded-full bg-[#0a192f] overflow-hidden flex items-center justify-center border-2 border-[#030014]">
+                {/* WhatsApp Style Default User Vector Icon */}
+                <svg className="w-7 h-7 text-[#38bdf8] translate-y-1" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
               </div>
             </div>
             {/* Online Status Dot */}
