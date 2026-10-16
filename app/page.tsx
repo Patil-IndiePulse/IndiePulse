@@ -40,8 +40,8 @@ export default function Home() {
       <div className="absolute top-0 left-1/4. w-96 h-96 bg-pink-600/15 rounded-full blur-[140px] pointer-events-none"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-[140px] pointer-events-none"></div>
 
-      {/* Navigation Bar - Steam Mobile Platform Style (Stable Search Bar) */}
-      <nav className="w-full bg-[#171a21] border-b border-[#2a475e] px-4 py-3 flex flex-col gap-2.5 relative z-50">
+      {/* Navigation Bar - Steam Mobile Platform Style (Without Quick Links Line) */}
+      <nav className="w-full bg-[#171a21] border-b border-[#2a475e] px-4 py-3 flex flex-col gap-2 relative z-50">
         
         {/* Line 1: Hamburger Menu & Stable Steam Search Bar */}
         <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', alignItems: 'center', width: '100%', gap: '8px', boxSizing: 'border-box' }} className="relative">
@@ -157,30 +157,43 @@ export default function Home() {
           )}
         </div>
 
-        {/* Line 2: Steam Quick Links */}
-        <div className="w-full flex items-center gap-4 text-xs text-[#c7d5e0] overflow-x-auto whitespace-nowrap pb-1">
-          <a href="/discover" className="hover:text-white">Browse ▾</a>
-          <a href="/quests" className="hover:text-white">Recommendations ▾</a>
-          <a href="/community" className="hover:text-white">More ▾</a>
-          <a href="/profile" className="text-[#66c0f4] ml-auto">IndiePulse Store</a>
-        </div>
-
       </nav>
 
       {/* Hero Section */}
       <div className="flex-1 px-6 py-6 max-w-6xl mx-auto w-full flex flex-col relative z-10">
         
-        {/* IndiePulse Logo Placed on Left Corner */}
-        <div className="flex flex-col items-start cursor-pointer group mb-6">
-          <div className="text-3xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_12px_rgba(249,115,22,0.5)]">
-            IndiePulse
+        {/* Top Header Row: Compact IndiePulse Logo on Left & Instagram-Style Profile DP Circle on Right Corner */}
+        <div className="w-full flex items-center justify-between mb-6">
+          
+          {/* Compact IndiePulse Logo */}
+          <div className="flex flex-col items-start cursor-pointer group">
+            <div className="text-2xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]">
+              IndiePulse
+            </div>
+            <div className="w-full flex justify-start -mt-1">
+              <svg className="w-24 h-2.5 text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.9)]" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 2C38 16 102 16 136 4" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+                <path d="M122 2L136 4L128 13" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
           </div>
-          <div className="w-full flex justify-start -mt-1">
-            <svg className="w-32 h-3 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.9)]" viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 2C38 16 102 16 136 4" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-              <path d="M122 2L136 4L128 13" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
+
+          {/* Instagram-Style User Profile DP Circle on Right Corner */}
+          <Link href="/profile" className="relative group cursor-pointer" aria-label="User Profile">
+            <div className="w-11 h-11 rounded-full p-[2px] bg-gradient-to-tr from-pink-500 via-purple-500 to-yellow-400 shadow-[0_0_12px_rgba(236,72,153,0.5)] transition-transform group-hover:scale-105">
+              <div className="w-full h-full rounded-full bg-slate-900 overflow-hidden flex items-center justify-center border-2 border-[#030014]">
+                {/* Replace src with actual user profile image state/prop if available */}
+                <img 
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" 
+                  alt="User Profile" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+            {/* Online Status Dot */}
+            <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-[#030014] rounded-full"></span>
+          </Link>
+
         </div>
 
         <div className="flex flex-col items-center justify-center text-center max-w-4xl mx-auto pt-2 pb-4">
@@ -330,7 +343,7 @@ export default function Home() {
           href="/curiosity" 
           className="block bg-slate-900/90 border border-pink-500/30 p-6 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_20px_rgba(236,72,153,0.15)]"
         >
-          <span className="text-xs font-bold px-2.5 py-1 bg-indigo-500/20 text-indigo-300 rounded-md border border-indigo-500/30">Core Drive 7</span>
+          <span className="text-xs font-bold px-2.5 py-1 bg-indigo-500/20 text-indigo-300 rounded-md border border-pink-500/30">Core Drive 7</span>
           <h3 className="text-lg font-bold mt-4 mb-2 text-white">Unpredictability & Curiosity</h3>
           <p className="text-sm text-slate-300">Unlock secret community drops, mystery game tests, and surprise rewards as you level up.</p>
         </Link>
