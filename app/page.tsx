@@ -40,42 +40,29 @@ export default function Home() {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-600/15 rounded-full blur-[140px] pointer-events-none"></div>
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-[140px] pointer-events-none"></div>
 
-      {/* Navigation Bar - Bulletproof Flexbox Layout */}
-      <nav style={{ width: '100%', backgroundColor: '#030014', borderBottom: '1px solid rgba(236, 72, 153, 0.25)', padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '12px', position: 'relative', zIndex: 50 }}>
+      {/* Navigation Bar - Exact Steam Platform Layout with All Original Features Kept */}
+      <nav style={{ width: '100%', backgroundColor: '#171a21', borderBottom: '1px solid #2a475e', padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative', zIndex: 50 }}>
         
-        {/* Line 1: IndiePulse Logo & Hamburger Menu */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+        {/* Line 1: Hamburger Menu (Three Lines) on Left & Steam-Style Search Bar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
           
-          {/* IndiePulse Logo - Fully Safe and Visible */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', cursor: 'pointer', paddingLeft: '2px' }}>
-            <div style={{ fontSize: '18px', fontWeight: 900, letterSpacing: '0.05em', color: '#f97316', textShadow: '0 0 10px rgba(249,115,22,0.4)' }}>
-              IndiePulse
-            </div>
-            <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '-4px' }}>
-              <svg style={{ width: '85px', height: '10px', color: '#facc15', filter: 'drop-shadow(0 0 8px rgba(250,204,21,0.9))' }} viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 2C38 16 102 16 136 4" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-                <path d="M122 2L136 4L128 13" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-          </div>
-
           {/* Three Lines (Hamburger Menu Button) */}
-          <div style={{ position: 'relative', paddingRight: '2px' }}>
+          <div style={{ position: 'relative', flexShrink: 0 }}>
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              style={{ background: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(236, 72, 153, 0.3)', borderRadius: '10px', padding: '10px', color: '#ec4899', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 10px rgba(236,72,153,0.2)' }}
+              style={{ background: '#21242d', border: '1px solid #32353c', borderRadius: '3px', padding: '7px 10px', color: '#c7d5e0', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               aria-label="Toggle Menu"
             >
-              <svg style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+              <svg style={{ width: '18px', height: '18px' }} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
               </svg>
             </button>
 
             {/* Hamburger Menu Drawer */}
             {isMenuOpen && (
-              <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '8px', width: '280px', backgroundColor: '#070514', border: '1px solid rgba(236,72,153,0.4)', borderRadius: '16px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)', zIndex: 100 }}>
+              <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: '8px', width: '280px', backgroundColor: '#070514', border: '1px solid rgba(236,72,153,0.4)', borderRadius: '16px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)', zIndex: 100 }}>
                 
-                {/* Login & Get Started Buttons */}
+                {/* Login & Get Started Buttons in Pink */}
                 <div style={{ display: 'flex', gap: '8px', width: '100%', marginBottom: '4px' }}>
                   <Link 
                     href="/login"
@@ -96,7 +83,7 @@ export default function Home() {
                 <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#ec4899', fontWeight: 'bold', paddingLeft: '4px' }}>Navigation & Control</div>
                 
                 <a href="/discover" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 12px', backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid #1e293b', borderRadius: '10px', fontSize: '12px', color: '#e2e8f0', textDecoration: 'none', display: 'flex', justifyContent: 'space-between' }}>
-                  <span>🧭 Discover Games</span> <span>→</span>
+                  <span>🧭 Discover Games & Projects</span> <span>→</span>
                 </a>
 
                 <a href="/community" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 12px', backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid #1e293b', borderRadius: '10px', fontSize: '12px', color: '#e2e8f0', textDecoration: 'none', display: 'flex', justifyContent: 'space-between' }}>
@@ -104,7 +91,7 @@ export default function Home() {
                 </a>
 
                 <a href="/leaderboard" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 12px', backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid #1e293b', borderRadius: '10px', fontSize: '12px', color: '#e2e8f0', textDecoration: 'none', display: 'flex', justifyContent: 'space-between' }}>
-                  <span>🏆 Leaderboard</span> <span>→</span>
+                  <span>🏆 Leaderboard & Rankings</span> <span>→</span>
                 </a>
 
                 <a href="/quests" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 12px', backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid #1e293b', borderRadius: '10px', fontSize: '12px', color: '#e2e8f0', textDecoration: 'none', display: 'flex', justifyContent: 'space-between' }}>
@@ -114,14 +101,16 @@ export default function Home() {
                 <a href="/profile" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 12px', backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid #1e293b', borderRadius: '10px', fontSize: '12px', color: '#e2e8f0', textDecoration: 'none', display: 'flex', justifyContent: 'space-between' }}>
                   <span>👤 My Profile</span> <span>→</span>
                 </a>
+
+                <a href="/menu" onClick={() => setIsMenuOpen(false)} style={{ marginTop: '4px', padding: '12px', background: 'linear-gradient(to right, rgba(219,39,119,0.3), rgba(147,51,234,0.3))', border: '1px solid rgba(236,72,153,0.5)', borderRadius: '10px', fontSize: '12px', fontWeight: 'bold', color: '#f472b6', textDecoration: 'none', display: 'flex', justifyContent: 'space-between' }}>
+                  <span>⚙️ Settings and Activity (Laptop View)</span> <span>→</span>
+                </a>
               </div>
             )}
           </div>
-        </div>
 
-        {/* Line 2: Guaranteed Steam-Style Search Bar (Dark box with ONLY blue search button on right) */}
-        <div style={{ width: '100%', position: 'relative' }}>
-          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#1a1b26', border: '1px solid #334155', borderRadius: '8px', overflow: 'hidden', width: '100%', boxSizing: 'border-box' }}>
+          {/* Steam-Style Exact Search Bar (Dark box with only blue search button on right) */}
+          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#313843', border: '1px solid #000000', borderRadius: '3px', overflow: 'hidden', flex: 1, boxSizing: 'border-box' }}>
             <input
               type="text"
               value={searchQuery}
@@ -131,14 +120,14 @@ export default function Home() {
               }}
               onFocus={() => setIsSearching(true)}
               placeholder="Search the store"
-              style={{ flex: 1, width: '100%', backgroundColor: 'transparent', padding: '10px 14px', fontSize: '13px', color: '#ffffff', fontStyle: 'italic', outline: 'none', border: 'none', minWidth: 0 }}
+              style={{ flex: 1, width: '100%', backgroundColor: 'transparent', padding: '6px 10px', fontSize: '12px', color: '#ffffff', fontStyle: 'italic', outline: 'none', border: 'none', minWidth: 0 }}
             />
             <button 
               type="button"
-              style={{ backgroundColor: '#0098ff', border: 'none', padding: '10px 18px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
+              style={{ backgroundColor: '#0098ff', border: 'none', padding: '6px 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
               aria-label="Search"
             >
-              <svg style={{ width: '16px', height: '16px', color: '#ffffff' }} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <svg style={{ width: '14px', height: '14px', color: '#ffffff' }} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
             </button>
@@ -146,17 +135,17 @@ export default function Home() {
 
           {/* Search Results Dropdown */}
           {isSearching && searchQuery.trim().length > 0 && (
-            <div className="absolute top-full mt-2 left-0 w-full bg-[#070514] border border-pink-500/50 rounded-xl shadow-2xl overflow-hidden z-50">
+            <div className="absolute top-full mt-2 left-0 w-full bg-[#171a21] border border-[#2a475e] rounded-lg shadow-2xl overflow-hidden z-50">
               {mockSearchResults.length > 0 ? (
                 mockSearchResults.map((item, index) => (
                   <a
                     key={index}
                     href={item.link}
                     onClick={() => setIsSearching(false)}
-                    className="block px-3 py-2 hover:bg-pink-950/40 border-b border-slate-800/50 last:border-none transition-colors cursor-pointer"
+                    className="block px-3 py-2 hover:bg-[#21242d] border-b border-[#2a475e]/50 last:border-none transition-colors cursor-pointer"
                   >
                     <div className="text-xs font-semibold text-white">{item.title}</div>
-                    <div className="text-[9px] text-pink-400 uppercase tracking-wider">{item.type}</div>
+                    <div className="text-[9px] text-[#66c0f4] uppercase tracking-wider">{item.type}</div>
                   </a>
                 ))
               ) : (
@@ -166,6 +155,14 @@ export default function Home() {
               )}
             </div>
           )}
+        </div>
+
+        {/* Line 2: Steam Quick Links (Browse, Recommendations, More) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '11px', color: '#c7d5e0', paddingLeft: '2px', overflowX: 'auto', whiteSpace: 'nowrap', paddingBottom: '2px' }}>
+          <a href="/discover" style={{ color: '#c7d5e0', textDecoration: 'none' }}>Browse ▾</a>
+          <a href="/quests" style={{ color: '#c7d5e0', textDecoration: 'none' }}>Recommendations ▾</a>
+          <a href="/community" style={{ color: '#c7d5e0', textDecoration: 'none' }}>More ▾</a>
+          <a href="/profile" style={{ color: '#66c0f4', textDecoration: 'none', marginLeft: 'auto' }}>IndiePulse Store</a>
         </div>
 
       </nav>
