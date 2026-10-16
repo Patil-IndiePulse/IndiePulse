@@ -110,7 +110,7 @@ export default function Home() {
           </div>
 
           {/* Stable Steam-Style Search Bar (Fixed Layout) */}
-          <div className="flex-1 flex items-center bg-[#313843] border border-[#000000] rounded overflow-hidden">
+          <div className="flex-1 flex items-center bg-[#313843] border border-[#000000] rounded overflow-hidden w-full max-w-full">
             <input
               type="text"
               value={searchQuery}
@@ -120,7 +120,7 @@ export default function Home() {
               }}
               onFocus={() => setIsSearching(true)}
               placeholder="Search the store"
-              className="w-full bg-transparent px-3 py-2 text-xs text-white italic outline-none border-none"
+              className="w-full bg-transparent px-3 py-2 text-xs text-white italic outline-none border-none min-w-0"
             />
             <button 
               type="button"
