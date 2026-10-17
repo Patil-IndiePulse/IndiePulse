@@ -15,15 +15,15 @@ export default function SettingDetailPage() {
     : 'Setting Details';
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white flex flex-col px-4 py-6 max-w-2xl mx-auto w-full">
+    <main className="min-h-screen bg-slate-950 text-white flex flex-col px-4 py-6 max-w-2xl mx-auto w-full select-none">
       
-      {/* Header with Back Button */}
+      {/* Header with Pink 'Back' Button */}
       <div className="flex flex-col items-start gap-4 mb-6">
         <Link 
           href="/menu" 
-          className="w-10 h-10 rounded-full bg-indigo-600 hover:bg-indigo-500 border border-indigo-500/50 flex items-center justify-center text-white text-2xl font-extrabold shadow-lg shadow-indigo-500/30 transition-all"
+          className="px-6 py-2.5 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-sm font-bold shadow-[0_0_20px_rgba(236,72,153,0.5)] border border-pink-400/40 transition-all flex items-center justify-center cursor-pointer"
         >
-          ←
+          Back
         </Link>
         <h1 className="text-2xl font-bold text-white tracking-wide">{title}</h1>
       </div>
@@ -47,7 +47,7 @@ export default function SettingDetailPage() {
 
           <button 
             onClick={() => alert('Changes saved successfully!')}
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all"
+            className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
           >
             Save Changes
           </button>
