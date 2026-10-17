@@ -159,24 +159,25 @@ export default function Home() {
 
       </nav>
 
-      {/* Hero Section with Enhanced Mobile Spacing & Bold Branding */}
+      {/* Hero Section */}
       <div className="flex-1 px-5 py-8 max-w-6xl mx-auto w-full flex flex-col relative z-10">
         
-        {/* Top Header Row: WhatsApp-Style Profile DP on Left & Highly Bold IndiePulse Logo on Right */}
+        {/* Top Header Row: Classic Pink-Themed User Avatar DP on Left & Bold IndiePulse Logo on Right */}
         <div className="w-full flex items-center justify-between mb-8 px-1">
           
-          {/* WhatsApp-Style User Avatar (Large & Clear) */}
+          {/* Classic Round User Avatar DP with Pink/Purple Theme Match */}
           <Link href="/profile" className="relative group cursor-pointer" aria-label="User Profile">
-            <div className="w-16 h-16 rounded-full p-[2.5px] bg-gradient-to-tr from-pink-500 via-purple-500 to-yellow-400 shadow-[0_0_20px_rgba(236,72,153,0.6)] transition-transform group-hover:scale-105">
-              <div className="w-full h-full rounded-full bg-[#0a192f] overflow-hidden flex items-center justify-center border-2 border-[#030014]">
-                <svg className="w-9 h-9 text-[#38bdf8] translate-y-1.5" fill="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 rounded-full p-[2.5px] bg-gradient-to-tr from-pink-500 via-purple-500 to-pink-400 shadow-[0_0_20px_rgba(236,72,153,0.6)] transition-transform group-hover:scale-105">
+              <div className="w-full h-full rounded-full bg-[#111827] overflow-hidden flex items-center justify-center border-2 border-[#030014]">
+                {/* Classic Classic Profile Avatar matching user's uploaded style */}
+                <svg className="w-9 h-9 text-[#9ca3af] translate-y-1.5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                 </svg>
               </div>
             </div>
           </Link>
 
-          {/* Highly Bold and Clear IndiePulse Branding Logo with Perfect Bottom Curve */}
+          {/* Highly Bold and Clear IndiePulse Branding Logo */}
           <div className="flex flex-col items-end cursor-pointer group">
             <div className="text-3xl md:text-4xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_15px_rgba(249,115,22,0.8)] font-sans">
               IndiePulse
@@ -234,7 +235,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Trending Section with Generous Spacing */}
+      {/* Trending Section */}
       <section className="px-5 py-10 max-w-6xl mx-auto w-full relative z-10">
         <div className="flex items-center justify-between mb-8 px-1">
           <div>
@@ -314,9 +315,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Core Drives Section with Proper Spacing */}
+      {/* Core Drives Section */}
       <section className="px-5 py-12 max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
-        <Link 
+         <Link 
           href="/development" 
           className="block bg-slate-900/90 border border-pink-500/35 p-7 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_25px_rgba(236,72,153,0.2)]"
         >
@@ -338,7 +339,7 @@ export default function Home() {
           href="/curiosity" 
           className="block bg-slate-900/90 border border-pink-500/35 p-7 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_25px_rgba(236,72,153,0.2)]"
         >
-          <span className="text-xs font-bold px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-lg border border-indigo-500/30">Core Drive 7</span>
+          <span className="text-xs font-bold px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-lg border border-pink-500/30">Core Drive 7</span>
           <h3 className="text-xl font-bold mt-5 mb-3 text-white">Unpredictability & Curiosity</h3>
           <p className="text-sm text-slate-300 leading-relaxed">Unlock secret community drops, mystery game tests, and surprise rewards as you level up.</p>
         </Link>
