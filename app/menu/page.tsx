@@ -32,17 +32,17 @@ export default function SettingsAndActivityPage() {
   };
 
   return (
-    <main className={`min-h-screen flex flex-col px-4 py-6 max-w-2xl mx-auto w-full transition-colors duration-300 ${isDarkMode ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}`}>
+    <main className={`min-h-screen flex flex-col px-4 py-6 max-w-2xl mx-auto w-full transition-colors duration-300 select-none ${isDarkMode ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}`}>
       
-      {/* Header with Back Button */}
+      {/* Header with Pink Gradient 'Back' Button */}
       <div className="flex flex-col items-start gap-4 mb-6">
         <Link 
           href="/" 
-          className="w-10 h-10 rounded-full bg-indigo-600 hover:bg-indigo-500 border border-indigo-500/50 flex items-center justify-center text-white text-2xl font-extrabold shadow-lg shadow-indigo-500/30 transition-all"
+          className="px-6 py-2.5 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-sm font-bold shadow-[0_0_20px_rgba(236,72,153,0.5)] border border-pink-400/40 transition-all flex items-center justify-center cursor-pointer"
         >
-          ←
+          Back
         </Link>
-        <h1 className={`text-xl font-bold tracking-wide ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Settings and activity</h1>
+        <h1 className={`text-2xl font-bold tracking-wide ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Settings and activity</h1>
       </div>
 
       {/* Search Settings Bar */}
@@ -51,13 +51,13 @@ export default function SettingsAndActivityPage() {
         <input
           type="text"
           placeholder="Search settings (e.g. password, privacy, theme)..."
-          className={`w-full border rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none transition-all shadow-inner ${isDarkMode ? 'bg-slate-900 border-slate-800 text-white placeholder-slate-500 focus:border-indigo-500' : 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-indigo-600'}`}
+          className={`w-full border rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none transition-all shadow-inner ${isDarkMode ? 'bg-slate-900 border-slate-800 text-white placeholder-slate-500 focus:border-pink-500' : 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-pink-600'}`}
         />
       </div>
 
       {/* Section 1: Your Account */}
       <div className="mb-6">
-        <h2 className={`text-xs font-semibold uppercase tracking-wider mb-3 px-2 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
+        <h2 className={`text-xs font-semibold uppercase tracking-wider mb-3 px-2 ${isDarkMode ? 'text-pink-400' : 'text-pink-600'}`}>
           1. Your Account
         </h2>
         <div className={`border rounded-2xl overflow-hidden divide-y ${isDarkMode ? 'bg-slate-900/80 border-slate-800 divide-slate-800/80' : 'bg-slate-50 border-slate-200 divide-slate-200'}`}>
@@ -88,7 +88,7 @@ export default function SettingsAndActivityPage() {
 
       {/* Section 2: How You Use IndiePulse */}
       <div className="mb-6">
-        <h2 className={`text-xs font-semibold uppercase tracking-wider mb-3 px-2 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
+        <h2 className={`text-xs font-semibold uppercase tracking-wider mb-3 px-2 ${isDarkMode ? 'text-pink-400' : 'text-pink-600'}`}>
           2. How You Use IndiePulse
         </h2>
         <div className={`border rounded-2xl overflow-hidden divide-y ${isDarkMode ? 'bg-slate-900/80 border-slate-800 divide-slate-800/80' : 'bg-slate-50 border-slate-200 divide-slate-200'}`}>
@@ -130,7 +130,7 @@ export default function SettingsAndActivityPage() {
 
       {/* Section 3: Who Can See Your Content */}
       <div className="mb-6">
-        <h2 className={`text-xs font-semibold uppercase tracking-wider mb-3 px-2 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
+        <h2 className={`text-xs font-semibold uppercase tracking-wider mb-3 px-2 ${isDarkMode ? 'text-pink-400' : 'text-pink-600'}`}>
           3. Who Can See Your Content
         </h2>
         <div className={`border rounded-2xl overflow-hidden divide-y ${isDarkMode ? 'bg-slate-900/80 border-slate-800 divide-slate-800/80' : 'bg-slate-50 border-slate-200 divide-slate-200'}`}>
@@ -160,7 +160,7 @@ export default function SettingsAndActivityPage() {
 
       {/* Section 4: Preferences & Support */}
       <div className="mb-6">
-        <h2 className={`text-xs font-semibold uppercase tracking-wider mb-3 px-2 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
+        <h2 className={`text-xs font-semibold uppercase tracking-wider mb-3 px-2 ${isDarkMode ? 'text-pink-400' : 'text-pink-600'}`}>
           4. Preferences & Support
         </h2>
         <div className={`border rounded-2xl overflow-hidden divide-y ${isDarkMode ? 'bg-slate-900/80 border-slate-800 divide-slate-800/80' : 'bg-slate-50 border-slate-200 divide-slate-200'}`}>
@@ -177,7 +177,7 @@ export default function SettingsAndActivityPage() {
                 <div className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>Switch platform appearance</div>
               </div>
             </div>
-            <span className={`text-xs px-3 py-1.5 rounded-lg font-semibold transition-all ${isDarkMode ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'bg-slate-900 text-white shadow-md'}`}>
+            <span className={`text-xs px-3 py-1.5 rounded-lg font-semibold transition-all ${isDarkMode ? 'bg-pink-600 text-white shadow-md shadow-pink-600/30' : 'bg-slate-900 text-white shadow-md'}`}>
               {isDarkMode ? 'Dark (Active)' : 'Light (Active)'}
             </span>
           </div>
@@ -195,9 +195,9 @@ export default function SettingsAndActivityPage() {
         </div>
       </div>
 
-      {/* Section 5: Language & Account Control (Linked to data-control) */}
+      {/* Section 5: Language & Account Control */}
       <div className="mb-8">
-        <h2 className={`text-xs font-semibold uppercase tracking-wider mb-3 px-2 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
+        <h2 className={`text-xs font-semibold uppercase tracking-wider mb-3 px-2 ${isDarkMode ? 'text-pink-400' : 'text-pink-600'}`}>
           5. Language & Account Control
         </h2>
         <div className={`border rounded-2xl overflow-hidden divide-y ${isDarkMode ? 'bg-slate-900/80 border-slate-800 divide-slate-800/80' : 'bg-slate-50 border-slate-200 divide-slate-200'}`}>
