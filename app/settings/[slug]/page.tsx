@@ -30,7 +30,7 @@ export default function SettingDetailPage() {
 
       {/* Content Box */}
       <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
-        <div className="text-indigo-400 font-semibold mb-2">Manage your {title}</div>
+        <div className="text-pink-400 font-semibold mb-2">Manage your {title}</div>
         <p className="text-slate-400 text-sm mb-6">
           Here you can update your preferences, change configurations, and view related information for {title.toLowerCase()}.
         </p>
@@ -42,12 +42,12 @@ export default function SettingDetailPage() {
               <div className="text-sm font-medium text-white">Enable Feature</div>
               <div className="text-xs text-slate-500">Turn on or off this setting module</div>
             </div>
-            <input type="checkbox" className="w-5 h-5 accent-indigo-600 rounded cursor-pointer" defaultChecked />
+            <input type="checkbox" className="w-5 h-5 accent-pink-600 rounded cursor-pointer" defaultChecked />
           </div>
 
           <button 
             onClick={() => alert('Changes saved successfully!')}
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
+            className="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-lg shadow-pink-600/30 transition-all cursor-pointer border border-pink-400/40"
           >
             Save Changes
           </button>
