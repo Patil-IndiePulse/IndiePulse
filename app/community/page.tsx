@@ -11,6 +11,7 @@ export default function CommunityPage() {
   ]);
 
   const [newPost, setNewPost] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handlePostSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,6 +22,7 @@ export default function CommunityPage() {
       ...posts
     ]);
     setNewPost("");
+    setIsModalOpen(false); // Post केल्यानंतर पॉपअप बंद होईल
   };
 
   const handleLike = (index: number) => {
@@ -56,24 +58,18 @@ export default function CommunityPage() {
         <h2 className="text-2xl font-black mb-2 tracking-tight">💬 IndiePulse Community</h2>
         <p className="text-slate-400 text-sm mb-6">Connect with fellow developers, share updates, and discuss ideas!</p>
         
-        {/* Create Post Form */}
-        <form onSubmit={handlePostSubmit} className="mb-6 text-left">
-          <textarea
-            value={newPost}
-            onChange={(e) => setNewPost(e.target.value)}
-            placeholder="What's happening in your game dev journey?"
-            className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl p-3 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-purple-500 mb-3 resize-none h-20"
-          ></textarea>
+        {/* Create Post Action Button */}
+        <div className="mb-6">
           <button 
-            type="submit"
-            className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white font-bold rounded-xl shadow-lg shadow-purple-600/30 transition-all text-sm cursor-pointer"
+            onClick={() => setIsModalOpen(true)}
+            className="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(236,72,153,0.4)] transition-all text-sm cursor-pointer border border-pink-400/40 flex items-center justify-center gap-2"
           >
-            + Create Post
+            <span>+</span> Create Post
           </button>
-        </form>
+        </div>
 
         {/* Posts Feed */}
-        <div className="flex flex-col gap-3 mb-2 text-left max-h-[320px] overflow-y-auto pr-1">
+        <div className="flex flex-col gap-3 mb-2 text-left max-h-[380px] overflow-y-auto pr-1">
           {posts.map((post, index) => (
             <div 
               key={index} 
@@ -87,7 +83,7 @@ export default function CommunityPage() {
               <div className="flex items-center gap-4 text-xs text-slate-400">
                 <button 
                   onClick={() => handleLike(index)}
-                  className="flex items-center gap-1 hover:text-purple-400 transition-colors cursor-pointer"
+                  className="flex items-center gap-1 hover:text-pink-400 transition-colors cursor-pointer"
                 >
                   ❤️ {post.likes} likes
                 </button>
@@ -97,6 +93,53 @@ export default function CommunityPage() {
           ))}
         </div>
       </div>
+
+      {/* Create Post Popup Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-900 border border-pink-500/40 rounded-3xl p-6 w-full max-w-md shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <span>✨</span> Create New Post
+              </h3>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handlePostSubmit} className="flex flex-col gap-4">
+              <textarea
+                value={newPost}
+                onChange={(e) => setNewPost(e.target.value)}
+                placeholder="What's happening in your game dev journey?"
+                className="w-full bg-slate-950 border border-pink-500/30 rounded-2xl p-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-pink-400 resize-none h-32 shadow-inner"
+                required
+              />
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-xs transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all text-xs cursor-pointer border border-pink-400/40"
+                >
+                  Post Now 🚀
+                </button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      )}
+
     </main>
   );
 }
