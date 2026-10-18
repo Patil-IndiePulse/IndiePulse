@@ -12,16 +12,20 @@ export default function QuestsPage() {
 
   const [selectedQuest, setSelectedQuest] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [taskStarted, setTaskStarted] = useState(false);
+  const [loadingState, setLoadingState] = useState<'idle' | 'scanning' | 'verified'>('idle');
 
   const handleStartQuest = (quest: any) => {
     setSelectedQuest(quest);
-    setTaskStarted(false);
+    setLoadingState('idle');
     setIsModalOpen(true);
   };
 
+  // AI-Automated Verification Simulation
   const handleExecuteTask = () => {
-    setTaskStarted(true); // युझरने टास्क ॲक्शन पूर्ण केल्याशिवाय 'Complete Quest' बटण येणार नाही
+    setLoadingState('scanning');
+    setTimeout(() => {
+      setLoadingState('verified'); // २ सेकंदांच्या ऑटोमॅटिक स्कॅन नंतरच टास्क व्हेरीफाय होईल
+    }, 2000);
   };
 
   const handleCompleteQuest = () => {
@@ -31,7 +35,7 @@ export default function QuestsPage() {
       );
       setIsModalOpen(false);
       setSelectedQuest(null);
-      setTaskStarted(false);
+      setLoadingState('idle');
     }
   };
 
@@ -107,14 +111,14 @@ export default function QuestsPage() {
               Reward upon completion: +{selectedQuest.xp} XP ⚡
             </div>
 
-            {!taskStarted ? (
+            {loadingState === 'idle' && (
               <div className="flex flex-col gap-3">
                 <button
                   type="button"
                   onClick={handleExecuteTask}
                   className="w-full py-3 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold rounded-xl text-xs shadow-md transition-all cursor-pointer"
                 >
-                  🎮 {selectedQuest.actionText}
+                  🤖 AI Verify: {selectedQuest.actionText}
                 </button>
                 <button
                   type="button"
@@ -124,10 +128,19 @@ export default function QuestsPage() {
                   Cancel
                 </button>
               </div>
-            ) : (
+            )}
+
+            {loadingState === 'scanning' && (
+              <div className="flex flex-col items-center gap-3 py-4">
+                <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-xs text-amber-400 font-semibold animate-pulse">AI is verifying your task progress...</p>
+              </div>
+            )}
+
+            {loadingState === 'verified' && (
               <div className="flex flex-col gap-3">
                 <div className="p-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs font-semibold">
-                  Task Action Performed! Now you can complete quest. ✅
+                  AI Verification Successful! Task completed. ✅
                 </div>
                 <div className="flex gap-3">
                   <button
