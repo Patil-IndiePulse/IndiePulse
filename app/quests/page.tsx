@@ -71,11 +71,12 @@ export default function QuestsPage() {
                 <span className="text-xs text-amber-400 font-semibold">✨ +{quest.xp} XP Reward ⚡</span>
               </div>
               <button 
-                onClick={() => handleStartQuest(quest)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 ${
+                onClick={() => !quest.completed && handleStartQuest(quest)}
+                disabled={quest.completed}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
                   quest.completed 
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
-                    : 'bg-amber-600 hover:bg-amber-500 text-white shadow-md shadow-amber-600/30'
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/35 cursor-default' 
+                    : 'bg-amber-600 hover:bg-amber-500 text-white shadow-md shadow-amber-600/35 cursor-pointer'
                 }`}
               >
                 {quest.completed ? 'Completed 🎉' : 'Start Quest 🚀'}
@@ -96,7 +97,7 @@ export default function QuestsPage() {
               {selectedQuest.desc}
             </p>
             <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-300 font-bold text-xs mb-6">
-              Reward: +{selectedQuest.xp} XP ⚡
+              Reward upon completion: +{selectedQuest.xp} XP ⚡
             </div>
 
             <div className="flex gap-3">
@@ -112,7 +113,7 @@ export default function QuestsPage() {
                 onClick={handleCompleteQuest}
                 className="flex-1 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all text-xs cursor-pointer border border-pink-400/40"
               >
-                Claim Reward 🚀
+                Complete Quest ✅
               </button>
             </div>
 
