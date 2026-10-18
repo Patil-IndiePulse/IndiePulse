@@ -16,12 +16,12 @@ export default function QuestsPage() {
 
   const handleStartQuest = (quest: any) => {
     setSelectedQuest(quest);
-    setTaskStarted(false); // नवीन क्वेस्ट उघडताना टास्क आधी सुरू करावी लागेल
+    setTaskStarted(false);
     setIsModalOpen(true);
   };
 
   const handleExecuteTask = () => {
-    setTaskStarted(true); // युझरने टास्क सुरू केली, आता तो कम्प्लीट करू शकतो
+    setTaskStarted(true); // युझरने टास्क ॲक्शन पूर्ण केल्याशिवाय 'Complete Quest' बटण येणार नाही
   };
 
   const handleCompleteQuest = () => {
@@ -127,7 +127,7 @@ export default function QuestsPage() {
             ) : (
               <div className="flex flex-col gap-3">
                 <div className="p-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs font-semibold">
-                  Task Action Performed! Now you can claim your reward. ✅
+                  Task Action Performed! Now you can complete quest. ✅
                 </div>
                 <div className="flex gap-3">
                   <button
@@ -140,7 +140,7 @@ export default function QuestsPage() {
                   <button
                     type="button"
                     onClick={handleCompleteQuest}
-                    className="flex-1 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all text-xs cursor-pointer border border-pink-400/40"
+                    className="flex-1 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl text-xs shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all text-xs cursor-pointer border border-pink-400/40"
                   >
                     Complete Quest ✅
                   </button>
