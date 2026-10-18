@@ -54,29 +54,29 @@ export default function QuestsPage() {
         <p className="text-slate-400 text-sm mb-6">Complete quests, level up your profile, and earn exciting XP rewards! 🎁</p>
         
         {/* Quests List */}
-        <div className="flex flex-col gap-3 mb-2 text-left max-h-[360px] overflow-y-auto pr-1">
+        <div className="flex flex-col gap-4 mb-2 text-left max-h-[380px] overflow-y-auto pr-1">
           {quests.map((quest) => (
             <div 
               key={quest.id} 
-              className={`flex justify-between items-center p-4 rounded-xl border transition-all ${
+              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border transition-all ${
                 quest.completed 
                   ? 'bg-slate-900/40 border-emerald-500/30 opacity-75' 
                   : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800'
               }`}
             >
-              <div>
+              <div className="space-y-1">
                 <h3 className={`font-bold text-sm ${quest.completed ? 'line-through text-slate-400' : 'text-slate-100'}`}>
                   {quest.title}
                 </h3>
-                <span className="text-xs text-amber-400 font-semibold">✨ +{quest.xp} XP Reward ⚡</span>
+                <span className="text-xs text-amber-400 font-semibold block">✨ +{quest.xp} XP Reward ⚡</span>
               </div>
               <button 
                 onClick={() => !quest.completed && handleStartQuest(quest)}
                 disabled={quest.completed}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all shrink-0 self-start sm:self-center ${
                   quest.completed 
                     ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/35 cursor-default' 
-                    : 'bg-amber-600 hover:bg-amber-500 text-white shadow-md shadow-amber-600/35 cursor-pointer'
+                    : 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white shadow-md shadow-amber-600/30 cursor-pointer'
                 }`}
               >
                 {quest.completed ? 'Completed 🎉' : 'Start Quest 🚀'}
@@ -104,7 +104,7 @@ export default function QuestsPage() {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-xs transition-all cursor-pointer"
+                className="flex-1 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl text-xs shadow-[0_0_15px_rgba(236,72,153,0.5)] border border-pink-400/40 transition-all cursor-pointer"
               >
                 Cancel
               </button>
