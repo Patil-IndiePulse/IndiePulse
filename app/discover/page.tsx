@@ -5,17 +5,17 @@ import Link from 'next/link';
 
 export default function DiscoverPage() {
   const [games, setGames] = useState([
-    { title: "Cyber Neon Runner", creator: "Aarav Dev", genre: "Action / Sci-Fi", plays: "3.4k" },
-    { title: "Mystic Quest RPG", creator: "Neha_Gamer", genre: "Adventure", plays: "2.8k" },
-    { title: "Pixel Bounce", creator: "Rahul (You)", genre: "Arcade", plays: "1.5k" }
+    { title: "Cyber Neon Runner", creator: "Aarav Dev", genre: "Action / Sci-Fi", plays: "3.4k plays" },
+    { title: "Mystic Quest RPG", creator: "Neha_Gamer", genre: "Adventure", plays: "2.8k plays" },
+    { title: "Pixel Bounce", creator: "Rahul (You)", genre: "Arcade", plays: "1.5k plays" }
   ]);
 
   const [allGames, setAllGames] = useState([
-    { title: "Cyber Neon Runner", creator: "Aarav Dev", genre: "Action / Sci-Fi", plays: "3.4k" },
-    { title: "Mystic Quest RPG", creator: "Neha_Gamer", genre: "Adventure", plays: "2.8k" },
-    { title: "Pixel Bounce", creator: "Rahul (You)", genre: "Arcade", plays: "1.5k" },
-    { title: "Galactic Wars", creator: "StarStudio", genre: "Shooter", plays: "4.1k" },
-    { title: "Speed Drift X", creator: "TurboGamer", genre: "Racing", plays: "5.2k" }
+    { title: "Cyber Neon Runner", creator: "Aarav Dev", genre: "Action / Sci-Fi", plays: "3.4k plays" },
+    { title: "Mystic Quest RPG", creator: "Neha_Gamer", genre: "Adventure", plays: "2.8k plays" },
+    { title: "Pixel Bounce", creator: "Rahul (You)", genre: "Arcade", plays: "1.5k plays" },
+    { title: "Galactic Wars", creator: "StarStudio", genre: "Shooter", plays: "4.1k plays" },
+    { title: "Speed Drift X", creator: "TurboGamer", genre: "Racing", plays: "5.2k plays" }
   ]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,8 +55,8 @@ export default function DiscoverPage() {
                 <h3 className="font-bold text-slate-100 text-base">{game.title}</h3>
                 <p className="text-xs text-slate-400">By {game.creator} • <span className="text-cyan-400">{game.genre}</span></p>
               </div>
-              <div className="text-right">
-                <span className="text-emerald-400 font-bold text-sm block">{game.plays} plays</span>
+              <div className="text-right shrink-0">
+                <span className="text-emerald-400 font-bold text-sm">{game.plays}</span>
               </div>
             </div>
           ))}
@@ -94,7 +94,9 @@ export default function DiscoverPage() {
                     <h4 className="font-bold text-white text-sm">{game.title}</h4>
                     <p className="text-[11px] text-slate-400">By {game.creator} • <span className="text-cyan-400">{game.genre}</span></p>
                   </div>
-                  <span className="text-emerald-400 font-bold text-xs">{game.plays}</span>
+                  <div className="text-right shrink-0">
+                    <span className="text-emerald-400 font-bold text-xs">{game.plays}</span>
+                  </div>
                 </div>
               ))}
             </div>
