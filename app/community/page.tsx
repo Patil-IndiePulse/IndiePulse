@@ -103,10 +103,10 @@ export default function CommunityPage() {
               <h3 className="text-base font-bold text-white flex items-center gap-2 whitespace-nowrap">
                 <span>✨</span> Create New Post
               </h3>
-              {/* Highlighted Pink Glowing Close 'X' Button */}
+              {/* Perfectly Sized Pink Glowing Close 'X' Button */}
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="w-9 h-9 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 border border-pink-400/50 flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(236,72,153,0.6)] transition-all cursor-pointer shrink-0"
+                className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 border border-pink-400/50 flex items-center justify-center text-white text-xs font-bold shadow-[0_0_12px_rgba(236,72,153,0.6)] transition-all cursor-pointer shrink-0"
               >
                 ✕
               </button>
