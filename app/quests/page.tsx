@@ -5,17 +5,23 @@ import Link from 'next/link';
 
 export default function QuestsPage() {
   const [quests, setQuests] = useState([
-    { id: 1, title: "🚀 Publish Your First Indie Game", xp: 500, completed: false, desc: "Upload your game build or prototype to the IndiePulse discover catalog." },
-    { id: 2, title: "🤝 Connect with 3 Nearby Developers", xp: 150, completed: false, desc: "Interact and send connection requests to local game developers." },
-    { id: 3, title: "📢 Share a DevLog Update in Community", xp: 100, completed: true, desc: "Post your daily game dev progress in the community feed." }
+    { id: 1, title: "🚀 Publish Your First Indie Game", xp: 500, completed: false, desc: "Upload your game build or prototype to the IndiePulse discover catalog.", actionText: "Upload Game Build" },
+    { id: 2, title: "🤝 Connect with 3 Nearby Developers", xp: 150, completed: false, desc: "Interact and send connection requests to local game developers.", actionText: "Find Developers" },
+    { id: 3, title: "📢 Share a DevLog Update in Community", xp: 100, completed: true, desc: "Post your daily game dev progress in the community feed.", actionText: "Open Community" }
   ]);
 
   const [selectedQuest, setSelectedQuest] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [taskStarted, setTaskStarted] = useState(false);
 
   const handleStartQuest = (quest: any) => {
     setSelectedQuest(quest);
+    setTaskStarted(false); // नवीन क्वेस्ट उघडताना टास्क आधी सुरू करावी लागेल
     setIsModalOpen(true);
+  };
+
+  const handleExecuteTask = () => {
+    setTaskStarted(true); // युझरने टास्क सुरू केली, आता तो कम्प्लीट करू शकतो
   };
 
   const handleCompleteQuest = () => {
@@ -25,6 +31,7 @@ export default function QuestsPage() {
       );
       setIsModalOpen(false);
       setSelectedQuest(null);
+      setTaskStarted(false);
     }
   };
 
@@ -100,22 +107,46 @@ export default function QuestsPage() {
               Reward upon completion: +{selectedQuest.xp} XP ⚡
             </div>
 
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                className="flex-1 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl text-xs shadow-[0_0_15px_rgba(236,72,153,0.5)] border border-pink-400/40 transition-all cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleCompleteQuest}
-                className="flex-1 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all text-xs cursor-pointer border border-pink-400/40"
-              >
-                Complete Quest ✅
-              </button>
-            </div>
+            {!taskStarted ? (
+              <div className="flex flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={handleExecuteTask}
+                  className="w-full py-3 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold rounded-xl text-xs shadow-md transition-all cursor-pointer"
+                >
+                  🎮 {selectedQuest.actionText}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl text-xs shadow-[0_0_15px_rgba(236,72,153,0.5)] border border-pink-400/40 transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <div className="p-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs font-semibold">
+                  Task Action Performed! Now you can claim your reward. ✅
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="flex-1 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl text-xs shadow-[0_0_15px_rgba(236,72,153,0.5)] border border-pink-400/40 transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCompleteQuest}
+                    className="flex-1 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all text-xs cursor-pointer border border-pink-400/40"
+                  >
+                    Complete Quest ✅
+                  </button>
+                </div>
+              </div>
+            )}
 
           </div>
         </div>
