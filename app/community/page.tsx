@@ -103,13 +103,6 @@ export default function CommunityPage() {
               <h3 className="text-base font-bold text-white flex items-center gap-2 whitespace-nowrap">
                 <span>✨</span> Create New Post
               </h3>
-              {/* Perfectly Sized Pink Glowing Close 'X' Button */}
-              <button 
-                onClick={() => setIsModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 border border-pink-400/50 flex items-center justify-center text-white text-xs font-bold shadow-[0_0_12px_rgba(236,72,153,0.6)] transition-all cursor-pointer shrink-0"
-              >
-                ✕
-              </button>
             </div>
 
             <form onSubmit={handlePostSubmit} className="flex flex-col gap-4">
@@ -124,7 +117,7 @@ export default function CommunityPage() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-xs transition-all cursor-pointer"
+                  className="flex-1 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all text-xs cursor-pointer border border-pink-400/40"
                 >
                   Cancel
                 </button>
