@@ -22,7 +22,7 @@ export default function CommunityPage() {
       ...posts
     ]);
     setNewPost("");
-    setIsModalOpen(false); // Post केल्यानंतर पॉपअप बंद होईल
+    setIsModalOpen(false);
   };
 
   const handleLike = (index: number) => {
@@ -100,12 +100,13 @@ export default function CommunityPage() {
           <div className="bg-slate-900 border border-pink-500/40 rounded-3xl p-6 w-full max-w-md shadow-2xl relative animate-in fade-in zoom-in duration-200">
             
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              <h3 className="text-base font-bold text-white flex items-center gap-2 whitespace-nowrap">
                 <span>✨</span> Create New Post
               </h3>
+              {/* Highlighted Pink Glowing Close 'X' Button */}
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white cursor-pointer"
+                className="w-9 h-9 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 border border-pink-400/50 flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(236,72,153,0.6)] transition-all cursor-pointer shrink-0"
               >
                 ✕
               </button>
