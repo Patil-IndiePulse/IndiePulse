@@ -32,28 +32,19 @@ export default function CommunityPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <main className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 relative overflow-hidden select-none">
       
       {/* Background Decorative Glow Effects */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none"></div>
 
-      {/* Top Left Back Button */}
+      {/* Top Left Pink Gradient 'Back' Button */}
       <div className="absolute top-6 left-6 z-10">
         <Link 
           href="/" 
-          className="w-12 h-12 bg-blue-600 hover:bg-blue-700 border border-blue-500 rounded-full flex items-center justify-center shadow-lg shadow-blue-600/30 transition-all transform hover:-translate-y-0.5 cursor-pointer group"
+          className="px-6 py-2.5 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-sm font-bold shadow-[0_0_20px_rgba(236,72,153,0.5)] border border-pink-400/40 transition-all flex items-center justify-center cursor-pointer"
         >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            className="h-6 w-6 text-white" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor" 
-            strokeWidth={2.5}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
+          Back
         </Link>
       </div>
 
