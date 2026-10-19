@@ -6,10 +6,8 @@ import { useRouter } from 'next/navigation';
 export default function AccountsCenter() {
   const router = useRouter();
 
-  // State to track which sub-page is open
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  // Form data states
   const [profileData, setProfileData] = useState({ name: 'Indie Creator', email: 'creator@indiepulse.com', bio: 'Passionate developer' });
   const [passData, setPassData] = useState({ currentPass: '', newPass: '', confirmPass: '' });
   const [connectedApps, setConnectedApps] = useState({ google: true, discord: false, github: true });
@@ -34,17 +32,17 @@ export default function AccountsCenter() {
       <div className="flex flex-col items-start gap-4 mb-6 relative z-10">
         <button 
           onClick={() => router.back()} 
-          className="px-5 py-2 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold shadow-[0_0_20px_rgba(236,72,153,0.4)] border border-pink-400/40 transition-all flex items-center gap-1.5 cursor-pointer"
+          className="w-auto inline-flex px-5 py-2 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold shadow-[0_0_20px_rgba(236,72,153,0.4)] border border-pink-400/40 transition-all items-center gap-1.5 cursor-pointer"
         >
           Back
         </button>
-        <div className="w-full">
+        <div className="w-full text-left">
           <h1 className="text-2xl font-black tracking-wide text-white">Accounts Center</h1>
           <p className="text-xs text-slate-300 mt-1">Manage your connected experiences and account settings across IndiePulse technologies.</p>
         </div>
       </div>
 
-      <div className="w-full relative z-10">
+      <div className="w-full relative z-10 text-left">
 
         {/* Success save message */}
         {message && (
@@ -53,26 +51,25 @@ export default function AccountsCenter() {
           </div>
         )}
 
-        {/* If no sub-page is open, show the main 6 options */}
         {!activeSection ? (
-          <div className="bg-[#120e26]/90 border border-purple-500/30 rounded-2xl overflow-hidden shadow-[0_0_25px_rgba(147,51,234,0.15)]">
+          <div className="bg-[#120e26]/90 border border-purple-500/30 rounded-2xl overflow-hidden shadow-[0_0_25px_rgba(147,51,234,0.15)] text-left">
             
-            <div className="p-3.5 bg-gradient-to-r from-pink-900/40 to-purple-900/40 text-pink-400 text-[11px] font-bold uppercase tracking-wider">
+            <div className="p-3.5 bg-gradient-to-r from-pink-900/40 to-purple-900/40 text-pink-400 text-[11px] font-bold uppercase tracking-wider text-left">
               ACCOUNT SETTINGS & PREFERENCES
             </div>
 
-            <div className="divide-y divide-purple-900/40">
+            <div className="divide-y divide-purple-900/40 text-left">
               
               {/* 1. Profiles and personal details */}
               <button 
                 onClick={() => setActiveSection('profile')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition text-left cursor-pointer group"
               >
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center gap-3.5 text-left">
                   <span className="text-xl">👤</span>
-                  <div>
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors">Profiles and personal details</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Manage your name, email, and bio</p>
+                  <div className="text-left">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Profiles and personal details</p>
+                    <p className="text-xs text-slate-400 mt-0.5 text-left">Manage your name, email, and bio</p>
                   </div>
                 </div>
                 <span className="text-slate-400 group-hover:text-white transition-colors text-sm">›</span>
@@ -83,11 +80,11 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('password')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition text-left cursor-pointer group"
               >
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center gap-3.5 text-left">
                   <span className="text-xl">🔒</span>
-                  <div>
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors">Password and security</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Change password, security alerts</p>
+                  <div className="text-left">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Password and security</p>
+                    <p className="text-xs text-slate-400 mt-0.5 text-left">Change password, security alerts</p>
                   </div>
                 </div>
                 <span className="text-slate-400 group-hover:text-white transition-colors text-sm">›</span>
@@ -98,11 +95,11 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('connected')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition text-left cursor-pointer group"
               >
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center gap-3.5 text-left">
                   <span className="text-xl">🔗</span>
-                  <div>
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors">Connected experiences</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Manage linked social & gaming accounts</p>
+                  <div className="text-left">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Connected experiences</p>
+                    <p className="text-xs text-slate-400 mt-0.5 text-left">Manage linked social & gaming accounts</p>
                   </div>
                 </div>
                 <span className="text-slate-400 group-hover:text-white transition-colors text-sm">›</span>
@@ -113,11 +110,11 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('permissions')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition text-left cursor-pointer group"
               >
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center gap-3.5 text-left">
                   <span className="text-xl">📋</span>
-                  <div>
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors">Your information and permissions</p>
-                    <p className="text-xs text-slate-400 mt-0.5">App access, camera, and location</p>
+                  <div className="text-left">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Your information and permissions</p>
+                    <p className="text-xs text-slate-400 mt-0.5 text-left">App access, camera, and location</p>
                   </div>
                 </div>
                 <span className="text-slate-400 group-hover:text-white transition-colors text-sm">›</span>
@@ -128,11 +125,11 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('ads')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition text-left cursor-pointer group"
               >
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center gap-3.5 text-left">
                   <span className="text-xl">📢</span>
-                  <div>
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors">Ad preferences</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Manage personalized ads and topics</p>
+                  <div className="text-left">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Ad preferences</p>
+                    <p className="text-xs text-slate-400 mt-0.5 text-left">Manage personalized ads and topics</p>
                   </div>
                 </div>
                 <span className="text-slate-400 group-hover:text-white transition-colors text-sm">›</span>
@@ -143,11 +140,11 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('accounts')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition text-left cursor-pointer group"
               >
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center gap-3.5 text-left">
                   <span className="text-xl">⚙</span>
-                  <div>
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors">Manage accounts</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Add or remove connected accounts</p>
+                  <div className="text-left">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Manage accounts</p>
+                    <p className="text-xs text-slate-400 mt-0.5 text-left">Add or remove connected accounts</p>
                   </div>
                 </div>
                 <span className="text-slate-400 group-hover:text-white transition-colors text-sm">›</span>
@@ -157,20 +154,17 @@ export default function AccountsCenter() {
 
           </div>
         ) : (
-          /* When user clicks an option, open its sub-page */
-          <div className="bg-[#120e26]/90 border border-purple-500/30 rounded-2xl p-6 shadow-[0_0_25px_rgba(147,51,234,0.15)]">
+          <div className="bg-[#120e26]/90 border border-purple-500/30 rounded-2xl p-6 shadow-[0_0_25px_rgba(147,51,234,0.15)] text-left">
             
-            {/* Back button to return to Accounts Center main view */}
             <button 
               onClick={() => setActiveSection(null)}
-              className="text-pink-400 text-xs font-semibold mb-4 hover:underline flex items-center gap-1 cursor-pointer"
+              className="text-pink-400 text-xs font-semibold mb-4 hover:underline flex items-center gap-1 cursor-pointer text-left"
             >
               ← Back to Accounts Center
             </button>
 
-            {/* 1. Profile and Personal Details Form */}
             {activeSection === 'profile' && (
-              <div>
+              <div className="text-left">
                 <h2 className="text-lg font-bold mb-4 text-white">Profiles and Personal Details</h2>
                 <div className="space-y-3">
                   <div>
@@ -210,9 +204,8 @@ export default function AccountsCenter() {
               </div>
             )}
 
-            {/* 2. Password and Security Form */}
             {activeSection === 'password' && (
-              <div>
+              <div className="text-left">
                 <h2 className="text-lg font-bold mb-4 text-white">Password and Security</h2>
                 <div className="space-y-3">
                   <div>
@@ -255,9 +248,8 @@ export default function AccountsCenter() {
               </div>
             )}
 
-            {/* 3. Connected Experiences */}
             {activeSection === 'connected' && (
-              <div>
+              <div className="text-left">
                 <h2 className="text-lg font-bold mb-2 text-white">Connected Experiences</h2>
                 <p className="text-slate-400 text-xs mb-4">Manage apps and accounts linked for cross-platform sharing.</p>
                 <div className="space-y-3">
@@ -298,9 +290,8 @@ export default function AccountsCenter() {
               </div>
             )}
 
-            {/* 4. Information and Permissions */}
             {activeSection === 'permissions' && (
-              <div>
+              <div className="text-left">
                 <h2 className="text-lg font-bold mb-2 text-white">Information and Permissions</h2>
                 <p className="text-slate-400 text-xs mb-4">Control what platform features can access.</p>
                 <div className="space-y-3">
@@ -341,9 +332,8 @@ export default function AccountsCenter() {
               </div>
             )}
 
-            {/* 5. Ad Preferences */}
             {activeSection === 'ads' && (
-              <div>
+              <div className="text-left">
                 <h2 className="text-lg font-bold mb-2 text-white">Ad Preferences</h2>
                 <p className="text-slate-400 text-xs mb-4">Manage how ads are tailored to your interests.</p>
                 <div className="space-y-3">
@@ -375,17 +365,16 @@ export default function AccountsCenter() {
               </div>
             )}
 
-            {/* 6. Manage Accounts */}
             {activeSection === 'accounts' && (
-              <div>
+              <div className="text-left">
                 <h2 className="text-lg font-bold mb-2 text-white">Manage Accounts</h2>
                 <p className="text-slate-400 text-xs mb-4">Accounts linked to your main profile.</p>
                 <div className="space-y-3">
                   {accountsList.map((acc) => (
                     <div key={acc.id} className="flex items-center justify-between p-3 bg-[#070514] border border-purple-500/30 rounded-xl text-sm">
-                      <div>
-                        <p className="font-medium">{acc.name}</p>
-                        <span className="text-xs text-pink-400">{acc.type}</span>
+                      <div className="text-left">
+                        <p className="font-medium text-left">{acc.name}</p>
+                        <span className="text-xs text-pink-400 text-left">{acc.type}</span>
                       </div>
                       <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded">Active</span>
                     </div>
