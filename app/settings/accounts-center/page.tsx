@@ -23,7 +23,7 @@ export default function AccountsCenter() {
   return (
     <main className="min-h-screen bg-[#070514] text-white flex flex-col px-4 py-8 max-w-2xl mx-auto w-full relative select-none">
       
-      {/* Background glow matching Notifications & Account Privacy pages */}
+      {/* Background glow matching Settings & Activity page */}
       <div className="absolute top-0 left-1/4 w-80 h-80 bg-pink-600/10 rounded-full blur-[100px] pointer-events-none"></div>
 
       {/* Back Button and Header */}
@@ -63,14 +63,14 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('profile')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5 text-left">
-                  <span className="text-xl shrink-0">👤</span>
-                  <div className="text-left">
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Profiles and personal details</p>
-                    <p className="text-xs text-slate-400 mt-0.5 text-left">Manage your name, email, and bio</p>
+                <div className="flex items-start gap-3.5 text-left w-full">
+                  <span className="text-xl shrink-0 pt-0.5">👤</span>
+                  <div className="text-left w-full">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left leading-snug">Profiles and personal details</p>
+                    <p className="text-xs text-slate-400 mt-1 text-left leading-snug">Manage your name, email, and bio</p>
                   </div>
                 </div>
-                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-2">›</span>
+                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-3 self-center">›</span>
               </button>
 
               {/* 2. Password and security */}
@@ -78,14 +78,14 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('password')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5 text-left">
-                  <span className="text-xl shrink-0">🔒</span>
-                  <div className="text-left">
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Password and security</p>
-                    <p className="text-xs text-slate-400 mt-0.5 text-left">Change password, security alerts</p>
+                <div className="flex items-start gap-3.5 text-left w-full">
+                  <span className="text-xl shrink-0 pt-0.5">🔒</span>
+                  <div className="text-left w-full">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left leading-snug">Password and security</p>
+                    <p className="text-xs text-slate-400 mt-1 text-left leading-snug">Change password, security alerts</p>
                   </div>
                 </div>
-                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-2">›</span>
+                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-3 self-center">›</span>
               </button>
 
               {/* 3. Connected experiences */}
@@ -93,14 +93,14 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('connected')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5 text-left">
-                  <span className="text-xl shrink-0">🔗</span>
-                  <div className="text-left">
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Connected experiences</p>
-                    <p className="text-xs text-slate-400 mt-0.5 text-left">Manage linked social & gaming accounts</p>
+                <div className="flex items-start gap-3.5 text-left w-full">
+                  <span className="text-xl shrink-0 pt-0.5">🔗</span>
+                  <div className="text-left w-full">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left leading-snug">Connected experiences</p>
+                    <p className="text-xs text-slate-400 mt-1 text-left leading-snug">Manage linked social & gaming accounts</p>
                   </div>
                 </div>
-                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-2">›</span>
+                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-3 self-center">›</span>
               </button>
 
               {/* 4. Your information and permissions */}
@@ -108,14 +108,14 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('permissions')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5 text-left">
-                  <span className="text-xl shrink-0">📋</span>
-                  <div className="text-left">
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Your information and permissions</p>
-                    <p className="text-xs text-slate-400 mt-0.5 text-left">App access, camera, and location</p>
+                <div className="flex items-start gap-3.5 text-left w-full">
+                  <span className="text-xl shrink-0 pt-0.5">📋</span>
+                  <div className="text-left w-full">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left leading-snug">Your information and permissions</p>
+                    <p className="text-xs text-slate-400 mt-1 text-left leading-snug">App access, camera, and location</p>
                   </div>
                 </div>
-                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-2">›</span>
+                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-3 self-center">›</span>
               </button>
 
               {/* 5. Ad preferences */}
@@ -123,14 +123,14 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('ads')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5 text-left">
-                  <span className="text-xl shrink-0">📢</span>
-                  <div className="text-left">
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Ad preferences</p>
-                    <p className="text-xs text-slate-400 mt-0.5 text-left">Manage personalized ads and topics</p>
+                <div className="flex items-start gap-3.5 text-left w-full">
+                  <span className="text-xl shrink-0 pt-0.5">📢</span>
+                  <div className="text-left w-full">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left leading-snug">Ad preferences</p>
+                    <p className="text-xs text-slate-400 mt-1 text-left leading-snug">Manage personalized ads and topics</p>
                   </div>
                 </div>
-                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-2">›</span>
+                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-3 self-center">›</span>
               </button>
 
               {/* 6. Manage accounts */}
@@ -138,14 +138,14 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('accounts')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5 text-left">
-                  <span className="text-xl shrink-0">⚙</span>
-                  <div className="text-left">
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Manage accounts</p>
-                    <p className="text-xs text-slate-400 mt-0.5 text-left">Add or remove connected accounts</p>
+                <div className="flex items-start gap-3.5 text-left w-full">
+                  <span className="text-xl shrink-0 pt-0.5">⚙</span>
+                  <div className="text-left w-full">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left leading-snug">Manage accounts</p>
+                    <p className="text-xs text-slate-400 mt-1 text-left leading-snug">Add or remove connected accounts</p>
                   </div>
                 </div>
-                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-2">›</span>
+                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-3 self-center">›</span>
               </button>
 
             </div>
@@ -205,7 +205,7 @@ export default function AccountsCenter() {
             {activeSection === 'password' && (
               <div className="text-left">
                 <h2 className="text-lg font-bold mb-4 text-white">Password and Security</h2>
-                <div className="space-y-1">
+                <div className="space-y-3">
                   <div>
                     <label className="text-[11px] text-slate-300 block mb-1 font-semibold text-left">Current Password</label>
                     <input 
