@@ -16,12 +16,11 @@ export default function ProGamePlayer() {
   const [timeLeft, setTimeLeft] = useState(30);
   const [gameOver, setGameOver] = useState(false);
   const [targets, setTargets] = useState<{ id: number; x: number; y: number; type: string }[]>([]);
-  const [isLandscape, setIsLandscape] = useState(false); // Mobile orientation toggle state
+  const [isLandscape, setIsLandscape] = useState(false);
 
   useEffect(() => {
     const savedGames = JSON.parse(localStorage.getItem('indipulse_games') || '{}');
     
-    // Check if game exists in local storage (user submitted)
     if (savedGames[gameId as string]?.title) {
       setGameTitle(savedGames[gameId as string].title);
       setGameGenre(savedGames[gameId as string].genre || 'Indie / Custom');
@@ -41,7 +40,6 @@ export default function ProGamePlayer() {
     setHighScore(parseInt(savedHighScore));
   }, [gameId]);
 
-  // Timer Loop
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (isPlaying && timeLeft > 0 && !gameOver) {
@@ -59,7 +57,6 @@ export default function ProGamePlayer() {
     return () => clearInterval(timer);
   }, [isPlaying, timeLeft, gameOver]);
 
-  // Target Spawner Loop based on Game Type / Title
   useEffect(() => {
     let spawner: NodeJS.Timeout;
     if (isPlaying && !gameOver) {
@@ -67,7 +64,6 @@ export default function ProGamePlayer() {
         setTargets((prev) => {
           if (prev.length >= 6) return prev; 
 
-          // Customize item icons based on game title keywords
           let itemTypes = ['⚡', '💎', '⭐'];
           if (gameTitle.toLowerCase().includes('candy') || gameTitle.toLowerCase().includes('crush')) {
             itemTypes = ['🍬', '🍫', '🍭', '⭐'];
@@ -136,51 +132,46 @@ export default function ProGamePlayer() {
   };
 
   return (
-    <main className={`fixed inset-0 w-screen h-screen bg-slate-950 text-white flex flex-col select-none overflow-hidden m-0 p-0 font-mono transition-transform duration-300 ${isLandscape ? 'rotate-90 md:rotate-0 origin-center min-h-[100vw]' : ''}`}>
+    <main className={`min-h-screen bg-[#070514] text-white flex flex-col select-none overflow-x-hidden p-3 md:p-6 font-mono transition-all duration-300 ${isLandscape ? 'rotate-90 md:rotate-0 origin-center min-w-[100vw]' : ''}`}>
       
-      {/* Top Bar */}
-      <div className="w-full bg-slate-900/90 border-b border-purple-500/30 px-6 py-3 flex items-center justify-between shadow-2xl shrink-0 z-50 backdrop-blur-md">
-        <div className="flex items-center gap-4">
+      {/* Top Navigation & Controls Bar */}
+      <div className="w-full bg-slate-900/90 border border-purple-500/30 px-4 py-3 rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-2xl z-50 backdrop-blur-md mb-4">
+        <div className="flex items-center gap-3">
           <button 
             onClick={() => router.back()}
-            className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 text-white text-xs font-bold shadow-lg shadow-pink-600/40 transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-1.5"
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 text-white text-xs font-bold shadow-lg shadow-pink-600/40 transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-1.5"
           >
             <span>◀</span> Back
           </button>
 
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <h1 className="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400 uppercase tracking-widest truncate max-w-xs md:max-w-md">
-              {gameTitle} <span className="text-[10px] text-slate-400 font-normal">({gameGenre})</span>
+            <h1 className="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400 uppercase tracking-widest truncate max-w-[180px] sm:max-w-xs">
+              {gameTitle}
             </h1>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          {/* Mobile Orientation Toggle Button */}
+        <div className="flex items-center gap-2.5">
+          {/* Orientation Toggle Button */}
           <button
             onClick={() => setIsLandscape(!isLandscape)}
-            className="px-3 py-1.5 rounded-xl bg-purple-950/80 border border-purple-500/40 text-[11px] font-mono text-pink-300 hover:bg-purple-900 transition-all cursor-pointer shadow-md"
+            className="px-3.5 py-2 rounded-xl bg-pink-600/20 border border-pink-500/50 text-xs font-bold text-pink-300 hover:bg-pink-600/30 transition-all cursor-pointer shadow-md flex items-center gap-1"
           >
-            📱 View: {isLandscape ? 'Landscape ↔' : 'Portrait ↕'}
+            <span>📱</span> Mode: {isLandscape ? 'Landscape ↔' : 'Portrait ↕'}
           </button>
-
-          <div className="hidden sm:flex items-center gap-2 text-xs text-purple-300 bg-purple-950/50 px-3 py-1 rounded-lg border border-purple-500/20">
-            <span>HIGH SCORE:</span>
-            <span className="text-emerald-400 font-bold">{highScore}</span>
-          </div>
 
           <button 
             onClick={() => router.push('/')}
-            className="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600/50 text-xs text-slate-300 transition-all shadow-md cursor-pointer"
+            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600/50 text-xs text-slate-300 transition-all shadow-md cursor-pointer"
           >
-            Exit Hub ✕
+            Exit ✕
           </button>
         </div>
       </div>
 
-      {/* Arena */}
-      <div className="relative w-full flex-1 bg-gradient-to-b from-slate-950 via-purple-950/20 to-slate-950 overflow-hidden flex flex-col items-center justify-center">
+      {/* Arena Container */}
+      <div className="relative w-full flex-1 min-h-[75vh] bg-gradient-to-b from-slate-950 via-purple-950/20 to-slate-950 rounded-3xl border border-purple-500/30 overflow-hidden flex flex-col items-center justify-center shadow-2xl">
         
         {!isPlaying && !gameOver && (
           <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-slate-950/90 backdrop-blur-xl p-6 text-center">
@@ -207,11 +198,11 @@ export default function ProGamePlayer() {
         {/* Gameplay HUD */}
         {isPlaying && (
           <>
-            <div className="absolute top-6 left-6 right-6 flex justify-between items-center z-30 pointer-events-none">
-              <div className="px-4 py-2 rounded-xl bg-slate-900/80 border border-purple-500/30 backdrop-blur-md shadow-lg text-xs">
+            <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-30 pointer-events-none">
+              <div className="px-4 py-2 rounded-xl bg-slate-900/90 border border-purple-500/30 backdrop-blur-md shadow-lg text-xs">
                 SCORE: <span className="text-emerald-400 font-bold text-base ml-1">{score}</span>
               </div>
-              <div className="px-4 py-2 rounded-xl bg-slate-900/80 border border-purple-500/30 backdrop-blur-md shadow-lg text-xs">
+              <div className="px-4 py-2 rounded-xl bg-slate-900/90 border border-purple-500/30 backdrop-blur-md shadow-lg text-xs">
                 TIME: <span className={`font-bold text-base ml-1 ${timeLeft <= 5 ? 'text-red-500 animate-ping' : 'text-pink-400'}`}>{timeLeft}s</span>
               </div>
             </div>
