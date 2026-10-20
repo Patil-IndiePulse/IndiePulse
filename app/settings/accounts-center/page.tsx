@@ -205,7 +205,7 @@ export default function AccountsCenter() {
             {activeSection === 'password' && (
               <div className="text-left">
                 <h2 className="text-lg font-bold mb-4 text-white">Password and Security</h2>
-                <div className="space-y-3">
+                <div className="space-y-1">
                   <div>
                     <label className="text-[11px] text-slate-300 block mb-1 font-semibold text-left">Current Password</label>
                     <input 
