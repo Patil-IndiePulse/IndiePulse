@@ -42,7 +42,6 @@ export default function ProGamePlayer() {
     setGameTitle(detectedTitle);
     setGameGenre(detectedGenre);
 
-    // AI automated backend layout detection without showing text on UI
     const lowerTitle = detectedTitle.toLowerCase();
     const lowerGenre = detectedGenre.toLowerCase();
     if (lowerTitle.includes('runner') || lowerGenre.includes('strategy') || lowerTitle.includes('cyber')) {
@@ -149,11 +148,11 @@ export default function ProGamePlayer() {
   return (
     <main className="fixed inset-0 w-screen h-screen bg-[#070514] text-white flex flex-col select-none overflow-hidden z-50 m-0 p-0">
       
-      {/* Clean Header Bar matching Settings Page style */}
+      {/* Compact Header Bar matching Settings Page */}
       <div className="w-full bg-[#120e26]/90 border-b border-purple-500/30 px-4 py-3 flex items-center justify-between shadow-lg shrink-0 z-50 backdrop-blur-md">
         <button 
           onClick={() => router.back()}
-          className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold shadow-md cursor-pointer transition-all"
+          className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold shadow-md cursor-pointer transition-all shrink-0"
         >
           Back
         </button>
@@ -163,7 +162,7 @@ export default function ProGamePlayer() {
         </h1>
       </div>
 
-      {/* Immersive Fullscreen Game Viewport */}
+      {/* Immersive Game Viewport */}
       <div className="relative w-full flex-1 flex flex-col items-center justify-center overflow-hidden bg-[#070514]">
         
         {/* Pre-Game Lobby */}
@@ -220,7 +219,7 @@ export default function ProGamePlayer() {
               🏆
             </div>
             <h2 className="text-xl font-bold text-white mb-1">Game Over!</h2>
-            <p className="text-xs text-slate-300 mb-6 font-mono">Final Score: <span className="text-white font-bold">{score}</span></p>
+            <p className="text-xs text-slate-300 mb-6">Final Score: <span className="text-white font-bold">{score}</span></p>
             
             <div className="flex gap-3 w-full max-w-xs">
               <button 

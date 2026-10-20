@@ -83,17 +83,17 @@ export default function SavedGamesPage() {
   return (
     <main className={`min-h-screen flex flex-col px-4 py-8 max-w-5xl mx-auto w-full transition-colors duration-500 ${isDarkMode ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'}`}>
       
-      {/* Top Navigation */}
+      {/* Top Navigation - Compact Back Button */}
       <div className="flex items-center justify-between mb-6">
         <Link 
           href="/menu" 
-          className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold tracking-widest uppercase shadow-lg shadow-pink-600/30 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold shadow-[0_0_20px_rgba(236,72,153,0.4)] border border-pink-400/40 transition-all cursor-pointer"
         >
-          Back to Hub
+          Back
         </Link>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/80 border border-purple-500/30 backdrop-blur-md">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-          <span className="text-[10px] font-mono uppercase tracking-widest text-purple-300">Live Server: Ready</span>
+          <span className="text-[10px] uppercase tracking-widest text-purple-300">Live Server: Ready</span>
         </div>
       </div>
 
@@ -102,7 +102,7 @@ export default function SavedGamesPage() {
         <h1 className="text-2xl md:text-3xl font-black tracking-tight bg-gradient-to-r from-pink-400 via-purple-300 to-indigo-400 bg-clip-text text-transparent text-left">
           INDIEPULSE // SEARCH & PLAY GAMES
         </h1>
-        <p className="text-xs mt-1 font-mono text-slate-400 max-w-xl text-left">
+        <p className="text-xs mt-1 text-slate-400 max-w-xl text-left">
           Search indie games uploaded by creators worldwide and jump straight into live gameplay.
         </p>
       </div>
@@ -116,7 +116,7 @@ export default function SavedGamesPage() {
             placeholder="Search games by title, genre, or developer name..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-900/80 border border-purple-500/30 text-white text-xs font-mono focus:outline-none focus:border-pink-500 shadow-xl transition-all backdrop-blur-md text-left"
+            className="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-900/80 border border-purple-500/30 text-white text-xs focus:outline-none focus:border-pink-500 shadow-xl transition-all backdrop-blur-md text-left"
           />
         </div>
       </div>
@@ -124,13 +124,13 @@ export default function SavedGamesPage() {
       {loading ? (
         <div className="text-center py-20">
           <div className="inline-block w-10 h-10 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-xs font-mono text-pink-400 tracking-widest uppercase animate-pulse">Syncing Developer Database...</p>
+          <p className="text-xs text-pink-400 tracking-widest uppercase animate-pulse">Syncing Developer Database...</p>
         </div>
       ) : (
         <div className="space-y-4 text-left">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-xs font-mono uppercase tracking-widest text-purple-400">Available Games ({filteredGames.length})</h2>
-            <span className="text-[10px] font-mono text-slate-500">Click any game to play instantly</span>
+            <h2 className="text-xs uppercase tracking-widest text-purple-400">Available Games ({filteredGames.length})</h2>
+            <span className="text-[10px] text-slate-500">Click any game to play instantly</span>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -142,12 +142,12 @@ export default function SavedGamesPage() {
                 >
                   <div className="text-left">
                     <div className="flex items-center justify-between mb-3">
-                      <span className="px-2.5 py-1 rounded-lg bg-purple-950 border border-purple-500/40 text-[10px] font-mono text-purple-300 uppercase">{game.genre}</span>
-                      <span className="text-[10px] font-mono text-slate-400">Plays: {game.plays}</span>
+                      <span className="px-2.5 py-1 rounded-lg bg-purple-950 border border-purple-500/40 text-[10px] text-purple-300 uppercase">{game.genre}</span>
+                      <span className="text-[10px] text-slate-400">Plays: {game.plays}</span>
                     </div>
                     <h3 className="text-lg font-black text-white group-hover:text-pink-400 transition-colors mb-1 text-left">{game.title}</h3>
-                    <p className="text-xs font-mono text-slate-400 mb-4 line-clamp-2 text-left">{game.description}</p>
-                    <p className="text-[10px] font-mono text-purple-300 mb-6 text-left">Developer: <span className="text-white font-bold">{game.developer}</span></p>
+                    <p className="text-xs text-slate-400 mb-4 line-clamp-2 text-left">{game.description}</p>
+                    <p className="text-[10px] text-purple-300 mb-6 text-left">Developer: <span className="text-white font-bold">{game.developer}</span></p>
                   </div>
 
                   <button 
@@ -159,7 +159,7 @@ export default function SavedGamesPage() {
                 </div>
               ))
             ) : (
-              <div className="col-span-2 text-center py-16 text-xs font-mono text-slate-500 bg-slate-900/40 rounded-3xl border border-slate-800">
+              <div className="col-span-2 text-center py-16 text-xs text-slate-500 bg-slate-900/40 rounded-3xl border border-slate-800">
                 No games found matching "{searchQuery}"
               </div>
             )}
