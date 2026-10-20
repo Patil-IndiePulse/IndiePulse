@@ -131,36 +131,37 @@ export default function ProGamePlayer() {
   };
 
   return (
-    <main className="min-h-screen bg-[#05030a] text-white flex flex-col select-none font-mono w-full">
+    <main className="fixed inset-0 w-screen h-screen bg-[#070514] text-white flex flex-col select-none overflow-hidden m-0 p-0 font-mono z-50">
       
-      {/* Steam-like Header Bar */}
+      {/* Steam Top Bar */}
       <div className="w-full bg-[#0d091e] border-b border-purple-500/20 px-4 py-3 flex items-center justify-between shadow-lg shrink-0 z-50">
         <div className="flex items-center gap-3">
           <button 
             onClick={() => router.back()}
-            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 text-white text-xs font-bold shadow-md cursor-pointer flex items-center gap-1"
+            className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 text-white text-xs font-bold shadow-md cursor-pointer flex items-center gap-1"
           >
             <span>◀</span> Back
           </button>
           <h1 className="text-xs font-black uppercase tracking-wider text-pink-300 truncate max-w-[200px] sm:max-w-md">
-            {gameTitle} <span className="text-[10px] text-slate-400">({gameGenre})</span>
+            {gameTitle} <span className="text-[10px] text-slate-400 font-normal">({gameGenre})</span>
           </h1>
         </div>
 
         <button 
           onClick={() => router.push('/')}
-          className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 cursor-pointer border border-slate-700"
+          className="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 cursor-pointer border border-slate-700"
         >
           Exit Hub ✕
         </button>
       </div>
 
-      {/* Steam Library / Game Launcher View */}
-      <div className="relative w-full flex-1 flex flex-col items-center justify-center p-4 md:p-8">
+      {/* Main Content Area */}
+      <div className="relative w-full flex-1 flex flex-col items-center justify-center overflow-hidden bg-[#070514]">
         
+        {/* Pre-game Steam Launcher Library View */}
         {!isPlaying && !gameOver && (
-          <div className="w-full max-w-2xl bg-[#0f0b24]/90 border border-purple-500/30 rounded-3xl p-6 md:p-10 shadow-2xl backdrop-blur-xl flex flex-col items-center text-center">
-            <div className="w-24 h-24 mb-6 rounded-3xl bg-gradient-to-tr from-pink-600 via-purple-600 to-indigo-600 flex items-center justify-center text-4xl shadow-xl shadow-pink-600/40 border border-white/20 animate-pulse">
+          <div className="absolute inset-0 z-40 bg-[#070514] flex flex-col items-center justify-center p-6 text-center overflow-y-auto">
+            <div className="w-24 h-24 mb-6 rounded-3xl bg-gradient-to-tr from-pink-600 via-purple-600 to-indigo-600 flex items-center justify-center text-4xl shadow-2xl shadow-pink-600/50 border border-white/20 animate-pulse">
               🎮
             </div>
             <span className="px-3 py-1 rounded-full bg-purple-950 border border-purple-500/40 text-[10px] text-purple-300 uppercase mb-3">
@@ -173,19 +174,19 @@ export default function ProGamePlayer() {
 
             <button 
               onClick={startGame}
-              className="w-full max-w-sm py-4 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 text-white text-sm font-black uppercase tracking-widest shadow-2xl shadow-pink-600/50 transition-all hover:scale-105 active:scale-95 cursor-pointer border border-pink-400/40"
+              className="px-8 py-4 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 text-white text-sm font-black uppercase tracking-widest shadow-2xl shadow-pink-600/50 transition-all hover:scale-105 active:scale-95 cursor-pointer border border-pink-400/40"
             >
               Play Game Now ⚡
             </button>
           </div>
         )}
 
-        {/* Immersive Fullscreen Active Gameplay Arena */}
+        {/* Fullscreen Immersive Active Gameplay Arena */}
         {isPlaying && (
           <div className="absolute inset-0 w-full h-full bg-[#070514] flex flex-col z-40 overflow-hidden">
             
             {/* In-Game Steam HUD Overlay */}
-            <div className="w-full bg-slate-950/80 border-b border-purple-500/20 px-6 py-3 flex justify-between items-center z-30 backdrop-blur-md">
+            <div className="w-full bg-slate-950/90 border-b border-purple-500/20 px-6 py-3 flex justify-between items-center z-30 backdrop-blur-md">
               <div className="text-xs font-mono text-slate-300">
                 SCORE: <span className="text-emerald-400 font-bold text-base ml-1">{score}</span>
               </div>
@@ -194,7 +195,7 @@ export default function ProGamePlayer() {
               </div>
             </div>
 
-            {/* Tap Field */}
+            {/* Tap Field / Game Board */}
             <div className="relative flex-1 w-full h-full cursor-crosshair">
               {targets.map((target) => (
                 <button
