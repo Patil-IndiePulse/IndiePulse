@@ -16,6 +16,7 @@ export default function ProGamePlayer() {
   const [timeLeft, setTimeLeft] = useState(30);
   const [gameOver, setGameOver] = useState(false);
   const [targets, setTargets] = useState<{ id: number; x: number; y: number; type: string }[]>([]);
+  const [isLandscape, setIsLandscape] = useState(false); // Mobile orientation toggle state
 
   useEffect(() => {
     const savedGames = JSON.parse(localStorage.getItem('indipulse_games') || '{}');
@@ -135,7 +136,7 @@ export default function ProGamePlayer() {
   };
 
   return (
-    <main className="fixed inset-0 w-screen h-screen bg-slate-950 text-white flex flex-col select-none overflow-hidden m-0 p-0 font-mono">
+    <main className={`fixed inset-0 w-screen h-screen bg-slate-950 text-white flex flex-col select-none overflow-hidden m-0 p-0 font-mono transition-transform duration-300 ${isLandscape ? 'rotate-90 md:rotate-0 origin-center min-h-[100vw]' : ''}`}>
       
       {/* Top Bar */}
       <div className="w-full bg-slate-900/90 border-b border-purple-500/30 px-6 py-3 flex items-center justify-between shadow-2xl shrink-0 z-50 backdrop-blur-md">
@@ -155,7 +156,15 @@ export default function ProGamePlayer() {
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
+          {/* Mobile Orientation Toggle Button */}
+          <button
+            onClick={() => setIsLandscape(!isLandscape)}
+            className="px-3 py-1.5 rounded-xl bg-purple-950/80 border border-purple-500/40 text-[11px] font-mono text-pink-300 hover:bg-purple-900 transition-all cursor-pointer shadow-md"
+          >
+            📱 View: {isLandscape ? 'Landscape ↔' : 'Portrait ↕'}
+          </button>
+
           <div className="hidden sm:flex items-center gap-2 text-xs text-purple-300 bg-purple-950/50 px-3 py-1 rounded-lg border border-purple-500/20">
             <span>HIGH SCORE:</span>
             <span className="text-emerald-400 font-bold">{highScore}</span>

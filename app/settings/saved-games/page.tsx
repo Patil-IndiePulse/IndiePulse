@@ -19,7 +19,6 @@ export default function SavedGamesPage() {
       setIsDarkMode(true);
     }
 
-    // Server-ready mock data for developer-uploaded games
     const mockUploadedGames = [
       { 
         id: 1, 
@@ -50,7 +49,6 @@ export default function SavedGamesPage() {
       },
     ];
 
-    // Read user submitted games from localStorage and combine with mock data
     try {
       const storedGamesObj = JSON.parse(localStorage.getItem('indipulse_games') || '{}');
       const userSubmittedGames = Object.values(storedGamesObj).map((game: any) => ({
@@ -72,14 +70,12 @@ export default function SavedGamesPage() {
     setLoading(false);
   }, []);
 
-  // Live filter logic for real-time search
   const filteredGames = gamesList.filter(game => 
     game.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     game.genre.toLowerCase().includes(searchQuery.toLowerCase()) ||
     game.developer.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Directly redirect user to the live play page when a game is clicked
   const handlePlayGame = (gameId: number | string) => {
     router.push(`/play/${gameId}`);
   };
@@ -91,7 +87,7 @@ export default function SavedGamesPage() {
       <div className="flex items-center justify-between mb-6">
         <Link 
           href="/menu" 
-          className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold tracking-widest uppercase shadow-lg shadow-pink-600/30 transition-all hover:scale-105 active:scale-95"
+          className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold tracking-widest uppercase shadow-lg shadow-pink-600/30 transition-all hover:scale-105 active:scale-95 cursor-pointer"
         >
           Back to Hub
         </Link>
@@ -102,11 +98,11 @@ export default function SavedGamesPage() {
       </div>
 
       {/* Header Section */}
-      <div className="relative mb-6 p-6 rounded-3xl bg-gradient-to-br from-purple-950/50 via-slate-900/80 to-pink-950/30 border border-purple-500/30 backdrop-blur-2xl overflow-hidden shadow-2xl">
-        <h1 className="text-2xl md:text-3xl font-black tracking-tight bg-gradient-to-r from-pink-400 via-purple-300 to-indigo-400 bg-clip-text text-transparent">
+      <div className="relative mb-6 p-6 rounded-3xl bg-gradient-to-br from-purple-950/50 via-slate-900/80 to-pink-950/30 border border-purple-500/30 backdrop-blur-2xl overflow-hidden shadow-2xl text-left">
+        <h1 className="text-2xl md:text-3xl font-black tracking-tight bg-gradient-to-r from-pink-400 via-purple-300 to-indigo-400 bg-clip-text text-transparent text-left">
           INDIEPULSE // SEARCH & PLAY GAMES
         </h1>
-        <p className="text-xs mt-1 font-mono text-slate-400 max-w-xl">
+        <p className="text-xs mt-1 font-mono text-slate-400 max-w-xl text-left">
           Search indie games uploaded by creators worldwide and jump straight into live gameplay.
         </p>
       </div>
@@ -120,7 +116,7 @@ export default function SavedGamesPage() {
             placeholder="Search games by title, genre, or developer name..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-900/80 border border-purple-500/30 text-white text-xs font-mono focus:outline-none focus:border-pink-500 shadow-xl transition-all backdrop-blur-md"
+            className="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-900/80 border border-purple-500/30 text-white text-xs font-mono focus:outline-none focus:border-pink-500 shadow-xl transition-all backdrop-blur-md text-left"
           />
         </div>
       </div>
@@ -131,8 +127,7 @@ export default function SavedGamesPage() {
           <p className="text-xs font-mono text-pink-400 tracking-widest uppercase animate-pulse">Syncing Developer Database...</p>
         </div>
       ) : (
-        /* Full Width Clean Search Grid Layout */
-        <div className="space-y-4">
+        <div className="space-y-4 text-left">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-xs font-mono uppercase tracking-widest text-purple-400">Available Games ({filteredGames.length})</h2>
             <span className="text-[10px] font-mono text-slate-500">Click any game to play instantly</span>
@@ -143,21 +138,21 @@ export default function SavedGamesPage() {
               filteredGames.map((game) => (
                 <div 
                   key={game.id} 
-                  className="p-5 rounded-3xl bg-slate-900/80 border border-purple-500/30 hover:border-pink-500/60 transition-all duration-300 flex flex-col justify-between shadow-xl backdrop-blur-md group"
+                  className="p-5 rounded-3xl bg-slate-900/80 border border-purple-500/30 hover:border-pink-500/60 transition-all duration-300 flex flex-col justify-between shadow-xl backdrop-blur-md group text-left"
                 >
-                  <div>
+                  <div className="text-left">
                     <div className="flex items-center justify-between mb-3">
                       <span className="px-2.5 py-1 rounded-lg bg-purple-950 border border-purple-500/40 text-[10px] font-mono text-purple-300 uppercase">{game.genre}</span>
                       <span className="text-[10px] font-mono text-slate-400">Plays: {game.plays}</span>
                     </div>
-                    <h3 className="text-lg font-black text-white group-hover:text-pink-400 transition-colors mb-1">{game.title}</h3>
-                    <p className="text-xs font-mono text-slate-400 mb-4 line-clamp-2">{game.description}</p>
-                    <p className="text-[10px] font-mono text-purple-300 mb-6">Developer: <span className="text-white font-bold">{game.developer}</span></p>
+                    <h3 className="text-lg font-black text-white group-hover:text-pink-400 transition-colors mb-1 text-left">{game.title}</h3>
+                    <p className="text-xs font-mono text-slate-400 mb-4 line-clamp-2 text-left">{game.description}</p>
+                    <p className="text-[10px] font-mono text-purple-300 mb-6 text-left">Developer: <span className="text-white font-bold">{game.developer}</span></p>
                   </div>
 
                   <button 
                     onClick={() => handlePlayGame(game.id)}
-                    className="w-full py-3 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold uppercase tracking-widest shadow-lg shadow-pink-600/30 transition-all hover:scale-[1.02] active:scale-95"
+                    className="w-full py-3 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold uppercase tracking-widest shadow-lg shadow-pink-600/30 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer"
                   >
                     Play Game Now 🎮
                   </button>
