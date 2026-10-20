@@ -42,6 +42,7 @@ export default function ProGamePlayer() {
     setGameTitle(detectedTitle);
     setGameGenre(detectedGenre);
 
+    // AI automated layout optimization in background (hidden from UI)
     const lowerTitle = detectedTitle.toLowerCase();
     const lowerGenre = detectedGenre.toLowerCase();
     if (lowerTitle.includes('runner') || lowerGenre.includes('strategy') || lowerTitle.includes('cyber')) {
@@ -148,11 +149,11 @@ export default function ProGamePlayer() {
   return (
     <main className="fixed inset-0 w-screen h-screen bg-[#070514] text-white flex flex-col select-none overflow-hidden z-50 m-0 p-0">
       
-      {/* Compact Header Bar matching Settings Page */}
+      {/* Compact Header Bar with proper short Back button */}
       <div className="w-full bg-[#120e26]/90 border-b border-purple-500/30 px-4 py-3 flex items-center justify-between shadow-lg shrink-0 z-50 backdrop-blur-md">
         <button 
           onClick={() => router.back()}
-          className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold shadow-md cursor-pointer transition-all shrink-0"
+          className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold shadow-md cursor-pointer transition-all w-auto shrink-0"
         >
           Back
         </button>
