@@ -149,14 +149,17 @@ export default function ProGamePlayer() {
   return (
     <main className="fixed inset-0 w-screen h-screen bg-[#070514] text-white flex flex-col select-none overflow-hidden z-50 m-0 p-0">
       
-      {/* Compact Header Bar with proper short Back button */}
+      {/* Compact Header Bar with strictly fitted Back button */}
       <div className="w-full bg-[#120e26]/90 border-b border-purple-500/30 px-4 py-3 flex items-center justify-between shadow-lg shrink-0 z-50 backdrop-blur-md">
-        <button 
-          onClick={() => router.back()}
-          className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold shadow-md cursor-pointer transition-all w-auto shrink-0"
-        >
-          Back
-        </button>
+        <div className="flex items-center shrink-0">
+          <button 
+            onClick={() => router.back()}
+            className="inline-flex items-center justify-center px-5 py-1.5 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold shadow-md cursor-pointer transition-all flex-shrink-0"
+            style={{ width: 'fit-content' }}
+          >
+            Back
+          </button>
+        </div>
 
         <h1 className="text-xs md:text-sm font-bold uppercase tracking-wide text-white truncate max-w-[220px] sm:max-w-md text-right">
           {gameTitle}
