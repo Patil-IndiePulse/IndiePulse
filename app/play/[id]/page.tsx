@@ -16,7 +16,7 @@ export default function ProGamePlayer() {
   const [timeLeft, setTimeLeft] = useState(30);
   const [gameOver, setGameOver] = useState(false);
   const [targets, setTargets] = useState<{ id: number; x: number; y: number; type: string }[]>([]);
-  const [isLandscape, setIsLandscape] = useState(false);
+  const [isTheaterMode, setIsTheaterMode] = useState(false);
 
   useEffect(() => {
     const savedGames = JSON.parse(localStorage.getItem('indipulse_games') || '{}');
@@ -132,10 +132,10 @@ export default function ProGamePlayer() {
   };
 
   return (
-    <main className={`min-h-screen bg-[#070514] text-white flex flex-col select-none overflow-x-hidden p-3 md:p-6 font-mono transition-all duration-300 ${isLandscape ? 'rotate-90 md:rotate-0 origin-center min-w-[100vw]' : ''}`}>
+    <main className="min-h-screen bg-[#070514] text-white flex flex-col select-none p-3 md:p-6 font-mono w-full">
       
-      {/* Top Navigation & Controls Bar */}
-      <div className="w-full bg-slate-900/90 border border-purple-500/30 px-4 py-3 rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-2xl z-50 backdrop-blur-md mb-4">
+      {/* Steam-like Top Navigation Bar */}
+      <div className="w-full bg-slate-900/95 border border-purple-500/30 px-4 py-3 rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-2xl z-50 backdrop-blur-md mb-4">
         <div className="flex items-center gap-3">
           <button 
             onClick={() => router.back()}
@@ -146,19 +146,19 @@ export default function ProGamePlayer() {
 
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <h1 className="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400 uppercase tracking-widest truncate max-w-[180px] sm:max-w-xs">
+            <h1 className="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400 uppercase tracking-widest truncate max-w-[160px] sm:max-w-xs">
               {gameTitle}
             </h1>
           </div>
         </div>
 
         <div className="flex items-center gap-2.5">
-          {/* Orientation Toggle Button */}
+          {/* Theater Mode Toggle */}
           <button
-            onClick={() => setIsLandscape(!isLandscape)}
-            className="px-3.5 py-2 rounded-xl bg-pink-600/20 border border-pink-500/50 text-xs font-bold text-pink-300 hover:bg-pink-600/30 transition-all cursor-pointer shadow-md flex items-center gap-1"
+            onClick={() => setIsTheaterMode(!isTheaterMode)}
+            className="px-3.5 py-2 rounded-xl bg-purple-950/80 border border-purple-500/40 text-xs font-bold text-pink-300 hover:bg-purple-900 transition-all cursor-pointer shadow-md"
           >
-            <span>📱</span> Mode: {isLandscape ? 'Landscape ↔' : 'Portrait ↕'}
+            🖥️ {isTheaterMode ? 'Standard View' : 'Theater Mode'}
           </button>
 
           <button 
@@ -170,19 +170,19 @@ export default function ProGamePlayer() {
         </div>
       </div>
 
-      {/* Arena Container */}
-      <div className="relative w-full flex-1 min-h-[75vh] bg-gradient-to-b from-slate-950 via-purple-950/20 to-slate-950 rounded-3xl border border-purple-500/30 overflow-hidden flex flex-col items-center justify-center shadow-2xl">
+      {/* Main Game Arena Container - Fully Clean & Non-Zooming */}
+      <div className={`relative w-full flex-1 bg-gradient-to-b from-slate-950 via-purple-950/20 to-slate-950 rounded-3xl border border-purple-500/30 overflow-hidden flex flex-col items-center justify-center shadow-2xl ${isTheaterMode ? 'h-[85vh]' : 'min-h-[70vh]'}`}>
         
         {!isPlaying && !gameOver && (
-          <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-slate-950/90 backdrop-blur-xl p-6 text-center">
-            <div className="w-24 h-24 mb-6 rounded-3xl bg-gradient-to-tr from-pink-600 via-purple-600 to-indigo-600 flex items-center justify-center text-4xl shadow-2xl shadow-pink-600/50 border border-white/20 animate-bounce">
+          <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-slate-950/95 backdrop-blur-xl p-6 text-center overflow-y-auto">
+            <div className="w-20 h-20 md:w-24 md:h-24 mb-4 rounded-3xl bg-gradient-to-tr from-pink-600 via-purple-600 to-indigo-600 flex items-center justify-center text-3xl md:text-4xl shadow-2xl shadow-pink-600/50 border border-white/20 animate-bounce">
               {gameTitle.toLowerCase().includes('candy') ? '🍬' : '🎮'}
             </div>
-            <span className="px-3 py-1 rounded-full bg-purple-950 border border-purple-500/40 text-[10px] text-purple-300 uppercase mb-3">
+            <span className="px-3 py-1 rounded-full bg-purple-950 border border-purple-500/40 text-[10px] text-purple-300 uppercase mb-2">
               Genre: {gameGenre}
             </span>
-            <h2 className="text-2xl md:text-3xl font-black text-white mb-2 uppercase tracking-wider">{gameTitle}</h2>
-            <p className="text-xs md:text-sm text-slate-400 max-w-md mb-8">
+            <h2 className="text-xl md:text-3xl font-black text-white mb-2 uppercase tracking-wider">{gameTitle}</h2>
+            <p className="text-xs md:text-sm text-slate-400 max-w-md mb-6 leading-relaxed">
               Live Custom Game Mode: Tap or click the items appearing on the screen to score points before time runs out!
             </p>
 
