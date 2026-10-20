@@ -21,15 +21,15 @@ export default function AccountsCenter() {
   };
 
   return (
-    <main className="min-h-screen bg-[#070514] text-white flex flex-col px-4 py-8 max-w-2xl mx-auto w-full relative select-none text-left">
+    <main className="min-h-screen bg-[#070514] text-white flex flex-col px-4 py-8 max-w-2xl mx-auto w-full relative select-none">
       
-      {/* Background glow matching Notifications & Your Activity pages */}
+      {/* Background glow matching Notifications & Account Privacy pages */}
       <div className="absolute top-0 left-1/4 w-80 h-80 bg-pink-600/10 rounded-full blur-[100px] pointer-events-none"></div>
 
       {/* Back Button and Header */}
       <div className="flex flex-col items-start gap-4 mb-6 relative z-10 w-full text-left">
         <Link 
-          href="/settings" 
+          href="/menu" 
           className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold shadow-[0_0_20px_rgba(236,72,153,0.4)] border border-pink-400/40 transition-all cursor-pointer"
         >
           Back
