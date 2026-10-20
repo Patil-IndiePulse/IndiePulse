@@ -83,11 +83,11 @@ export default function SavedGamesPage() {
   return (
     <main className={`min-h-screen flex flex-col px-4 py-8 max-w-5xl mx-auto w-full transition-colors duration-500 ${isDarkMode ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'}`}>
       
-      {/* Top Navigation - Compact Back Button */}
+      {/* Top Navigation - Perfectly Compact Back Button */}
       <div className="flex items-center justify-between mb-6">
         <Link 
           href="/menu" 
-          className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold shadow-[0_0_20px_rgba(236,72,153,0.4)] border border-pink-400/40 transition-all cursor-pointer w-auto"
+          className="inline-flex items-center justify-center px-6 py-2 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold shadow-[0_0_20px_rgba(236,72,153,0.4)] border border-pink-400/40 transition-all cursor-pointer w-fit shrink-0"
         >
           Back
         </Link>
@@ -97,14 +97,14 @@ export default function SavedGamesPage() {
         </div>
       </div>
 
-      {/* Small Clean Header Box (Removed extra text) */}
+      {/* Small Clean Header Box */}
       <div className="relative mb-6 p-4 rounded-2xl bg-gradient-to-br from-purple-950/50 via-slate-900/80 to-pink-950/30 border border-purple-500/30 backdrop-blur-2xl shadow-xl text-left">
         <h1 className="text-xl md:text-2xl font-black tracking-tight bg-gradient-to-r from-pink-400 via-purple-300 to-indigo-400 bg-clip-text text-transparent text-left">
           Saved Games & Projects
         </h1>
       </div>
 
-      {/* Clean Search Bar with 'Search game' */}
+      {/* Clean Search Bar */}
       <div className="mb-6">
         <div className="relative">
           <span className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-purple-400">🔍</span>
