@@ -1,11 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function AccountsCenter() {
-  const router = useRouter();
-
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const [profileData, setProfileData] = useState({ name: 'Indie Creator', email: 'creator@indiepulse.com', bio: 'Passionate developer' });
@@ -23,26 +21,26 @@ export default function AccountsCenter() {
   };
 
   return (
-    <main className="min-h-screen bg-[#070514] text-white flex flex-col px-4 py-8 max-w-2xl mx-auto w-full relative select-none">
+    <main className="min-h-screen bg-[#070514] text-white flex flex-col px-4 py-8 max-w-2xl mx-auto w-full relative select-none text-left">
       
-      {/* Background glow matching Account Privacy page */}
+      {/* Background glow matching Notifications & Your Activity pages */}
       <div className="absolute top-0 left-1/4 w-80 h-80 bg-pink-600/10 rounded-full blur-[100px] pointer-events-none"></div>
 
       {/* Back Button and Header */}
-      <div className="flex flex-col items-start gap-4 mb-6 relative z-10 w-full">
-        <button 
-          onClick={() => router.back()} 
-          className="w-max px-5 py-2 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold shadow-[0_0_20px_rgba(236,72,153,0.4)] border border-pink-400/40 transition-all cursor-pointer"
+      <div className="flex flex-col items-start gap-4 mb-6 relative z-10 w-full text-left">
+        <Link 
+          href="/settings" 
+          className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold shadow-[0_0_20px_rgba(236,72,153,0.4)] border border-pink-400/40 transition-all cursor-pointer"
         >
           Back
-        </button>
+        </Link>
         <div className="w-full text-left">
           <h1 className="text-2xl font-black tracking-wide text-white">Accounts Center</h1>
           <p className="text-xs text-slate-300 mt-1">Manage your connected experiences and account settings across IndiePulse technologies.</p>
         </div>
       </div>
 
-      <div className="w-full relative z-10">
+      <div className="w-full relative z-10 text-left">
 
         {/* Success save message */}
         {message && (
@@ -52,7 +50,7 @@ export default function AccountsCenter() {
         )}
 
         {!activeSection ? (
-          <div className="bg-[#120e26]/90 border border-purple-500/30 rounded-2xl overflow-hidden shadow-[0_0_25px_rgba(147,51,234,0.15)] w-full">
+          <div className="bg-[#120e26]/90 border border-purple-500/30 rounded-2xl overflow-hidden shadow-[0_0_25px_rgba(147,51,234,0.15)] w-full text-left">
             
             <div className="p-3.5 bg-gradient-to-r from-pink-900/40 to-purple-900/40 text-pink-400 text-[11px] font-bold uppercase tracking-wider text-left">
               ACCOUNT SETTINGS & PREFERENCES
@@ -65,9 +63,9 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('profile')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5 text-left w-full">
+                <div className="flex items-center gap-3.5 text-left">
                   <span className="text-xl shrink-0">👤</span>
-                  <div className="text-left w-full">
+                  <div className="text-left">
                     <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Profiles and personal details</p>
                     <p className="text-xs text-slate-400 mt-0.5 text-left">Manage your name, email, and bio</p>
                   </div>
@@ -80,9 +78,9 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('password')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5 text-left w-full">
+                <div className="flex items-center gap-3.5 text-left">
                   <span className="text-xl shrink-0">🔒</span>
-                  <div className="text-left w-full">
+                  <div className="text-left">
                     <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Password and security</p>
                     <p className="text-xs text-slate-400 mt-0.5 text-left">Change password, security alerts</p>
                   </div>
@@ -95,9 +93,9 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('connected')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5 text-left w-full">
+                <div className="flex items-center gap-3.5 text-left">
                   <span className="text-xl shrink-0">🔗</span>
-                  <div className="text-left w-full">
+                  <div className="text-left">
                     <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Connected experiences</p>
                     <p className="text-xs text-slate-400 mt-0.5 text-left">Manage linked social & gaming accounts</p>
                   </div>
@@ -110,9 +108,9 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('permissions')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5 text-left w-full">
+                <div className="flex items-center gap-3.5 text-left">
                   <span className="text-xl shrink-0">📋</span>
-                  <div className="text-left w-full">
+                  <div className="text-left">
                     <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Your information and permissions</p>
                     <p className="text-xs text-slate-400 mt-0.5 text-left">App access, camera, and location</p>
                   </div>
@@ -125,9 +123,9 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('ads')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5 text-left w-full">
+                <div className="flex items-center gap-3.5 text-left">
                   <span className="text-xl shrink-0">📢</span>
-                  <div className="text-left w-full">
+                  <div className="text-left">
                     <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Ad preferences</p>
                     <p className="text-xs text-slate-400 mt-0.5 text-left">Manage personalized ads and topics</p>
                   </div>
@@ -140,9 +138,9 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('accounts')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5 text-left w-full">
+                <div className="flex items-center gap-3.5 text-left">
                   <span className="text-xl shrink-0">⚙</span>
-                  <div className="text-left w-full">
+                  <div className="text-left">
                     <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Manage accounts</p>
                     <p className="text-xs text-slate-400 mt-0.5 text-left">Add or remove connected accounts</p>
                   </div>
@@ -173,7 +171,7 @@ export default function AccountsCenter() {
                       type="text" 
                       value={profileData.name}
                       onChange={(e) => setProfileData({...profileData, name: e.target.value})}
-                      className="w-full bg-[#070514] border border-purple-500/40 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-pink-500"
+                      className="w-full bg-[#070514] border border-purple-500/40 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-pink-500 text-left"
                     />
                   </div>
                   <div>
@@ -182,7 +180,7 @@ export default function AccountsCenter() {
                       type="email" 
                       value={profileData.email}
                       onChange={(e) => setProfileData({...profileData, email: e.target.value})}
-                      className="w-full bg-[#070514] border border-purple-500/40 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-pink-500"
+                      className="w-full bg-[#070514] border border-purple-500/40 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-pink-500 text-left"
                     />
                   </div>
                   <div>
@@ -190,7 +188,7 @@ export default function AccountsCenter() {
                     <textarea 
                       value={profileData.bio}
                       onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
-                      className="w-full bg-[#070514] border border-purple-500/40 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-pink-500"
+                      className="w-full bg-[#070514] border border-purple-500/40 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-pink-500 text-left"
                       rows={3}
                     />
                   </div>
@@ -215,7 +213,7 @@ export default function AccountsCenter() {
                       placeholder="••••••••"
                       value={passData.currentPass}
                       onChange={(e) => setPassData({...passData, currentPass: e.target.value})}
-                      className="w-full bg-[#070514] border border-purple-500/40 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-pink-500"
+                      className="w-full bg-[#070514] border border-purple-500/40 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-pink-500 text-left"
                     />
                   </div>
                   <div>
@@ -225,7 +223,7 @@ export default function AccountsCenter() {
                       placeholder="••••••••"
                       value={passData.newPass}
                       onChange={(e) => setPassData({...passData, newPass: e.target.value})}
-                      className="w-full bg-[#070514] border border-purple-500/40 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-pink-500"
+                      className="w-full bg-[#070514] border border-purple-500/40 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-pink-500 text-left"
                     />
                   </div>
                   <div>
@@ -235,7 +233,7 @@ export default function AccountsCenter() {
                       placeholder="••••••••"
                       value={passData.confirmPass}
                       onChange={(e) => setPassData({...passData, confirmPass: e.target.value})}
-                      className="w-full bg-[#070514] border border-purple-500/40 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-pink-500"
+                      className="w-full bg-[#070514] border border-purple-500/40 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-pink-500 text-left"
                     />
                   </div>
                   <button 
