@@ -11,7 +11,6 @@ export default function ProGamePlayer() {
   const [gameTitle, setGameTitle] = useState('Neon Protocol Zero');
   const [gameGenre, setGameGenre] = useState('Action / Arcade');
   const [aiLayout, setAiLayout] = useState<'portrait' | 'landscape'>('portrait');
-  const [aiAnalysisText, setAiAnalysisText] = useState('AI Cloud Engine: Immersive Ready');
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
@@ -43,15 +42,13 @@ export default function ProGamePlayer() {
     setGameTitle(detectedTitle);
     setGameGenre(detectedGenre);
 
-    // AI automated analysis for device screen & orientation optimization
+    // AI automated backend layout detection without showing text on UI
     const lowerTitle = detectedTitle.toLowerCase();
     const lowerGenre = detectedGenre.toLowerCase();
     if (lowerTitle.includes('runner') || lowerGenre.includes('strategy') || lowerTitle.includes('cyber')) {
       setAiLayout('landscape');
-      setAiAnalysisText('🤖 AI Engine: Widescreen Landscape Mode');
     } else {
       setAiLayout('portrait');
-      setAiAnalysisText('🤖 AI Engine: Vertical Portrait Mode');
     }
 
     const savedHighScore = localStorage.getItem(`highScore_${gameId}`) || '0';
@@ -150,64 +147,55 @@ export default function ProGamePlayer() {
   };
 
   return (
-    <main className="fixed inset-0 w-screen h-screen bg-[#05030a] text-white flex flex-col select-none font-mono overflow-hidden z-50 m-0 p-0">
+    <main className="fixed inset-0 w-screen h-screen bg-[#070514] text-white flex flex-col select-none overflow-hidden z-50 m-0 p-0">
       
-      {/* Steam-Like Pro Header Bar (Clean & Minimalist) */}
-      <div className="w-full bg-[#0d091e]/95 border-b border-purple-500/20 px-5 py-3.5 flex items-center justify-between shadow-xl shrink-0 z-50 backdrop-blur-md">
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={() => router.back()}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 text-white text-xs font-bold shadow-lg shadow-pink-600/30 transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
-          >
-            <span>◀</span> Back to Hub
-          </button>
-        </div>
+      {/* Clean Header Bar matching Settings Page style */}
+      <div className="w-full bg-[#120e26]/90 border-b border-purple-500/30 px-4 py-3 flex items-center justify-between shadow-lg shrink-0 z-50 backdrop-blur-md">
+        <button 
+          onClick={() => router.back()}
+          className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold shadow-md cursor-pointer transition-all"
+        >
+          Back
+        </button>
 
-        <div className="flex flex-col text-right">
-          <h1 className="text-xs md:text-sm font-black uppercase tracking-wider text-pink-300 truncate max-w-[200px] sm:max-w-md">
-            {gameTitle}
-          </h1>
-          <span className="text-[9px] text-purple-400 font-semibold">{aiAnalysisText}</span>
-        </div>
+        <h1 className="text-xs md:text-sm font-bold uppercase tracking-wide text-white truncate max-w-[220px] sm:max-w-md text-right">
+          {gameTitle}
+        </h1>
       </div>
 
-      {/* True Fullscreen Immersive Game Viewport Container */}
+      {/* Immersive Fullscreen Game Viewport */}
       <div className="relative w-full flex-1 flex flex-col items-center justify-center overflow-hidden bg-[#070514]">
         
-        {/* Pre-Game Steam Launcher Lobby */}
+        {/* Pre-Game Lobby */}
         {!isPlaying && !gameOver && (
           <div className="absolute inset-0 z-40 bg-[#070514] flex flex-col items-center justify-center p-6 text-center overflow-y-auto">
-            <div className="w-24 h-24 mb-6 rounded-3xl bg-gradient-to-tr from-pink-600 via-purple-600 to-indigo-600 flex items-center justify-center text-4xl shadow-2xl shadow-pink-600/50 border border-white/20 animate-pulse">
+            <div className="w-20 h-20 mb-5 rounded-2xl bg-gradient-to-br from-pink-600/30 to-purple-600/30 border border-pink-500/40 flex items-center justify-center text-3xl shadow-xl shadow-pink-600/20">
               🎮
             </div>
-            <span className="px-3.5 py-1.5 rounded-full bg-purple-950/80 border border-purple-500/40 text-[10px] text-purple-300 uppercase mb-3 tracking-widest">
-              AI Optimized Engine // Mode: {aiLayout.toUpperCase()}
+            <span className="px-3 py-1 rounded-full bg-purple-950 border border-purple-500/40 text-[10px] text-purple-300 uppercase mb-2">
+              Genre: {gameGenre}
             </span>
-            <h2 className="text-2xl md:text-4xl font-black text-white mb-3 uppercase tracking-wider">{gameTitle}</h2>
-            <p className="text-xs md:text-sm text-slate-400 max-w-lg mb-8 leading-relaxed">
-              AI automated resolution matching complete. Experience zero-zoom immersive gameplay optimized instantly for your device screen.
+            <h2 className="text-xl md:text-2xl font-bold text-white mb-2">{gameTitle}</h2>
+            <p className="text-xs text-slate-300 max-w-sm mb-6 leading-relaxed">
+              Tap or click the items appearing on the screen to score points before time runs out!
             </p>
 
             <button 
               onClick={startGame}
-              className="px-10 py-4 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 text-white text-sm md:text-base font-black uppercase tracking-widest shadow-2xl shadow-pink-600/60 transition-all hover:scale-105 active:scale-95 cursor-pointer border border-pink-400/50"
+              className="w-full max-w-xs py-3 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold uppercase tracking-widest shadow-lg shadow-pink-600/30 transition-all cursor-pointer"
             >
-              Play Game Now ⚡
+              Start Game Now ⚡
             </button>
           </div>
         )}
 
-        {/* Active Fullscreen Gameplay Arena */}
+        {/* Active Gameplay Arena */}
         {isPlaying && (
           <div className="absolute inset-0 w-full h-full bg-[#070514] flex flex-col z-40 overflow-hidden">
             
-            <div className="w-full bg-slate-950/90 border-b border-purple-500/20 px-6 py-3.5 flex justify-between items-center z-30 backdrop-blur-md">
-              <div className="text-xs font-mono text-slate-300">
-                SCORE: <span className="text-emerald-400 font-bold text-base ml-1">{score}</span>
-              </div>
-              <div className="text-xs font-mono text-slate-300">
-                TIME LEFT: <span className={`font-bold text-base ml-1 ${timeLeft <= 5 ? 'text-red-500 animate-ping' : 'text-pink-400'}`}>{timeLeft}s</span>
-              </div>
+            <div className="w-full bg-[#120e26]/80 border-b border-purple-500/30 px-6 py-3 flex justify-between items-center z-30 backdrop-blur-md">
+              <div className="text-xs text-pink-400 font-semibold">SCORE: <span className="text-white font-bold text-sm ml-1">{score}</span></div>
+              <div className="text-xs text-purple-300 font-semibold">TIME: <span className={`font-bold text-sm ml-1 ${timeLeft <= 5 ? 'text-red-400 animate-ping' : 'text-white'}`}>{timeLeft}s</span></div>
             </div>
 
             <div className="relative flex-1 w-full h-full cursor-crosshair">
@@ -216,7 +204,7 @@ export default function ProGamePlayer() {
                   key={target.id}
                   onClick={(e) => handleTargetClick(target.id, target.type, e)}
                   style={{ top: `${target.y}%`, left: `${target.x}%` }}
-                  className="absolute w-16 h-16 -ml-8 -mt-8 rounded-2xl bg-gradient-to-tr from-pink-600 to-purple-600 hover:scale-125 active:scale-90 transition-transform shadow-2xl shadow-pink-600/80 flex items-center justify-center text-2xl border-2 border-white/50 animate-bounce cursor-pointer"
+                  className="absolute w-14 h-14 -ml-7 -mt-7 rounded-2xl bg-gradient-to-tr from-pink-600 to-purple-600 hover:scale-125 active:scale-90 transition-transform shadow-xl shadow-pink-600/50 flex items-center justify-center text-xl border border-white/40 animate-bounce cursor-pointer"
                 >
                   {target.type}
                 </button>
@@ -225,38 +213,27 @@ export default function ProGamePlayer() {
           </div>
         )}
 
-        {/* Game Over Summary Screen */}
+        {/* Game Over Screen */}
         {gameOver && (
-          <div className="absolute inset-0 z-50 bg-[#070514]/95 flex flex-col items-center justify-center backdrop-blur-2xl p-6 text-center">
-            <div className="w-20 h-20 mb-4 rounded-3xl bg-purple-950 border border-purple-500/40 flex items-center justify-center text-3xl shadow-xl">
+          <div className="absolute inset-0 z-50 bg-[#070514]/95 flex flex-col items-center justify-center backdrop-blur-xl p-6 text-center">
+            <div className="w-16 h-16 mb-4 rounded-2xl bg-[#120e26] border border-purple-500/40 flex items-center justify-center text-2xl shadow-xl">
               🏆
             </div>
-            <h2 className="text-2xl md:text-3xl font-black text-white mb-1 uppercase tracking-wider">{gameTitle}</h2>
-            <p className="text-xs text-slate-400 mb-6">Session finished successfully.</p>
+            <h2 className="text-xl font-bold text-white mb-1">Game Over!</h2>
+            <p className="text-xs text-slate-300 mb-6 font-mono">Final Score: <span className="text-white font-bold">{score}</span></p>
             
-            <div className="flex gap-4 mb-8">
-              <div className="px-6 py-3 rounded-2xl bg-slate-900 border border-purple-500/30 text-xs">
-                FINAL SCORE <br />
-                <span className="text-emerald-400 font-bold text-xl">{score}</span>
-              </div>
-              <div className="px-6 py-3 rounded-2xl bg-slate-900 border border-purple-500/30 text-xs">
-                PERSONAL BEST <br />
-                <span className="text-pink-400 font-bold text-xl">{highScore}</span>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
+            <div className="flex gap-3 w-full max-w-xs">
               <button 
                 onClick={startGame}
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 text-white text-xs font-bold uppercase tracking-widest shadow-lg transition-all hover:scale-105 cursor-pointer"
+                className="flex-1 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 rounded-xl font-bold text-xs cursor-pointer shadow-md"
               >
                 Play Again 🔄
               </button>
               <button 
                 onClick={() => router.push('/')}
-                className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold uppercase tracking-widest transition-all cursor-pointer"
+                className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold text-xs cursor-pointer"
               >
-                Exit to Hub 🏠
+                Exit Hub 🏠
               </button>
             </div>
           </div>
