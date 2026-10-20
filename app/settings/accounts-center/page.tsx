@@ -28,11 +28,11 @@ export default function AccountsCenter() {
       {/* Background glow matching Account Privacy page */}
       <div className="absolute top-0 left-1/4 w-80 h-80 bg-pink-600/10 rounded-full blur-[100px] pointer-events-none"></div>
 
-      {/* Back Button and Header - Fixed with self-start so button stays compact */}
+      {/* Back Button and Header */}
       <div className="flex flex-col items-start gap-4 mb-6 relative z-10 w-full">
         <button 
           onClick={() => router.back()} 
-          className="self-start px-5 py-2 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold shadow-[0_0_20px_rgba(236,72,153,0.4)] border border-pink-400/40 transition-all flex items-center gap-1.5 cursor-pointer"
+          className="w-max px-5 py-2 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold shadow-[0_0_20px_rgba(236,72,153,0.4)] border border-pink-400/40 transition-all cursor-pointer"
         >
           Back
         </button>
@@ -46,33 +46,33 @@ export default function AccountsCenter() {
 
         {/* Success save message */}
         {message && (
-          <div className="mb-4 p-3 bg-emerald-600/20 border border-emerald-500 text-emerald-300 rounded-xl text-sm animate-pulse">
+          <div className="mb-4 p-3 bg-emerald-600/20 border border-emerald-500 text-emerald-300 rounded-xl text-sm animate-pulse text-left">
             {message}
           </div>
         )}
 
         {!activeSection ? (
-          <div className="bg-[#120e26]/90 border border-purple-500/30 rounded-2xl overflow-hidden shadow-[0_0_25px_rgba(147,51,234,0.15)]">
+          <div className="bg-[#120e26]/90 border border-purple-500/30 rounded-2xl overflow-hidden shadow-[0_0_25px_rgba(147,51,234,0.15)] w-full">
             
             <div className="p-3.5 bg-gradient-to-r from-pink-900/40 to-purple-900/40 text-pink-400 text-[11px] font-bold uppercase tracking-wider text-left">
               ACCOUNT SETTINGS & PREFERENCES
             </div>
 
-            <div className="divide-y divide-purple-900/40">
+            <div className="divide-y divide-purple-900/40 w-full text-left">
               
               {/* 1. Profiles and personal details */}
               <button 
                 onClick={() => setActiveSection('profile')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center gap-3.5 text-left w-full">
                   <span className="text-xl shrink-0">👤</span>
-                  <div>
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors">Profiles and personal details</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Manage your name, email, and bio</p>
+                  <div className="text-left w-full">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Profiles and personal details</p>
+                    <p className="text-xs text-slate-400 mt-0.5 text-left">Manage your name, email, and bio</p>
                   </div>
                 </div>
-                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0">›</span>
+                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-2">›</span>
               </button>
 
               {/* 2. Password and security */}
@@ -80,14 +80,14 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('password')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center gap-3.5 text-left w-full">
                   <span className="text-xl shrink-0">🔒</span>
-                  <div>
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors">Password and security</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Change password, security alerts</p>
+                  <div className="text-left w-full">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Password and security</p>
+                    <p className="text-xs text-slate-400 mt-0.5 text-left">Change password, security alerts</p>
                   </div>
                 </div>
-                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0">›</span>
+                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-2">›</span>
               </button>
 
               {/* 3. Connected experiences */}
@@ -95,14 +95,14 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('connected')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center gap-3.5 text-left w-full">
                   <span className="text-xl shrink-0">🔗</span>
-                  <div>
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors">Connected experiences</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Manage linked social & gaming accounts</p>
+                  <div className="text-left w-full">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Connected experiences</p>
+                    <p className="text-xs text-slate-400 mt-0.5 text-left">Manage linked social & gaming accounts</p>
                   </div>
                 </div>
-                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0">›</span>
+                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-2">›</span>
               </button>
 
               {/* 4. Your information and permissions */}
@@ -110,14 +110,14 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('permissions')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center gap-3.5 text-left w-full">
                   <span className="text-xl shrink-0">📋</span>
-                  <div>
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors">Your information and permissions</p>
-                    <p className="text-xs text-slate-400 mt-0.5">App access, camera, and location</p>
+                  <div className="text-left w-full">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Your information and permissions</p>
+                    <p className="text-xs text-slate-400 mt-0.5 text-left">App access, camera, and location</p>
                   </div>
                 </div>
-                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0">›</span>
+                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-2">›</span>
               </button>
 
               {/* 5. Ad preferences */}
@@ -125,14 +125,14 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('ads')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center gap-3.5 text-left w-full">
                   <span className="text-xl shrink-0">📢</span>
-                  <div>
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors">Ad preferences</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Manage personalized ads and topics</p>
+                  <div className="text-left w-full">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Ad preferences</p>
+                    <p className="text-xs text-slate-400 mt-0.5 text-left">Manage personalized ads and topics</p>
                   </div>
                 </div>
-                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0">›</span>
+                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-2">›</span>
               </button>
 
               {/* 6. Manage accounts */}
@@ -140,14 +140,14 @@ export default function AccountsCenter() {
                 onClick={() => setActiveSection('accounts')}
                 className="w-full flex items-center justify-between p-4 hover:bg-purple-950/30 transition cursor-pointer group text-left"
               >
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center gap-3.5 text-left w-full">
                   <span className="text-xl shrink-0">⚙</span>
-                  <div>
-                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors">Manage accounts</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Add or remove connected accounts</p>
+                  <div className="text-left w-full">
+                    <p className="font-semibold text-sm text-white group-hover:text-pink-400 transition-colors text-left">Manage accounts</p>
+                    <p className="text-xs text-slate-400 mt-0.5 text-left">Add or remove connected accounts</p>
                   </div>
                 </div>
-                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0">›</span>
+                <span className="text-slate-400 group-hover:text-white transition-colors text-sm shrink-0 pl-2">›</span>
               </button>
 
             </div>
@@ -158,17 +158,17 @@ export default function AccountsCenter() {
             
             <button 
               onClick={() => setActiveSection(null)}
-              className="text-pink-400 text-xs font-semibold mb-4 hover:underline flex items-center gap-1 cursor-pointer"
+              className="text-pink-400 text-xs font-semibold mb-4 hover:underline flex items-center gap-1 cursor-pointer text-left"
             >
               ← Back to Accounts Center
             </button>
 
             {activeSection === 'profile' && (
-              <div>
+              <div className="text-left">
                 <h2 className="text-lg font-bold mb-4 text-white">Profiles and Personal Details</h2>
                 <div className="space-y-3">
                   <div>
-                    <label className="text-[11px] text-slate-300 block mb-1 font-semibold">Full Name</label>
+                    <label className="text-[11px] text-slate-300 block mb-1 font-semibold text-left">Full Name</label>
                     <input 
                       type="text" 
                       value={profileData.name}
@@ -177,7 +177,7 @@ export default function AccountsCenter() {
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] text-slate-300 block mb-1 font-semibold">Email Address</label>
+                    <label className="text-[11px] text-slate-300 block mb-1 font-semibold text-left">Email Address</label>
                     <input 
                       type="email" 
                       value={profileData.email}
@@ -186,7 +186,7 @@ export default function AccountsCenter() {
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] text-slate-300 block mb-1 font-semibold">Bio / Geo-location details</label>
+                    <label className="text-[11px] text-slate-300 block mb-1 font-semibold text-left">Bio / Geo-location details</label>
                     <textarea 
                       value={profileData.bio}
                       onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
@@ -205,11 +205,11 @@ export default function AccountsCenter() {
             )}
 
             {activeSection === 'password' && (
-              <div>
+              <div className="text-left">
                 <h2 className="text-lg font-bold mb-4 text-white">Password and Security</h2>
                 <div className="space-y-3">
                   <div>
-                    <label className="text-[11px] text-slate-300 block mb-1 font-semibold">Current Password</label>
+                    <label className="text-[11px] text-slate-300 block mb-1 font-semibold text-left">Current Password</label>
                     <input 
                       type="password" 
                       placeholder="••••••••"
@@ -219,7 +219,7 @@ export default function AccountsCenter() {
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] text-slate-300 block mb-1 font-semibold">New Password</label>
+                    <label className="text-[11px] text-slate-300 block mb-1 font-semibold text-left">New Password</label>
                     <input 
                       type="password" 
                       placeholder="••••••••"
@@ -229,7 +229,7 @@ export default function AccountsCenter() {
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] text-slate-300 block mb-1 font-semibold">Confirm New Password</label>
+                    <label className="text-[11px] text-slate-300 block mb-1 font-semibold text-left">Confirm New Password</label>
                     <input 
                       type="password" 
                       placeholder="••••••••"
@@ -249,7 +249,7 @@ export default function AccountsCenter() {
             )}
 
             {activeSection === 'connected' && (
-              <div>
+              <div className="text-left">
                 <h2 className="text-lg font-bold mb-2 text-white">Connected Experiences</h2>
                 <p className="text-slate-400 text-xs mb-4">Manage apps and accounts linked for cross-platform sharing.</p>
                 <div className="space-y-3">
@@ -291,7 +291,7 @@ export default function AccountsCenter() {
             )}
 
             {activeSection === 'permissions' && (
-              <div>
+              <div className="text-left">
                 <h2 className="text-lg font-bold mb-2 text-white">Information and Permissions</h2>
                 <p className="text-slate-400 text-xs mb-4">Control what platform features can access.</p>
                 <div className="space-y-3">
@@ -333,7 +333,7 @@ export default function AccountsCenter() {
             )}
 
             {activeSection === 'ads' && (
-              <div>
+              <div className="text-left">
                 <h2 className="text-lg font-bold mb-2 text-white">Ad Preferences</h2>
                 <p className="text-slate-400 text-xs mb-4">Manage how ads are tailored to your interests.</p>
                 <div className="space-y-3">
@@ -366,15 +366,15 @@ export default function AccountsCenter() {
             )}
 
             {activeSection === 'accounts' && (
-              <div>
+              <div className="text-left">
                 <h2 className="text-lg font-bold mb-2 text-white">Manage Accounts</h2>
                 <p className="text-slate-400 text-xs mb-4">Accounts linked to your main profile.</p>
                 <div className="space-y-3">
                   {accountsList.map((acc) => (
                     <div key={acc.id} className="flex items-center justify-between p-3 bg-[#070514] border border-purple-500/30 rounded-xl text-sm">
-                      <div>
-                        <p className="font-medium">{acc.name}</p>
-                        <span className="text-xs text-pink-400">{acc.type}</span>
+                      <div className="text-left">
+                        <p className="font-medium text-left">{acc.name}</p>
+                        <span className="text-xs text-pink-400 text-left">{acc.type}</span>
                       </div>
                       <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded">Active</span>
                     </div>
