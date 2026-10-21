@@ -14,6 +14,14 @@ export default function Home() {
   // Menu drawer state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // WhatsApp Style Live Chat Modal State
+  const [showChatModal, setShowChatModal] = useState(false);
+  const [messages, setMessages] = useState([
+    { id: 1, sender: 'Studio Alpha', text: 'Hey developers! Check out our new sci-fi indie game update.', time: '06:40 PM', isMe: false },
+    { id: 2, sender: 'Gamer_Omkar', text: 'Just played it! The graphics and smooth viewport are amazing.', time: '06:42 PM', isMe: true }
+  ]);
+  const [newMessage, setNewMessage] = useState('');
+
   const mockSearchResults = [
     { id: '1', title: 'Cyber Nexus // RPG', type: 'Game', link: '/play/1' },
     { id: '2', title: 'Neon Protocol Zero', type: 'Game', link: '/play/2' },
@@ -34,6 +42,22 @@ export default function Home() {
     }
   };
 
+  const sendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim()) return;
+
+    const newMsgObj = {
+      id: Date.now(),
+      sender: 'Gamer_Omkar',
+      text: newMessage,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      isMe: true
+    };
+
+    setMessages((prev) => [...prev, newMsgObj]);
+    setNewMessage('');
+  };
+
   return (
     <main className="min-h-screen bg-[#030014] text-white flex flex-col relative overflow-x-hidden select-none pb-12">
       {/* Background Unified Glow Effects */}
@@ -46,11 +70,11 @@ export default function Home() {
         {/* Line 1: Hamburger Menu & Stable Steam Search Bar */}
         <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', alignItems: 'center', width: '100%', gap: '10px', boxSizing: 'border-box' }} className="relative">
           
-          {/* Three Lines (Hamburger Menu Button) */}
+          {/* Three Lines (Hamburger Menu Button) with Blue + Pink Gradient */}
           <div className="relative shrink-0">
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-3 bg-[#21242d] border border-[#32353c] rounded-lg text-[#c7d5e0] hover:text-white transition-all cursor-pointer flex items-center justify-center shadow"
+              className="p-3 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 border border-pink-400/30 rounded-lg text-white transition-all cursor-pointer flex items-center justify-center shadow-lg shadow-pink-600/30"
               aria-label="Toggle Menu"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -162,14 +186,13 @@ export default function Home() {
       {/* Hero Section */}
       <div className="flex-1 px-5 py-8 max-w-6xl mx-auto w-full flex flex-col relative z-10">
         
-        {/* Top Header Row: Classic Pink-Themed User Avatar DP on Left & Bold IndiePulse Logo on Right */}
+        {/* Top Header Row: Classic Pink-Themed User Avatar DP on Left & Google-Style Color Mixed IndiePulse Logo on Right */}
         <div className="w-full flex items-center justify-between mb-8 px-1">
           
           {/* Classic Round User Avatar DP with Pink/Purple Theme Match */}
           <Link href="/profile" className="relative group cursor-pointer" aria-label="User Profile">
             <div className="w-16 h-16 rounded-full p-[2.5px] bg-gradient-to-tr from-pink-500 via-purple-500 to-pink-400 shadow-[0_0_20px_rgba(236,72,153,0.6)] transition-transform group-hover:scale-105">
               <div className="w-full h-full rounded-full bg-[#111827] overflow-hidden flex items-center justify-center border-2 border-[#030014]">
-                {/* Classic Classic Profile Avatar matching user's uploaded style */}
                 <svg className="w-9 h-9 text-[#9ca3af] translate-y-1.5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                 </svg>
@@ -177,9 +200,9 @@ export default function Home() {
             </div>
           </Link>
 
-          {/* Highly Bold and Clear IndiePulse Branding Logo */}
+          {/* Google-Style Color Mixed IndiePulse Branding Logo */}
           <div className="flex flex-col items-end cursor-pointer group">
-            <div className="text-3xl md:text-4xl font-black tracking-wider text-orange-500 drop-shadow-[0_0_15px_rgba(249,115,22,0.8)] font-sans">
+            <div className="text-3xl md:text-4xl font-black tracking-wider font-sans bg-gradient-to-r from-blue-400 via-pink-500 to-yellow-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(236,72,153,0.6)]">
               IndiePulse
             </div>
             <div className="w-full flex justify-end -mt-1">
@@ -228,12 +251,80 @@ export default function Home() {
             <a href="/community" className="w-full sm:w-auto px-6 py-3.5 bg-slate-900/90 hover:bg-slate-800 text-pink-300 font-semibold rounded-xl border border-pink-500/40 shadow-[0_0_15px_rgba(236,72,153,0.25)] transition-all text-center">
               Explore Community Feed
             </a>
-            <a href="/quests" className="w-full sm:w-auto px-6 py-3.5 bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white font-semibold rounded-xl border border-slate-700 transition-all text-center">
-              Join the Quests
-            </a>
+            {/* Chat Button replacing Join Quests */}
+            <button 
+              onClick={() => setShowChatModal(true)}
+              className="w-full sm:w-auto px-6 py-3.5 bg-slate-900/90 hover:bg-slate-800 text-emerald-400 font-semibold rounded-xl border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.25)] transition-all text-center cursor-pointer flex items-center justify-center gap-2 mx-auto"
+            >
+              <span>💬</span> Chat
+            </button>
           </div>
         </div>
       </div>
+
+      {/* WhatsApp Style Live Chat Modal Overlay */}
+      {showChatModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex flex-col justify-end sm:justify-center items-center p-0 sm:p-4">
+          <div className="w-full sm:max-w-md h-[85vh] sm:h-[600px] bg-[#0b141a] border border-emerald-500/30 rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+            
+            {/* WhatsApp Chat Header */}
+            <div className="bg-[#1f2c34] px-4 py-3 flex items-center justify-between border-b border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow">
+                  💬
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold text-white uppercase tracking-wider">IndiePulse Global Hub</h3>
+                  <span className="text-[10px] text-emerald-400 font-medium">Developers & Gamers Online</span>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowChatModal(false)}
+                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs font-bold cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Chat Messages Body (WhatsApp Theme) */}
+            <div className="flex-1 bg-[#0b141a] p-4 overflow-y-auto space-y-3 flex flex-col">
+              <div className="text-center my-2">
+                <span className="px-3 py-1 rounded-lg bg-[#182229] text-[10px] text-slate-400 shadow">
+                  Messages are end-to-end encrypted for developers & gamers.
+                </span>
+              </div>
+
+              {messages.map((msg) => (
+                <div key={msg.id} className={`flex flex-col max-w-[80%] ${msg.isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
+                  <span className="text-[9px] text-purple-300 mb-1 px-1">{msg.sender}</span>
+                  <div className={`p-3 rounded-2xl text-xs shadow-md ${msg.isMe ? 'bg-[#005c4b] text-white rounded-tr-none' : 'bg-[#202c33] text-slate-100 rounded-tl-none'}`}>
+                    <p className="leading-relaxed">{msg.text}</p>
+                    <span className="block text-[8px] text-slate-400 text-right mt-1">{msg.time}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* WhatsApp Chat Input Bar */}
+            <form onSubmit={sendMessage} className="bg-[#1f2c34] p-3 flex items-center gap-2 border-t border-slate-800">
+              <input 
+                type="text"
+                placeholder="Type a message..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                className="flex-1 py-2.5 px-4 rounded-full bg-[#2a3942] text-white text-xs focus:outline-none placeholder-slate-400 shadow-inner"
+              />
+              <button 
+                type="submit"
+                className="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center text-sm shadow-lg transition-all cursor-pointer shrink-0"
+              >
+                ➤
+              </button>
+            </form>
+
+          </div>
+        </div>
+      )}
 
       {/* Trending Section */}
       <section className="px-5 py-10 max-w-6xl mx-auto w-full relative z-10">
@@ -261,7 +352,7 @@ export default function Home() {
               </span>
             </div>
             <div className="p-6">
-              <div className="text-[11px] text-pink-400 uppercase font-bold mb-1.5 tracking-wide">Cyberpunk / Action</div>
+               <div className="text-[11px] text-pink-400 uppercase font-bold mb-1.5 tracking-wide">Cyberpunk / Action</div>
               <h3 className="text-lg font-bold text-white mb-2.5 group-hover:text-pink-300 transition-colors">Cyber Nexus // RPG</h3>
               <p className="text-xs text-slate-300 mb-5 line-clamp-2 leading-relaxed">An immersive cyberpunk role-playing adventure uploaded by an indie developer.</p>
               <div className="flex items-center justify-between pt-4 border-t border-slate-800">
@@ -276,7 +367,7 @@ export default function Home() {
           <div className="bg-slate-900/90 border border-pink-500/35 rounded-2xl overflow-hidden hover:border-pink-400 transition-all group shadow-[0_0_25px_rgba(236,72,153,0.25)]">
             <div className="h-44 bg-gradient-to-br from-purple-950 via-pink-950 to-slate-950 flex items-center justify-center relative overflow-hidden">
               <span className="text-5xl group-hover:scale-110 transition-transform duration-300">🧩</span>
-              <span className="absolute top-3.5 right-3.5 px-2.5 py-1 bg-black/70 backdrop-blur-md text-[11px] text-purple-300 rounded-lg font-semibold border border-purple-500/40">
+              <span className="absolute top-3.5 right-3.5 px-2.5 py-1 bg-black/70 backdrop-blur-md text-[11px] text-purple-300 rounded-lg font-semibold border border-pink-500/40">
                 Puzzle
               </span>
             </div>
@@ -317,7 +408,7 @@ export default function Home() {
 
       {/* Core Drives Section */}
       <section className="px-5 py-12 max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
-         <Link 
+        <Link 
           href="/development" 
           className="block bg-slate-900/90 border border-pink-500/35 p-7 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_25px_rgba(236,72,153,0.2)]"
         >
@@ -374,7 +465,7 @@ export default function Home() {
             </div>
             <div>
               <h3 className="text-lg font-bold text-white">Founder's Direct Note & Feedback</h3>
-             <p className="text-xs text-slate-300 mt-0.5">Have a suggestion or thought? Send it directly to the founder!</p>
+              <p className="text-xs text-slate-300 mt-0.5">Have a suggestion or thought? Send it directly to the founder!</p>
             </div>
           </div>
 
