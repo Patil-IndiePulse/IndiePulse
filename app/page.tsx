@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const router = useRouter();
   const [feedback, setFeedback] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -13,14 +15,6 @@ export default function Home() {
   
   // Menu drawer state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // WhatsApp Style Live Chat Modal State
-  const [showChatModal, setShowChatModal] = useState(false);
-  const [messages, setMessages] = useState([
-    { id: 1, sender: 'Studio Alpha', text: 'Hey developers! Check out our new sci-fi indie game update.', time: '06:40 PM', isMe: false },
-    { id: 2, sender: 'Gamer_Omkar', text: 'Just played it! The graphics and smooth viewport are amazing.', time: '06:42 PM', isMe: true }
-  ]);
-  const [newMessage, setNewMessage] = useState('');
 
   const mockSearchResults = [
     { id: '1', title: 'Cyber Nexus // RPG', type: 'Game', link: '/play/1' },
@@ -40,22 +34,6 @@ export default function Home() {
         setTimeout(() => setSubmitted(false), 5000);
       }, 1200);
     }
-  };
-
-  const sendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim()) return;
-
-    const newMsgObj = {
-      id: Date.now(),
-      sender: 'Gamer_Omkar',
-      text: newMessage,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isMe: true
-    };
-
-    setMessages((prev) => [...prev, newMsgObj]);
-    setNewMessage('');
   };
 
   return (
@@ -251,80 +229,16 @@ export default function Home() {
             <a href="/community" className="w-full sm:w-auto px-6 py-3.5 bg-slate-900/90 hover:bg-slate-800 text-pink-300 font-semibold rounded-xl border border-pink-500/40 shadow-[0_0_15px_rgba(236,72,153,0.25)] transition-all text-center">
               Explore Community Feed
             </a>
-            {/* Chat Button replacing Join Quests */}
-            <button 
-              onClick={() => setShowChatModal(true)}
+            {/* Chat Button linked directly to /chat folder */}
+            <Link 
+              href="/chat"
               className="w-full sm:w-auto px-6 py-3.5 bg-slate-900/90 hover:bg-slate-800 text-emerald-400 font-semibold rounded-xl border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.25)] transition-all text-center cursor-pointer flex items-center justify-center gap-2 mx-auto"
             >
               <span>💬</span> Chat
-            </button>
+            </Link>
           </div>
         </div>
       </div>
-
-      {/* WhatsApp Style Live Chat Modal Overlay */}
-      {showChatModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex flex-col justify-end sm:justify-center items-center p-0 sm:p-4">
-          <div className="w-full sm:max-w-md h-[85vh] sm:h-[600px] bg-[#0b141a] border border-emerald-500/30 rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden">
-            
-            {/* WhatsApp Chat Header */}
-            <div className="bg-[#1f2c34] px-4 py-3 flex items-center justify-between border-b border-slate-800">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow">
-                  💬
-                </div>
-                <div>
-                  <h3 className="text-xs font-bold text-white uppercase tracking-wider">IndiePulse Global Hub</h3>
-                  <span className="text-[10px] text-emerald-400 font-medium">Developers & Gamers Online</span>
-                </div>
-              </div>
-              <button 
-                onClick={() => setShowChatModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs font-bold cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Chat Messages Body (WhatsApp Theme) */}
-            <div className="flex-1 bg-[#0b141a] p-4 overflow-y-auto space-y-3 flex flex-col">
-              <div className="text-center my-2">
-                <span className="px-3 py-1 rounded-lg bg-[#182229] text-[10px] text-slate-400 shadow">
-                  Messages are end-to-end encrypted for developers & gamers.
-                </span>
-              </div>
-
-              {messages.map((msg) => (
-                <div key={msg.id} className={`flex flex-col max-w-[80%] ${msg.isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
-                  <span className="text-[9px] text-purple-300 mb-1 px-1">{msg.sender}</span>
-                  <div className={`p-3 rounded-2xl text-xs shadow-md ${msg.isMe ? 'bg-[#005c4b] text-white rounded-tr-none' : 'bg-[#202c33] text-slate-100 rounded-tl-none'}`}>
-                    <p className="leading-relaxed">{msg.text}</p>
-                    <span className="block text-[8px] text-slate-400 text-right mt-1">{msg.time}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* WhatsApp Chat Input Bar */}
-            <form onSubmit={sendMessage} className="bg-[#1f2c34] p-3 flex items-center gap-2 border-t border-slate-800">
-              <input 
-                type="text"
-                placeholder="Type a message..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                className="flex-1 py-2.5 px-4 rounded-full bg-[#2a3942] text-white text-xs focus:outline-none placeholder-slate-400 shadow-inner"
-              />
-              <button 
-                type="submit"
-                className="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center text-sm shadow-lg transition-all cursor-pointer shrink-0"
-              >
-                ➤
-              </button>
-            </form>
-
-          </div>
-        </div>
-      )}
 
       {/* Trending Section */}
       <section className="px-5 py-10 max-w-6xl mx-auto w-full relative z-10">
@@ -352,7 +266,7 @@ export default function Home() {
               </span>
             </div>
             <div className="p-6">
-               <div className="text-[11px] text-pink-400 uppercase font-bold mb-1.5 tracking-wide">Cyberpunk / Action</div>
+              <div className="text-[11px] text-pink-400 uppercase font-bold mb-1.5 tracking-wide">Cyberpunk / Action</div>
               <h3 className="text-lg font-bold text-white mb-2.5 group-hover:text-pink-300 transition-colors">Cyber Nexus // RPG</h3>
               <p className="text-xs text-slate-300 mb-5 line-clamp-2 leading-relaxed">An immersive cyberpunk role-playing adventure uploaded by an indie developer.</p>
               <div className="flex items-center justify-between pt-4 border-t border-slate-800">
@@ -367,7 +281,7 @@ export default function Home() {
           <div className="bg-slate-900/90 border border-pink-500/35 rounded-2xl overflow-hidden hover:border-pink-400 transition-all group shadow-[0_0_25px_rgba(236,72,153,0.25)]">
             <div className="h-44 bg-gradient-to-br from-purple-950 via-pink-950 to-slate-950 flex items-center justify-center relative overflow-hidden">
               <span className="text-5xl group-hover:scale-110 transition-transform duration-300">🧩</span>
-              <span className="absolute top-3.5 right-3.5 px-2.5 py-1 bg-black/70 backdrop-blur-md text-[11px] text-purple-300 rounded-lg font-semibold border border-pink-500/40">
+              <span className="absolute top-3.5 right-3.5 px-2.5 py-1 bg-black/70 backdrop-blur-md text-[11px] text-purple-300 rounded-lg font-semibold border border-purple-500/40">
                 Puzzle
               </span>
             </div>
