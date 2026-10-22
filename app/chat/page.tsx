@@ -3,212 +3,278 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function WhatsAppUnifiedSystem() {
+export default function IndiePulseChatSystem() {
   const router = useRouter();
   
-  // 1. Central State for Managing Entire App Navigation
-  const [currentTab, setCurrentTab] = useState<'chats' | 'updates' | 'communities' | 'calls'>('chats');
-  const [activeChat, setActiveChat] = useState<any>(null);
+  // App navigation state: 'list' | 'search' | 'conversation'
+  const [currentView, setCurrentView] = useState<'list' | 'search' | 'conversation'>('list');
+  
+  // Search query for mobile number or developer name
   const [searchQuery, setSearchQuery] = useState('');
-  const [messageInput, setMessageInput] = useState('');
+  
+  // Active selected chat
+  const [activeChat, setActiveChat] = useState<any>(null);
+  
+  // Message input and file attachment state
+  const [messageText, setMessageText] = useState('');
+  const [attachedFile, setAttachedFile] = useState<string | null>(null);
 
-  // 2. Centralized Database State (Mock Data for dynamic handling)
-  const [conversations, setConversations] = useState([
-    { id: '1', name: 'Parth (BCA Notes)', lastMsg: 'IA2 java.pdf (7.7 MB)', time: '10:39 AM', unread: 3, avatar: 'P', online: true },
-    { id: '2', name: 'PHP and SQL 4th sem', lastMsg: '~ shraddha: Reminder', time: '7/10/26', unread: 0, avatar: 'PHP', online: false },
-    { id: '3', name: '+91 73539 94670', lastMsg: 'git commit -m "feat: update..."', time: '10:56 AM', unread: 1, avatar: '7', online: true }
+  // Initial chat list (Developers & Gamers)
+  const [chats, setChats] = useState([
+    { id: '1', name: '+91 90354 37802', lastMsg: 'Call kr ki', time: '7:34 PM', unread: 1, avatar: '9' },
+    { id: '2', name: 'Studio Alpha Developer', lastMsg: 'New indie build uploaded!', time: 'Yesterday', unread: 0, avatar: 'S' }
   ]);
 
-  const [chatMessages, setChatMessages] = useState<Record<string, { sender: string; text: string; time: string; isMe: boolean }[]>>({
+  // Messages database for each chat
+  const [messages, setMessages] = useState<Record<string, { sender: string; text: string; file?: string; time: string; isMe: boolean }[]>>({
     '1': [
-      { sender: 'Parth', text: 'Here are the Java inheritance notes and PDF files.', time: '10:39 AM', isMe: false }
+      { sender: '+91 90354 37802', text: 'Hi', time: '7:33 PM', isMe: false },
+      { sender: 'You', text: 'Hello 👋', time: '7:33 PM', isMe: true },
+      { sender: '+91 90354 37802', text: 'Call kr ki', time: '7:34 PM', isMe: false }
+    ],
+    '2': [
+      { sender: 'Studio Alpha Developer', text: 'Check out the new game engine alpha release.', time: 'Yesterday', isMe: false }
     ]
   });
 
-  // 3. Dynamic Message Sender Handler (Handles all chat operations in one function)
+  // Handle starting a chat via number search
+  const handleStartChat = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    const query = searchQuery.trim();
+    let existing = chats.find(c => c.name.toLowerCase().includes(query.toLowerCase()));
+
+    if (!existing) {
+      const newChatObj = { id: Date.now().toString(), name: query, lastMsg: 'Direct chat started', time: 'Just now', unread: 0, avatar: query.charAt(0) };
+      setChats([newChatObj, ...chats]);
+      setActiveChat(newChatObj);
+    } else {
+      setActiveChat(existing);
+    }
+    setCurrentView('conversation');
+    setSearchQuery('');
+  };
+
+  // Handle sending text or files
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!messageInput.trim() || !activeChat) return;
+    if ((!messageText.trim() && !attachedFile) || !activeChat) return;
 
     const newMsg = {
       sender: 'You',
-      text: messageInput,
+      text: messageText,
+      file: attachedFile || undefined,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       isMe: true
     };
 
-    setChatMessages(prev => ({
+    setMessages(prev => ({
       ...prev,
       [activeChat.id]: [...(prev[activeChat.id] || []), newMsg]
     }));
-    setMessageInput('');
+    setMessageText('');
+    setAttachedFile(null);
+  };
+
+  // Handle file attachment simulation
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setAttachedFile(e.target.files[0].name);
+    }
   };
 
   return (
-    <main className="min-h-screen bg-[#0b141a] text-white flex flex-col font-sans select-none pb-16">
+    <main className="min-h-screen bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-hidden">
       
-      {/* 4. CONDITIONAL VIEW CONTROLLER (Handles Chat Screen vs Home Screen dynamically) */}
-      {activeChat ? (
-        
-        /* --- ACTIVE CHAT ROOM VIEW --- */
+      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room) */}
+      {currentView === 'conversation' && activeChat ? (
         <div className="flex-1 flex flex-col h-screen bg-[#0b141a]">
-          <div className="bg-[#1f2c34] px-4 py-3 flex items-center justify-between border-b border-slate-800 shadow">
+          
+          {/* Top Header */}
+          <div className="bg-[#1f2c34] px-4 py-3 flex items-center justify-between border-b border-slate-800 shadow-md">
             <div className="flex items-center gap-3">
-              <button onClick={() => setActiveChat(null)} className="text-emerald-400 font-bold text-sm cursor-pointer">◀</button>
-              <div className="w-9 h-9 rounded-full bg-emerald-700 flex items-center justify-center font-bold text-sm text-white shadow">
+              <button 
+                onClick={() => setCurrentView('list')}
+                className="text-emerald-400 font-bold text-sm cursor-pointer"
+              >
+                ◀
+              </button>
+              <div className="w-10 h-10 rounded-full bg-emerald-700 flex items-center justify-center font-bold text-sm text-white shadow">
                 {activeChat.avatar}
               </div>
               <div>
-                <h2 className="text-xs font-bold text-white tracking-wide truncate max-w-[180px]">{activeChat.name}</h2>
-                <span className="text-[9px] text-emerald-400">{activeChat.online ? 'online' : 'offline'}</span>
+                <h2 className="text-xs font-bold text-white tracking-wide truncate max-w-[160px]">{activeChat.name}</h2>
+                <span className="text-[9px] text-emerald-400 font-medium">online</span>
               </div>
             </div>
             <div className="flex items-center gap-4 text-slate-300 text-sm">
-              <span>📹</span>
-              <span>📞</span>
-              <span>⋮</span>
+              <span className="cursor-pointer">📹</span>
+              <span className="cursor-pointer">📞</span>
+              <span className="cursor-pointer">⋮</span>
             </div>
           </div>
 
+          {/* Messages Container */}
           <div className="flex-1 p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a]">
             <div className="text-center my-2">
               <span className="px-3 py-1 rounded-lg bg-[#182229] text-[10px] text-slate-400 shadow">
-                🔒 Messages and calls are end-to-end encrypted.
+                🔒 Messages are end-to-end encrypted for developers & gamers.
               </span>
             </div>
-            {(chatMessages[activeChat.id] || []).map((msg, idx) => (
-              <div key={idx} className={`flex flex-col max-w-[80%] ${msg.isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
+
+            {(messages[activeChat.id] || []).map((msg, idx) => (
+              <div key={idx} className={`flex flex-col max-w-[85%] ${msg.isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
                 <div className={`p-3 rounded-2xl text-xs shadow-md ${msg.isMe ? 'bg-[#005c4b] text-white rounded-tr-none' : 'bg-[#202c33] text-slate-100 rounded-tl-none'}`}>
-                  <p className="leading-relaxed">{msg.text}</p>
+                  {msg.file && (
+                    <div className="mb-2 p-2 bg-black/30 rounded-lg flex items-center gap-2 border border-white/10 text-[11px] text-emerald-300">
+                      <span>📄 {msg.file}</span>
+                    </div>
+                  )}
+                  {msg.text && <p className="leading-relaxed">{msg.text}</p>}
                   <span className="block text-[8px] text-slate-400 text-right mt-1">{msg.time}</span>
                 </div>
               </div>
             ))}
           </div>
 
+          {/* Attached File Preview Bar */}
+          {attachedFile && (
+            <div className="bg-[#1f2c34] px-4 py-2 border-t border-slate-800 flex items-center justify-between text-xs text-emerald-400">
+              <span>Attached: {attachedFile}</span>
+              <button onClick={() => setAttachedFile(null)} className="text-red-400 font-bold">✕ Remove</button>
+            </div>
+          )}
+
+          {/* Bottom Input & File Upload Bar */}
           <form onSubmit={handleSendMessage} className="bg-[#1f2c34] p-3 flex items-center gap-2 border-t border-slate-800">
+            
+            {/* Attachment Button */}
+            <label className="text-slate-300 hover:text-white cursor-pointer p-2 text-base">
+              📎
+              <input type="file" onChange={handleFileUpload} className="hidden" />
+            </label>
+
+            {/* Message Input */}
             <input 
               type="text"
               placeholder="Message"
-              value={messageInput}
-              onChange={(e) => setMessageInput(e.target.value)}
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
               className="flex-1 py-2.5 px-4 rounded-full bg-[#2a3942] text-white text-xs focus:outline-none placeholder-slate-400 shadow-inner"
             />
-            <button type="submit" className="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0">
-              ➤
+
+            {/* Send or Mic Button */}
+            <button 
+              type="submit"
+              className="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all"
+            >
+              {messageText.trim() || attachedFile ? '➤' : '🎤'}
+            </button>
+          </form>
+
+        </div>
+      ) : currentView === 'search' ? (
+        
+        /* VIEW 2: SEARCH NUMBER OR DEVELOPER PAGE */
+        <div className="flex-1 flex flex-col w-full max-w-md mx-auto p-4">
+          <div className="flex items-center gap-3 mb-6">
+            <button onClick={() => setCurrentView('list')} className="text-emerald-400 font-bold text-sm cursor-pointer">◀ Back</button>
+            <h1 className="text-base font-bold text-white">Search Developer / Gamer</h1>
+          </div>
+
+          <form onSubmit={handleStartChat} className="space-y-4">
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">🔍</span>
+              <input 
+                type="text"
+                placeholder="Enter mobile number or name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus
+                className="w-full py-3.5 pl-11 pr-4 bg-[#111b21] text-white text-xs rounded-xl border border-slate-700 focus:outline-none focus:border-emerald-500 shadow-inner"
+              />
+            </div>
+            <button 
+              type="submit"
+              className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg cursor-pointer transition-all"
+            >
+              Start Direct Chat ⚡
             </button>
           </form>
         </div>
 
       ) : (
 
-        /* --- MAIN DASHBOARD VIEW (Tabs Controller) --- */
+        /* VIEW 3: MAIN CHAT LIST SCREEN (IndiePulse Branding + Plus Button) */
         <div className="flex-1 flex flex-col w-full max-w-md mx-auto">
           
-          {/* Top Universal Header */}
-          <div className="px-4 py-3.5 flex items-center justify-between bg-[#0b141a] border-b border-slate-900">
-            <div className="flex items-center gap-3">
-              <button onClick={() => router.push('/')} className="text-emerald-400 font-bold text-xs bg-slate-800 px-2.5 py-1 rounded-lg cursor-pointer">Home</button>
-              <h1 className="text-xl font-bold text-white tracking-tight">WhatsApp</h1>
+          {/* Top Header with IndiePulse Logo */}
+          <div className="px-4 py-4 flex items-center justify-between bg-[#0b141a] border-b border-slate-900">
+            <div className="flex flex-col">
+              <div className="text-xl font-black tracking-wider bg-gradient-to-r from-blue-400 via-pink-500 to-yellow-400 bg-clip-text text-transparent">
+                IndiePulse
+              </div>
+              <span className="text-[10px] text-emerald-400 font-bold">Developer & Gamer Chat Hub</span>
             </div>
+            
             <div className="flex items-center gap-5 text-slate-300 text-lg">
-              <span>₹</span>
-              <span>📷</span>
-              <span className="cursor-pointer" onClick={() => {
-                const phone = prompt("Enter mobile number or name for direct chat:");
-                if (phone) {
-                  const newObj = { id: Date.now().toString(), name: phone, lastMsg: 'Direct chat started', time: 'Just now', unread: 0, avatar: phone.charAt(0), online: true };
-                  setConversations([newObj, ...conversations]);
-                  setActiveChat(newObj);
-                }
-              }}>⋮</span>
+              <span className="cursor-pointer" onClick={() => setCurrentView('search')}>🔍</span>
+              <span className="cursor-pointer" onClick={() => setCurrentView('search')}>⋮</span>
             </div>
           </div>
 
-          {/* TAB 1: CHATS VIEW */}
-          {currentTab === 'chats' && (
-            <div className="flex-1 flex flex-col">
-              <div className="px-4 my-2">
-                <input 
-                  type="text"
-                  placeholder="Ask Meta AI or Search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full py-2.5 pl-4 pr-4 bg-[#111b21] text-white text-xs rounded-full border border-slate-800 focus:outline-none focus:border-emerald-500 shadow-inner"
-                />
-              </div>
+          {/* Search Bar / Meta AI trigger */}
+          <div className="px-4 my-3">
+            <div 
+              onClick={() => setCurrentView('search')}
+              className="w-full py-2.5 px-4 bg-[#111b21] text-slate-400 text-xs rounded-full border border-slate-800 flex items-center gap-3 cursor-pointer shadow-inner"
+            >
+              <span>🔍</span>
+              <span>Search developer number or name...</span>
+            </div>
+          </div>
 
-              <div className="flex-1 space-y-0.5 overflow-y-auto px-2 mt-2">
-                {conversations.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())).map((chat) => (
-                  <div 
-                    key={chat.id}
-                    onClick={() => setActiveChat(chat)}
-                    className="flex items-center gap-3 p-3 rounded-2xl hover:bg-[#202c33] cursor-pointer transition-all border-b border-slate-900/50"
-                  >
-                    <div className="w-12 h-12 rounded-full bg-purple-900 flex items-center justify-center font-bold text-base text-white shrink-0 shadow">
-                      {chat.avatar}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-center mb-1">
-                        <h3 className="text-xs font-bold text-white truncate">{chat.name}</h3>
-                        <span className="text-[10px] text-slate-400">{chat.time}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <p className="text-[11px] text-slate-400 truncate">{chat.lastMsg}</p>
-                        {chat.unread > 0 && (
-                          <span className="w-4 h-4 rounded-full bg-emerald-500 text-slate-950 text-[9px] font-black flex items-center justify-center shrink-0 ml-2">
-                            {chat.unread}
-                          </span>
-                        )}
-                      </div>
-                    </div>
+          {/* Active Chats List */}
+          <div className="flex-1 space-y-0.5 overflow-y-auto px-2 mt-1">
+            {chats.map((chat) => (
+              <div 
+                key={chat.id}
+                onClick={() => {
+                  setActiveChat(chat);
+                  setCurrentView('conversation');
+                }}
+                className="flex items-center gap-3 p-3 rounded-2xl hover:bg-[#202c33] cursor-pointer transition-all border-b border-slate-900/50"
+              >
+                <div className="w-12 h-12 rounded-full bg-emerald-700 flex items-center justify-center font-bold text-base text-white shrink-0 shadow">
+                  {chat.avatar}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-center mb-1">
+                    <h3 className="text-xs font-bold text-white truncate">{chat.name}</h3>
+                    <span className="text-[10px] text-slate-400">{chat.time}</span>
                   </div>
-                ))}
+                  <div className="flex justify-between items-center">
+                    <p className="text-[11px] text-slate-400 truncate">{chat.lastMsg}</p>
+                    {chat.unread > 0 && (
+                      <span className="w-4 h-4 rounded-full bg-emerald-500 text-slate-950 text-[9px] font-black flex items-center justify-center shrink-0 ml-2">
+                        {chat.unread}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
 
-          {/* TAB 2: UPDATES VIEW */}
-          {currentTab === 'updates' && (
-            <div className="flex-1 p-4 space-y-4">
-              <h2 className="text-base font-bold">Status & Stories</h2>
-              <div className="p-3 bg-[#111b21] rounded-xl text-xs text-slate-300">No recent updates available.</div>
-            </div>
-          )}
-
-          {/* TAB 3: COMMUNITIES VIEW */}
-          {currentTab === 'communities' && (
-            <div className="flex-1 p-4 space-y-4">
-              <h2 className="text-base font-bold">Communities Hub</h2>
-              <div className="p-3 bg-[#111b21] rounded-xl text-xs text-slate-300">All community groups are synced.</div>
-            </div>
-          )}
-
-          {/* TAB 4: CALLS VIEW */}
-          {currentTab === 'calls' && (
-            <div className="flex-1 p-4 space-y-4">
-              <h2 className="text-base font-bold">Recent Voice & Video Calls</h2>
-              <div className="p-3 bg-[#111b21] rounded-xl text-xs text-slate-300">No missed calls.</div>
-            </div>
-          )}
-
-          {/* UNIVERSAL BOTTOM NAVIGATION BAR (Handles tab switching instantly) */}
-          <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#1f2c34] border-t border-slate-800 flex justify-around items-center py-2 z-50 shadow-2xl">
-            <button onClick={() => setCurrentTab('chats')} className={`flex flex-col items-center cursor-pointer ${currentTab === 'chats' ? 'text-emerald-400 font-bold' : 'text-slate-400'}`}>
-              <span className="text-lg">💬</span>
-              <span className="text-[10px] mt-0.5">Chats</span>
-            </button>
-            <button onClick={() => setCurrentTab('updates')} className={`flex flex-col items-center cursor-pointer ${currentTab === 'updates' ? 'text-emerald-400 font-bold' : 'text-slate-400'}`}>
-              <span className="text-lg">🔔</span>
-              <span className="text-[10px] mt-0.5">Updates</span>
-            </button>
-            <button onClick={() => setCurrentTab('communities')} className={`flex flex-col items-center cursor-pointer ${currentTab === 'communities' ? 'text-emerald-400 font-bold' : 'text-slate-400'}`}>
-              <span className="text-lg">👥</span>
-              <span className="text-[10px] mt-0.5">Communities</span>
-            </button>
-            <button onClick={() => setCurrentTab('calls')} className={`flex flex-col items-center cursor-pointer ${currentTab === 'calls' ? 'text-emerald-400 font-bold' : 'text-slate-400'}`}>
-              <span className="text-lg">📞</span>
-              <span className="text-[10px] mt-0.5">Calls</span>
+          {/* WhatsApp Style Floating Plus (+) Button at Bottom Right */}
+          <div className="absolute bottom-6 right-6 z-40">
+            <button 
+              onClick={() => setCurrentView('search')}
+              className="w-14 h-14 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 flex items-center justify-center text-3xl font-black shadow-2xl transition-transform hover:scale-105 active:scale-95 cursor-pointer"
+              aria-label="New Chat"
+            >
+              +
             </button>
           </div>
 
