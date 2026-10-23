@@ -102,11 +102,11 @@ export default function IndiePulseChatSystem() {
   return (
     <main className="min-h-screen w-full bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden">
       
-      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room with Clean Header & Fixed Input Bar) */}
+      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room with Perfect WhatsApp Input Bar & Header) */}
       {currentView === 'conversation' && activeChat ? (
-        <div className="flex-1 flex flex-col h-screen bg-[#0b141a] pb-20">
+        <div className="flex-1 flex flex-col h-screen bg-[#0b141a] pb-16">
           
-          {/* Top WhatsApp Style Header (No top back button, pure WhatsApp header) */}
+          {/* Top WhatsApp Style Header */}
           <div className="bg-[#1f2c34] px-3 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-sm text-white shadow shrink-0">
@@ -155,8 +155,8 @@ export default function IndiePulseChatSystem() {
             </div>
           )}
 
-          {/* Bottom WhatsApp Style Input Bar (Perfect Fit inside screen width) */}
-          <form onSubmit={handleSendMessage} className="bg-[#0b141a] px-3 py-2.5 flex items-center gap-2 fixed bottom-0 left-0 right-0 z-50">
+          {/* Bottom WhatsApp Style Input Bar (Fixed Layout Without Overflow) */}
+          <form onSubmit={handleSendMessage} className="bg-[#0b141a] px-2 py-2 flex items-center gap-2 fixed bottom-0 left-0 right-0 z-50 w-full max-w-full">
             <div className="flex-1 bg-[#1f2c34] rounded-full px-3 py-2 flex items-center gap-2 border border-slate-800 shadow-inner min-w-0">
               <span className="text-slate-400 text-sm cursor-pointer shrink-0">😊</span>
               <input 
@@ -173,10 +173,10 @@ export default function IndiePulseChatSystem() {
               <span className="text-slate-400 text-sm cursor-pointer shrink-0">📷</span>
             </div>
 
-            {/* WhatsApp Style Circular Send / Mic Button (Properly contained) */}
+            {/* WhatsApp Style Circular Send / Mic Button (Fixed Sizing) */}
             <button 
               type="submit"
-              className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all"
+              className="w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all select-none"
             >
               {messageText.trim() || attachedFile ? '➤' : '🎤'}
             </button>
