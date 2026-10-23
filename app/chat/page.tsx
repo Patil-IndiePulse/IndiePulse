@@ -24,24 +24,16 @@ export default function IndiePulseChatSystem() {
 
   // Pre-registered database of developer & gamer contacts
   const [registeredContacts, setRegisteredContacts] = useState([
-    { id: '1', name: '+91 90354 37802', lastMsg: 'Call kr ki', time: '7:34 PM', unread: 1, avatar: '9' },
+    { id: '1', name: '+91 90354 37802', lastMsg: 'Tap to start chatting', time: '', unread: 0, avatar: '9' },
     { id: '2', name: 'Studio Alpha Developer', lastMsg: 'New indie build uploaded!', time: 'Yesterday', unread: 0, avatar: 'S' },
     { id: '3', name: '+91 80507 64670', lastMsg: 'Direct chat started', time: 'Just now', unread: 0, avatar: '8' }
   ]);
 
-  // Messages database for each chat
+  // Messages database for each chat (Cleared demo messages for fresh WhatsApp-like experience)
   const [messages, setMessages] = useState<Record<string, { sender: string; text: string; file?: string; time: string; isMe: boolean }[]>>({
-    '1': [
-      { sender: '+91 90354 37802', text: 'Hi', time: '7:33 PM', isMe: false },
-      { sender: 'You', text: 'Hello 👋', time: '7:33 PM', isMe: true },
-      { sender: '+91 90354 37802', text: 'Call kr ki', time: '7:34 PM', isMe: false }
-    ],
-    '2': [
-      { sender: 'Studio Alpha Developer', text: 'Check out the new game engine alpha release.', time: 'Yesterday', isMe: false }
-    ],
-    '3': [
-      { sender: '+91 80507 64670', text: 'Hello developer!', time: 'Just now', isMe: true }
-    ]
+    '1': [],
+    '2': [],
+    '3': []
   });
 
   // Filter existing chats on the first page based on search query
@@ -93,34 +85,36 @@ export default function IndiePulseChatSystem() {
   return (
     <main className="min-h-screen w-full bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden">
       
-      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room with Blue Accents & Compact Stylish Pink Back Button) */}
+      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room with Blue Accents & Small Rounded Pink Back Button) */}
       {currentView === 'conversation' && activeChat ? (
-        <div className="flex-1 flex flex-col h-screen bg-[#0b141a]">
+        <div className="flex-1 flex flex-col h-screen bg-[#0b141a] pb-20">
           
-          {/* Top Header */}
-          <div className="bg-[#1f2c34] px-4 py-3 flex items-center justify-between border-b border-slate-800 shadow-md">
-            <div className="flex items-center gap-3">
+          {/* Top WhatsApp Style Header */}
+          <div className="bg-[#1f2c34] px-3 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md">
+            <div className="flex items-center gap-2.5">
               <button 
                 onClick={() => setCurrentView('list')}
-                className="inline-flex items-center justify-center px-3 py-1.5 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white rounded-full text-xs font-bold shadow-[0_0_12px_rgba(236,72,153,0.5)] border border-pink-400/30 cursor-pointer shrink-0"
+                className="w-9 h-9 rounded-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white flex items-center justify-center text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.6)] border border-pink-400/40 cursor-pointer shrink-0"
               >
-                ◀ Back
+                ◀
               </button>
               <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs text-white shadow">
                 {activeChat.avatar}
               </div>
-              <div>
-                <h2 className="text-xs font-bold text-white tracking-wide truncate max-w-[160px]">{activeChat.name}</h2>
+              <div className="flex flex-col">
+                <h2 className="text-xs font-bold text-white tracking-wide truncate max-w-[150px]">{activeChat.name}</h2>
                 <span className="text-[9px] text-blue-400 font-semibold">online</span>
               </div>
             </div>
-            <div className="flex items-center gap-3 text-slate-300 text-sm">
+            <div className="flex items-center gap-4 text-slate-300 text-sm pr-1">
+              <span className="cursor-pointer">📹</span>
+              <span className="cursor-pointer">📞</span>
               <span className="cursor-pointer">⋮</span>
             </div>
           </div>
 
-          {/* Messages Container */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a] pb-24">
+          {/* Messages Container (Clean WhatsApp Style) */}
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a]">
             <div className="text-center my-2">
               <span className="px-3 py-1 rounded-lg bg-[#182229] text-[10px] text-slate-400 shadow border border-slate-800">
                 🔒 Messages & file transfers are end-to-end encrypted.
@@ -150,7 +144,7 @@ export default function IndiePulseChatSystem() {
             </div>
           )}
 
-          {/* Bottom Input & File Upload Bar (Properly Fixed Above Keyboard/Screen Bottom) */}
+          {/* Bottom Input & File Upload Bar (Perfectly fixed above keyboard/screen bottom) */}
           <form onSubmit={handleSendMessage} className="bg-[#1f2c34] p-3 flex items-center gap-2 border-t border-slate-800 fixed bottom-0 left-0 right-0 z-50 shadow-2xl">
             
             {/* File Upload Button */}
@@ -185,9 +179,9 @@ export default function IndiePulseChatSystem() {
           <div className="flex items-center mb-4">
             <button 
               onClick={() => setCurrentView('list')} 
-              className="inline-flex items-center justify-center px-3 py-1.5 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white rounded-full text-xs font-bold shadow-[0_0_12px_rgba(236,72,153,0.5)] border border-pink-400/30 cursor-pointer shrink-0"
+              className="w-9 h-9 rounded-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white flex items-center justify-center text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.6)] border border-pink-400/40 cursor-pointer shrink-0"
             >
-              ◀ Back
+              ◀
             </button>
           </div>
 
