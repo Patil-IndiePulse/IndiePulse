@@ -93,7 +93,7 @@ export default function IndiePulseChatSystem() {
             <div className="flex items-center gap-3">
               <button 
                 onClick={() => setCurrentView('list')}
-                className="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer w-auto self-start"
+                className="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer inline-flex items-center"
               >
                 ◀ Back
               </button>
@@ -178,7 +178,7 @@ export default function IndiePulseChatSystem() {
           <div className="flex items-center mb-6">
             <button 
               onClick={() => setCurrentView('list')} 
-              className="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer w-auto self-start"
+              className="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer inline-flex items-center"
             >
               ◀ Back
             </button>
