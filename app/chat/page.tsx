@@ -9,8 +9,11 @@ export default function IndiePulseChatSystem() {
   // App navigation state: 'list' | 'search' | 'conversation'
   const [currentView, setCurrentView] = useState<'list' | 'search' | 'conversation'>('list');
   
-  // Search query for mobile number or developer name
-  const [searchQuery, setSearchQuery] = useState('');
+  // Search query for first page chat list filtering
+  const [listSearchQuery, setListSearchQuery] = useState('');
+
+  // Global search query for plus (+) button number searching
+  const [globalSearchQuery, setGlobalSearchQuery] = useState('');
   
   // Active selected chat
   const [activeChat, setActiveChat] = useState<any>(null);
@@ -41,16 +44,22 @@ export default function IndiePulseChatSystem() {
     ]
   });
 
-  // Filter contacts based on availability check in system
-  const searchResults = searchQuery.trim() 
-    ? registeredContacts.filter(c => c.name.toLowerCase().includes(searchQuery.trim().toLowerCase()))
+  // Filter existing chats on the first page based on search query
+  const filteredChatList = registeredContacts.filter(c => 
+    c.name.toLowerCase().includes(listSearchQuery.toLowerCase()) || 
+    c.lastMsg.toLowerCase().includes(listSearchQuery.toLowerCase())
+  );
+
+  // Filter global database when using the plus (+) button search view
+  const globalSearchResults = globalSearchQuery.trim() 
+    ? registeredContacts.filter(c => c.name.toLowerCase().includes(globalSearchQuery.trim().toLowerCase()))
     : [];
 
-  // Handle selecting a verified contact from search results
+  // Handle selecting a verified contact from global search results
   const handleSelectContact = (contact: any) => {
     setActiveChat(contact);
     setCurrentView('conversation');
-    setSearchQuery('');
+    setGlobalSearchQuery('');
   };
 
   // Handle sending text or files
@@ -84,24 +93,26 @@ export default function IndiePulseChatSystem() {
   return (
     <main className="min-h-screen w-full bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden">
       
-      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room with Blue Accents & Slim Pink Back Button) */}
+      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room with Blue Accents & Small Pink Back Button) */}
       {currentView === 'conversation' && activeChat ? (
         <div className="flex-1 flex flex-col h-screen bg-[#0b141a]">
           
           {/* Top Header */}
           <div className="bg-[#1f2c34] px-4 py-3 flex items-center justify-between border-b border-slate-800 shadow-md">
             <div className="flex items-center gap-3">
-              <button 
-                onClick={() => setCurrentView('list')}
-                className="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer inline-flex items-center"
-              >
-                ◀ Back
-              </button>
+              <div className="flex items-center">
+                <button 
+                  onClick={() => setCurrentView('list')}
+                  className="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer"
+                >
+                  ◀ Back
+                </button>
+              </div>
               <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs text-white shadow">
                 {activeChat.avatar}
               </div>
               <div>
-                <h2 className="text-xs font-bold text-white tracking-wide truncate max-w-[200px]">{activeChat.name}</h2>
+                <h2 className="text-xs font-bold text-white tracking-wide truncate max-w-[180px]">{activeChat.name}</h2>
                 <span className="text-[9px] text-blue-400 font-semibold">online</span>
               </div>
             </div>
@@ -173,37 +184,39 @@ export default function IndiePulseChatSystem() {
         </div>
       ) : currentView === 'search' ? (
         
-        /* VIEW 2: SEARCH NUMBER & SYSTEM AVAILABILITY CHECK */
+        /* VIEW 2: GLOBAL NUMBER SEARCH PAGE (Triggered by Plus Button) */
         <div className="flex-1 flex flex-col p-4 w-full">
-          <div className="flex items-center mb-6">
-            <button 
-              onClick={() => setCurrentView('list')} 
-              className="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer inline-flex items-center"
-            >
-              ◀ Back
-            </button>
+          <div className="flex items-center mb-4">
+            <div className="flex items-center">
+              <button 
+                onClick={() => setCurrentView('list')} 
+                className="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer"
+              >
+                ◀ Back
+              </button>
+            </div>
           </div>
 
-          {/* Number / Name Search Input Box */}
+          {/* Global Number / Name Search Input Box */}
           <div className="relative mb-4">
             <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">🔍</span>
             <input 
               type="text"
-              placeholder="Enter mobile number or name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search global developer number or name..."
+              value={globalSearchQuery}
+              onChange={(e) => setGlobalSearchQuery(e.target.value)}
               autoFocus
               className="w-full py-3.5 pl-11 pr-4 bg-[#111b21] text-white text-xs rounded-xl border border-slate-700 focus:outline-none focus:border-blue-500 shadow-inner"
             />
           </div>
 
-          {/* System Availability Verification Results */}
+          {/* Global Search Results */}
           <div className="flex-1 space-y-2 overflow-y-auto">
-            {searchQuery.trim() !== '' ? (
-              searchResults.length > 0 ? (
+            {globalSearchQuery.trim() !== '' ? (
+              globalSearchResults.length > 0 ? (
                 <div>
-                  <div className="text-[10px] uppercase tracking-wider text-blue-400 font-bold mb-2">Available in System:</div>
-                  {searchResults.map((contact) => (
+                  <div className="text-[10px] uppercase tracking-wider text-blue-400 font-bold mb-2">Global System Results:</div>
+                  {globalSearchResults.map((contact) => (
                     <div 
                       key={contact.id}
                       onClick={() => handleSelectContact(contact)}
@@ -215,7 +228,7 @@ export default function IndiePulseChatSystem() {
                         </div>
                         <div>
                           <h3 className="text-xs font-bold text-white">{contact.name}</h3>
-                          <span className="text-[10px] text-blue-400 font-medium">✓ Number Available • Click to chat</span>
+                          <span className="text-[10px] text-blue-400 font-medium">✓ Number Found • Click to chat</span>
                         </div>
                       </div>
                       <span className="text-xs text-blue-400 font-bold">Chat →</span>
@@ -224,12 +237,12 @@ export default function IndiePulseChatSystem() {
                 </div>
               ) : (
                 <div className="p-4 bg-slate-900/80 border border-red-500/30 rounded-xl text-center text-xs text-red-300">
-                  ❌ Number not available in the system database. Try another number or developer name.
+                  ❌ Number not found in global system database.
                 </div>
               )
             ) : (
               <div className="text-center text-xs text-slate-400 mt-8">
-                Type a mobile number or developer name above to check availability in the system.
+                Type any developer number or name to search globally.
               </div>
             )}
           </div>
@@ -237,7 +250,7 @@ export default function IndiePulseChatSystem() {
 
       ) : (
 
-        /* VIEW 3: MAIN CHAT LIST SCREEN (IndiePulse Branding + Pink Plus Button) */
+        /* VIEW 3: MAIN CHAT LIST SCREEN (WhatsApp Style Search List & Pink Plus Button) */
         <div className="flex-1 flex flex-col w-full pb-20">
           
           {/* Top Header with IndiePulse Logo */}
@@ -259,50 +272,59 @@ export default function IndiePulseChatSystem() {
             </div>
           </div>
 
-          {/* Search Bar / Trigger */}
+          {/* WhatsApp Style Chat List Search Bar */}
           <div className="px-4 my-3">
-            <div 
-              onClick={() => setCurrentView('search')}
-              className="w-full py-2.5 px-4 bg-[#111b21] text-slate-400 text-xs rounded-full border border-slate-800 flex items-center gap-3 cursor-pointer shadow-inner"
-            >
-              <span>🔍</span>
-              <span>Search available developer number...</span>
+            <div className="relative flex items-center">
+              <span className="absolute left-4 text-slate-400 text-xs">🔍</span>
+              <input 
+                type="text"
+                placeholder="Search chats or messages..."
+                value={listSearchQuery}
+                onChange={(e) => setListSearchQuery(e.target.value)}
+                className="w-full py-2.5 pl-11 pr-4 bg-[#111b21] text-white text-xs rounded-full border border-slate-800 focus:outline-none focus:border-blue-500 shadow-inner"
+              />
             </div>
           </div>
 
-          {/* Active Chats List */}
+          {/* Active Filtered Chats List */}
           <div className="flex-1 space-y-0.5 overflow-y-auto px-2 mt-1">
-            {registeredContacts.map((chat) => (
-              <div 
-                key={chat.id}
-                onClick={() => {
-                  setActiveChat(chat);
-                  setCurrentView('conversation');
-                }}
-                className="flex items-center gap-3 p-3 rounded-2xl hover:bg-[#202c33] cursor-pointer transition-all border-b border-slate-900/50"
-              >
-                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-base text-white shrink-0 shadow-[0_0_12px_rgba(37,99,235,0.4)]">
-                  {chat.avatar}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-center mb-1">
-                    <h3 className="text-xs font-bold text-white truncate">{chat.name}</h3>
-                    <span className="text-[10px] text-slate-400">{chat.time}</span>
+            {filteredChatList.length > 0 ? (
+              filteredChatList.map((chat) => (
+                <div 
+                  key={chat.id}
+                  onClick={() => {
+                    setActiveChat(chat);
+                    setCurrentView('conversation');
+                  }}
+                  className="flex items-center gap-3 p-3 rounded-2xl hover:bg-[#202c33] cursor-pointer transition-all border-b border-slate-900/50"
+                >
+                  <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-base text-white shrink-0 shadow-[0_0_12px_rgba(37,99,235,0.4)]">
+                    {chat.avatar}
                   </div>
-                  <div className="flex justify-between items-center">
-                    <p className="text-[11px] text-slate-400 truncate">{chat.lastMsg}</p>
-                    {chat.unread > 0 && (
-                      <span className="w-4 h-4 rounded-full bg-blue-500 text-white text-[9px] font-black flex items-center justify-center shrink-0 ml-2 shadow">
-                        {chat.unread}
-                      </span>
-                    )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-center mb-1">
+                      <h3 className="text-xs font-bold text-white truncate">{chat.name}</h3>
+                      <span className="text-[10px] text-slate-400">{chat.time}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <p className="text-[11px] text-slate-400 truncate">{chat.lastMsg}</p>
+                      {chat.unread > 0 && (
+                        <span className="w-4 h-4 rounded-full bg-blue-500 text-white text-[9px] font-black flex items-center justify-center shrink-0 ml-2 shadow">
+                          {chat.unread}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="text-center text-xs text-slate-400 mt-10">
+                No chats found matching your search. Click the (+) button below to start a new chat.
               </div>
-            ))}
+            )}
           </div>
 
-          {/* Floating Plus Button adjusted higher up */}
+          {/* Floating Plus (+) Button for Global Search */}
           <div className="fixed bottom-20 right-6 z-40">
             <button 
               onClick={() => setCurrentView('search')}
