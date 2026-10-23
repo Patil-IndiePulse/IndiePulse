@@ -6,23 +6,13 @@ import { useRouter } from 'next/navigation';
 export default function IndiePulseChatSystem() {
   const router = useRouter();
   
-  // App navigation state: 'list' | 'search' | 'conversation'
   const [currentView, setCurrentView] = useState<'list' | 'search' | 'conversation'>('list');
-  
-  // Search query for first page chat list filtering
   const [listSearchQuery, setListSearchQuery] = useState('');
-
-  // Global search query for plus (+) button number searching
   const [globalSearchQuery, setGlobalSearchQuery] = useState('');
-  
-  // Active selected chat
   const [activeChat, setActiveChat] = useState<any>(null);
-  
-  // Message input and file attachment state
   const [messageText, setMessageText] = useState('');
   const [attachedFile, setAttachedFile] = useState<string | null>(null);
 
-  // Handle phone hardware back button / browser back action dynamically like WhatsApp
   useEffect(() => {
     const handlePopState = () => {
       if (currentView === 'conversation' || currentView === 'search') {
@@ -39,39 +29,33 @@ export default function IndiePulseChatSystem() {
     window.history.pushState({ view }, '');
   };
 
-  // Pre-registered database of developer & gamer contacts
   const [registeredContacts, setRegisteredContacts] = useState([
     { id: '1', name: '+91 90354 37802', lastMsg: 'Tap to start chatting', time: '', unread: 0, avatar: '9' },
     { id: '2', name: 'Studio Alpha Developer', lastMsg: 'New indie build uploaded!', time: 'Yesterday', unread: 0, avatar: 'S' },
     { id: '3', name: '+91 80507 64670', lastMsg: 'Direct chat started', time: 'Just now', unread: 0, avatar: '8' }
   ]);
 
-  // Messages database for each chat
   const [messages, setMessages] = useState<Record<string, { sender: string; text: string; file?: string; time: string; isMe: boolean }[]>>({
     '1': [],
     '2': [],
     '3': []
   });
 
-  // Filter existing chats on the first page based on search query
   const filteredChatList = registeredContacts.filter(c => 
     c.name.toLowerCase().includes(listSearchQuery.toLowerCase()) || 
     c.lastMsg.toLowerCase().includes(listSearchQuery.toLowerCase())
   );
 
-  // Filter global database when using the plus (+) button search view
   const globalSearchResults = globalSearchQuery.trim() 
     ? registeredContacts.filter(c => c.name.toLowerCase().includes(globalSearchQuery.trim().toLowerCase()))
     : [];
 
-  // Handle selecting a verified contact from global search results
   const handleSelectContact = (contact: any) => {
     setActiveChat(contact);
     changeView('conversation');
     setGlobalSearchQuery('');
   };
 
-  // Handle sending text or files
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if ((!messageText.trim() && !attachedFile) || !activeChat) return;
@@ -92,7 +76,6 @@ export default function IndiePulseChatSystem() {
     setAttachedFile(null);
   };
 
-  // Handle file upload
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setAttachedFile(e.target.files[0].name);
@@ -102,11 +85,10 @@ export default function IndiePulseChatSystem() {
   return (
     <main className="min-h-screen w-full bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden">
       
-      {/* VIEW 1: CONVERSATION SCREEN */}
       {currentView === 'conversation' && activeChat ? (
         <div className="flex-1 flex flex-col h-screen bg-[#0b141a] justify-between">
           
-          {/* Top WhatsApp Style Header */}
+          {/* Top Header */}
           <div className="bg-[#1f2c34] px-3 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md shrink-0">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-sm text-white shadow shrink-0">
@@ -147,7 +129,6 @@ export default function IndiePulseChatSystem() {
             ))}
           </div>
 
-          {/* Attached File Preview Bar */}
           {attachedFile && (
             <div className="bg-[#1f2c34] px-4 py-2 border-t border-slate-800 flex items-center justify-between text-xs text-blue-400 shrink-0">
               <span>Attached: {attachedFile}</span>
@@ -155,19 +136,19 @@ export default function IndiePulseChatSystem() {
             </div>
           )}
 
-          {/* Bottom WhatsApp Style Input Bar (Perfect Sizing & Screen Fit) */}
-          <div className="bg-[#0b141a] px-2 py-2 shrink-0 w-full">
-            <form onSubmit={handleSendMessage} className="flex items-center gap-1.5 w-full max-w-full">
+          {/* Bottom Input Bar - Strictly Fixed Mobile Layout */}
+          <div className="bg-[#0b141a] p-2 shrink-0 w-full">
+            <form onSubmit={handleSendMessage} className="flex items-center gap-2 w-full">
               
-              {/* Message Input Container Box */}
-              <div className="flex-1 bg-[#1f2c34] rounded-full px-3 py-2 flex items-center gap-2 border border-slate-800 shadow-inner min-w-0">
+              {/* Input Box with min-w-0 to prevent disappearing */}
+              <div className="flex-1 min-w-0 bg-[#1f2c34] rounded-full px-3 py-2 flex items-center gap-2 border border-slate-800 shadow-inner">
                 <span className="text-slate-400 text-base cursor-pointer shrink-0">😊</span>
                 <input 
                   type="text"
                   placeholder="Message"
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
-                  className="flex-1 bg-transparent text-white text-xs focus:outline-none placeholder-slate-400 min-w-0"
+                  className="w-full bg-transparent text-white text-xs focus:outline-none placeholder-slate-400 min-w-0"
                 />
                 <label className="text-slate-400 hover:text-white cursor-pointer text-lg shrink-0">
                   📎
@@ -176,10 +157,10 @@ export default function IndiePulseChatSystem() {
                 <span className="text-slate-400 text-base cursor-pointer shrink-0">📷</span>
               </div>
 
-              {/* Properly Sized & Aligned Circular Send (➤) or Mic (🎤) Button */}
+              {/* Fixed Size Circular Send / Mic Button (Shrink-0 prevents stretching) */}
               <button 
                 type="submit"
-                className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all select-none"
+                className="w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all select-none"
               >
                 {messageText.trim() || attachedFile ? '➤' : '🎤'}
               </button>
@@ -190,13 +171,9 @@ export default function IndiePulseChatSystem() {
         </div>
       ) : currentView === 'search' ? (
         
-        /* VIEW 2: GLOBAL NUMBER SEARCH PAGE */
         <div className="flex-1 flex flex-col p-4 w-full">
           <div className="flex items-center mb-4">
-            <button 
-              onClick={() => changeView('list')} 
-              className="text-xs text-blue-400 font-semibold cursor-pointer"
-            >
+            <button onClick={() => changeView('list')} className="text-xs text-blue-400 font-semibold cursor-pointer">
               ← Back to Chats
             </button>
           </div>
@@ -252,7 +229,6 @@ export default function IndiePulseChatSystem() {
 
       ) : (
 
-        /* VIEW 3: MAIN CHAT LIST SCREEN */
         <div className="flex-1 flex flex-col w-full pb-20">
           
           <div className="px-4 py-4 flex items-center justify-between bg-[#0b141a] border-b border-slate-900">
