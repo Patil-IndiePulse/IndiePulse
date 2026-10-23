@@ -29,7 +29,7 @@ export default function IndiePulseChatSystem() {
     { id: '3', name: '+91 80507 64670', lastMsg: 'Direct chat started', time: 'Just now', unread: 0, avatar: '8' }
   ]);
 
-  // Messages database for each chat (Cleared demo messages for fresh WhatsApp-like experience)
+  // Messages database for each chat
   const [messages, setMessages] = useState<Record<string, { sender: string; text: string; file?: string; time: string; isMe: boolean }[]>>({
     '1': [],
     '2': [],
@@ -85,16 +85,16 @@ export default function IndiePulseChatSystem() {
   return (
     <main className="min-h-screen w-full bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden">
       
-      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room with Perfect Header & Fixed Input Bar) */}
+      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room with Perfect WhatsApp Input Bar & Header) */}
       {currentView === 'conversation' && activeChat ? (
-        <div className="flex-1 flex flex-col h-screen bg-[#0b141a] pb-24">
+        <div className="flex-1 flex flex-col h-screen bg-[#0b141a] pb-16">
           
           {/* Top WhatsApp Style Header */}
           <div className="bg-[#1f2c34] px-3 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md">
             <div className="flex items-center gap-2.5 min-w-0">
               <button 
                 onClick={() => setCurrentView('list')}
-                className="w-8 h-8 rounded-full bg-pink-600 hover:bg-pink-500 text-white flex items-center justify-center text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.6)] border border-pink-400/40 cursor-pointer shrink-0"
+                className="w-8 h-8 rounded-full bg-pink-600 hover:bg-pink-500 text-white flex items-center justify-center text-sm font-bold shadow cursor-pointer shrink-0"
               >
                 ‹
               </button>
@@ -113,7 +113,7 @@ export default function IndiePulseChatSystem() {
             </div>
           </div>
 
-          {/* Messages Container (Clean WhatsApp Style) */}
+          {/* Messages Container */}
           <div className="flex-1 p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a]">
             <div className="text-center my-2">
               <span className="px-3 py-1 rounded-lg bg-[#182229] text-[10px] text-slate-400 shadow border border-slate-800">
@@ -144,30 +144,30 @@ export default function IndiePulseChatSystem() {
             </div>
           )}
 
-          {/* Bottom Input & File Upload Bar (Properly Adjusted & Visible) */}
-          <form onSubmit={handleSendMessage} className="bg-[#1f2c34] px-3 py-2.5 flex items-center gap-2 border-t border-slate-800 fixed bottom-0 left-0 right-0 z-50 shadow-2xl">
-            
-            {/* File Upload Button */}
-            <label className="text-blue-400 hover:text-blue-300 cursor-pointer p-1.5 text-lg transition-transform hover:scale-110 shrink-0">
-              📎
-              <input type="file" onChange={handleFileUpload} className="hidden" />
-            </label>
+          {/* Bottom WhatsApp Style Input Bar (Exact WhatsApp Alignment & Fit) */}
+          <form onSubmit={handleSendMessage} className="bg-[#0b141a] px-2 py-2 flex items-center gap-2 fixed bottom-0 left-0 right-0 z-50">
+            <div className="flex-1 bg-[#1f2c34] rounded-full px-3 py-1.5 flex items-center gap-2 border border-slate-800 shadow-inner">
+              <span className="text-slate-400 text-sm cursor-pointer">😊</span>
+              <input 
+                type="text"
+                placeholder="Message"
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+                className="flex-1 bg-transparent text-white text-xs focus:outline-none placeholder-slate-400 min-w-0 py-1"
+              />
+              <label className="text-slate-400 hover:text-white cursor-pointer text-base shrink-0">
+                📎
+                <input type="file" onChange={handleFileUpload} className="hidden" />
+              </label>
+              <span className="text-slate-400 text-sm cursor-pointer">📷</span>
+            </div>
 
-            {/* Message Input Box */}
-            <input 
-              type="text"
-              placeholder="Type a message..."
-              value={messageText}
-              onChange={(e) => setMessageText(e.target.value)}
-              className="flex-1 py-2 px-3.5 rounded-full bg-[#2a3942] text-white text-xs focus:outline-none placeholder-slate-400 shadow-inner border border-slate-700/50 min-w-0"
-            />
-
-            {/* Send Button with Blue Theme */}
+            {/* WhatsApp Style Circular Send / Mic Button */}
             <button 
               type="submit"
-              className="w-9 h-9 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-xs shadow-[0_0_15px_rgba(37,99,235,0.6)] cursor-pointer shrink-0 transition-all"
+              className="w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all"
             >
-              ➤
+              {messageText.trim() || attachedFile ? '➤' : '🎤'}
             </button>
           </form>
 
@@ -179,7 +179,7 @@ export default function IndiePulseChatSystem() {
           <div className="flex items-center mb-4">
             <button 
               onClick={() => setCurrentView('list')} 
-              className="w-8 h-8 rounded-full bg-pink-600 hover:bg-pink-500 text-white flex items-center justify-center text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.6)] border border-pink-400/40 cursor-pointer shrink-0"
+              className="w-8 h-8 rounded-full bg-pink-600 hover:bg-pink-500 text-white flex items-center justify-center text-xs font-bold shadow cursor-pointer shrink-0"
             >
               ‹
             </button>
