@@ -155,11 +155,11 @@ export default function IndiePulseChatSystem() {
             </div>
           )}
 
-          {/* Bottom WhatsApp Style Input Bar (Properly aligned without any overflow or stretching) */}
-          <div className="bg-[#0b141a] p-2 shrink-0">
-            <form onSubmit={handleSendMessage} className="flex items-center gap-2 w-full">
-              <div className="flex-1 bg-[#1f2c34] rounded-full px-4 py-2.5 flex items-center gap-3 border border-slate-800 shadow-inner">
-                <span className="text-slate-400 text-base cursor-pointer">😊</span>
+          {/* Bottom WhatsApp Style Input Bar (Exact WhatsApp Alignment & Dynamic Send/Mic Switch) */}
+          <div className="bg-[#0b141a] px-2 py-2 shrink-0 w-full">
+            <form onSubmit={handleSendMessage} className="flex items-center gap-2 w-full max-w-full">
+              <div className="flex-1 bg-[#1f2c34] rounded-full px-3.5 py-2 flex items-center gap-2.5 border border-slate-800 shadow-inner min-w-0">
+                <span className="text-slate-400 text-base cursor-pointer shrink-0">😊</span>
                 <input 
                   type="text"
                   placeholder="Message"
@@ -171,13 +171,13 @@ export default function IndiePulseChatSystem() {
                   📎
                   <input type="file" onChange={handleFileUpload} className="hidden" />
                 </label>
-                <span className="text-slate-400 text-base cursor-pointer">📷</span>
+                <span className="text-slate-400 text-base cursor-pointer shrink-0">📷</span>
               </div>
 
-              {/* WhatsApp Style Circular Send / Mic Button */}
+              {/* WhatsApp Style Dynamic Circular Send (➤) or Mic (🎤) Button */}
               <button 
                 type="submit"
-                className="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all"
+                className="w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all select-none"
               >
                 {messageText.trim() || attachedFile ? '➤' : '🎤'}
               </button>
