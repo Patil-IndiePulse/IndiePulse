@@ -93,38 +93,34 @@ export default function IndiePulseChatSystem() {
   return (
     <main className="min-h-screen w-full bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden">
       
-      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room with Blue Accents & Small Pink Back Button) */}
+      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room with Blue Accents & Compact Stylish Pink Back Button) */}
       {currentView === 'conversation' && activeChat ? (
         <div className="flex-1 flex flex-col h-screen bg-[#0b141a]">
           
           {/* Top Header */}
           <div className="bg-[#1f2c34] px-4 py-3 flex items-center justify-between border-b border-slate-800 shadow-md">
             <div className="flex items-center gap-3">
-              <div className="flex items-center">
-                <button 
-                  onClick={() => setCurrentView('list')}
-                  className="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer"
-                >
-                  ◀ Back
-                </button>
-              </div>
+              <button 
+                onClick={() => setCurrentView('list')}
+                className="inline-flex items-center justify-center px-3 py-1.5 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white rounded-full text-xs font-bold shadow-[0_0_12px_rgba(236,72,153,0.5)] border border-pink-400/30 cursor-pointer shrink-0"
+              >
+                ◀ Back
+              </button>
               <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs text-white shadow">
                 {activeChat.avatar}
               </div>
               <div>
-                <h2 className="text-xs font-bold text-white tracking-wide truncate max-w-[180px]">{activeChat.name}</h2>
+                <h2 className="text-xs font-bold text-white tracking-wide truncate max-w-[160px]">{activeChat.name}</h2>
                 <span className="text-[9px] text-blue-400 font-semibold">online</span>
               </div>
             </div>
             <div className="flex items-center gap-3 text-slate-300 text-sm">
-              <span className="cursor-pointer">📹</span>
-              <span className="cursor-pointer">📞</span>
               <span className="cursor-pointer">⋮</span>
             </div>
           </div>
 
           {/* Messages Container */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a]">
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a] pb-24">
             <div className="text-center my-2">
               <span className="px-3 py-1 rounded-lg bg-[#182229] text-[10px] text-slate-400 shadow border border-slate-800">
                 🔒 Messages & file transfers are end-to-end encrypted.
@@ -154,8 +150,8 @@ export default function IndiePulseChatSystem() {
             </div>
           )}
 
-          {/* Bottom Input & File Upload Bar */}
-          <form onSubmit={handleSendMessage} className="bg-[#1f2c34] p-3 flex items-center gap-2 border-t border-slate-800">
+          {/* Bottom Input & File Upload Bar (Properly Fixed Above Keyboard/Screen Bottom) */}
+          <form onSubmit={handleSendMessage} className="bg-[#1f2c34] p-3 flex items-center gap-2 border-t border-slate-800 fixed bottom-0 left-0 right-0 z-50 shadow-2xl">
             
             {/* File Upload Button */}
             <label className="text-blue-400 hover:text-blue-300 cursor-pointer p-2 text-lg transition-transform hover:scale-110">
@@ -187,14 +183,12 @@ export default function IndiePulseChatSystem() {
         /* VIEW 2: GLOBAL NUMBER SEARCH PAGE (Triggered by Plus Button) */
         <div className="flex-1 flex flex-col p-4 w-full">
           <div className="flex items-center mb-4">
-            <div className="flex items-center">
-              <button 
-                onClick={() => setCurrentView('list')} 
-                className="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer"
-              >
-                ◀ Back
-              </button>
-            </div>
+            <button 
+              onClick={() => setCurrentView('list')} 
+              className="inline-flex items-center justify-center px-3 py-1.5 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white rounded-full text-xs font-bold shadow-[0_0_12px_rgba(236,72,153,0.5)] border border-pink-400/30 cursor-pointer shrink-0"
+            >
+              ◀ Back
+            </button>
           </div>
 
           {/* Global Number / Name Search Input Box */}
