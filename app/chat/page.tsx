@@ -85,28 +85,28 @@ export default function IndiePulseChatSystem() {
   return (
     <main className="min-h-screen w-full bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden">
       
-      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room with Blue Accents & Small Rounded Pink Back Button) */}
+      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room with Perfect Header & Fixed Input Bar) */}
       {currentView === 'conversation' && activeChat ? (
-        <div className="flex-1 flex flex-col h-screen bg-[#0b141a] pb-20">
+        <div className="flex-1 flex flex-col h-screen bg-[#0b141a] pb-24">
           
           {/* Top WhatsApp Style Header */}
           <div className="bg-[#1f2c34] px-3 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
               <button 
                 onClick={() => setCurrentView('list')}
-                className="w-9 h-9 rounded-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white flex items-center justify-center text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.6)] border border-pink-400/40 cursor-pointer shrink-0"
+                className="w-8 h-8 rounded-full bg-pink-600 hover:bg-pink-500 text-white flex items-center justify-center text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.6)] border border-pink-400/40 cursor-pointer shrink-0"
               >
-                ◀
+                ‹
               </button>
-              <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs text-white shadow">
+              <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs text-white shadow shrink-0">
                 {activeChat.avatar}
               </div>
-              <div className="flex flex-col">
-                <h2 className="text-xs font-bold text-white tracking-wide truncate max-w-[150px]">{activeChat.name}</h2>
+              <div className="flex flex-col min-w-0">
+                <h2 className="text-xs font-bold text-white tracking-wide truncate">{activeChat.name}</h2>
                 <span className="text-[9px] text-blue-400 font-semibold">online</span>
               </div>
             </div>
-            <div className="flex items-center gap-4 text-slate-300 text-sm pr-1">
+            <div className="flex items-center gap-3 text-slate-300 text-sm shrink-0 pl-2">
               <span className="cursor-pointer">📹</span>
               <span className="cursor-pointer">📞</span>
               <span className="cursor-pointer">⋮</span>
@@ -144,28 +144,28 @@ export default function IndiePulseChatSystem() {
             </div>
           )}
 
-          {/* Bottom Input & File Upload Bar (Perfectly fixed above keyboard/screen bottom) */}
-          <form onSubmit={handleSendMessage} className="bg-[#1f2c34] p-3 flex items-center gap-2 border-t border-slate-800 fixed bottom-0 left-0 right-0 z-50 shadow-2xl">
+          {/* Bottom Input & File Upload Bar (Properly Adjusted & Visible) */}
+          <form onSubmit={handleSendMessage} className="bg-[#1f2c34] px-3 py-2.5 flex items-center gap-2 border-t border-slate-800 fixed bottom-0 left-0 right-0 z-50 shadow-2xl">
             
             {/* File Upload Button */}
-            <label className="text-blue-400 hover:text-blue-300 cursor-pointer p-2 text-lg transition-transform hover:scale-110">
+            <label className="text-blue-400 hover:text-blue-300 cursor-pointer p-1.5 text-lg transition-transform hover:scale-110 shrink-0">
               📎
               <input type="file" onChange={handleFileUpload} className="hidden" />
             </label>
 
-            {/* Message Input */}
+            {/* Message Input Box */}
             <input 
               type="text"
               placeholder="Type a message..."
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
-              className="flex-1 py-2.5 px-4 rounded-full bg-[#2a3942] text-white text-xs focus:outline-none placeholder-slate-400 shadow-inner border border-slate-700/50"
+              className="flex-1 py-2 px-3.5 rounded-full bg-[#2a3942] text-white text-xs focus:outline-none placeholder-slate-400 shadow-inner border border-slate-700/50 min-w-0"
             />
 
             {/* Send Button with Blue Theme */}
             <button 
               type="submit"
-              className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-sm shadow-[0_0_15px_rgba(37,99,235,0.6)] cursor-pointer shrink-0 transition-all"
+              className="w-9 h-9 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-xs shadow-[0_0_15px_rgba(37,99,235,0.6)] cursor-pointer shrink-0 transition-all"
             >
               ➤
             </button>
@@ -179,9 +179,9 @@ export default function IndiePulseChatSystem() {
           <div className="flex items-center mb-4">
             <button 
               onClick={() => setCurrentView('list')} 
-              className="w-9 h-9 rounded-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white flex items-center justify-center text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.6)] border border-pink-400/40 cursor-pointer shrink-0"
+              className="w-8 h-8 rounded-full bg-pink-600 hover:bg-pink-500 text-white flex items-center justify-center text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.6)] border border-pink-400/40 cursor-pointer shrink-0"
             >
-              ◀
+              ‹
             </button>
           </div>
 
