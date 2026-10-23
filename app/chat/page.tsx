@@ -155,12 +155,12 @@ export default function IndiePulseChatSystem() {
             </div>
           )}
 
-          {/* Bottom WhatsApp Style Input Bar (Fixed Mobile Layout & Exact Sizing) */}
-          <div className="bg-[#0b141a] p-2 shrink-0 w-full">
-            <form onSubmit={handleSendMessage} className="flex items-center gap-2 w-full">
+          {/* Bottom WhatsApp Style Input Bar (Perfect Sizing & Screen Fit) */}
+          <div className="bg-[#0b141a] px-2 py-2 shrink-0 w-full">
+            <form onSubmit={handleSendMessage} className="flex items-center gap-1.5 w-full max-w-full">
               
               {/* Message Input Container Box */}
-              <div className="flex-1 bg-[#1f2c34] rounded-full px-3 py-2 flex items-center gap-2 border border-slate-800 shadow-inner">
+              <div className="flex-1 bg-[#1f2c34] rounded-full px-3 py-2 flex items-center gap-2 border border-slate-800 shadow-inner min-w-0">
                 <span className="text-slate-400 text-base cursor-pointer shrink-0">😊</span>
                 <input 
                   type="text"
@@ -176,10 +176,10 @@ export default function IndiePulseChatSystem() {
                 <span className="text-slate-400 text-base cursor-pointer shrink-0">📷</span>
               </div>
 
-              {/* Perfectly Sized Circular Send (➤) or Mic (🎤) Button */}
+              {/* Properly Sized & Aligned Circular Send (➤) or Mic (🎤) Button */}
               <button 
                 type="submit"
-                className="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all select-none"
+                className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all select-none"
               >
                 {messageText.trim() || attachedFile ? '➤' : '🎤'}
               </button>
