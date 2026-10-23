@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function IndiePulseChatSystem() {
@@ -21,6 +21,23 @@ export default function IndiePulseChatSystem() {
   // Message input and file attachment state
   const [messageText, setMessageText] = useState('');
   const [attachedFile, setAttachedFile] = useState<string | null>(null);
+
+  // Handle phone hardware back button / browser back action dynamically like WhatsApp
+  useEffect(() => {
+    const handlePopState = () => {
+      if (currentView === 'conversation' || currentView === 'search') {
+        setCurrentView('list');
+        setActiveChat(null);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [currentView]);
+
+  const changeView = (view: 'list' | 'search' | 'conversation') => {
+    setCurrentView(view);
+    window.history.pushState({ view }, '');
+  };
 
   // Pre-registered database of developer & gamer contacts
   const [registeredContacts, setRegisteredContacts] = useState([
@@ -50,7 +67,7 @@ export default function IndiePulseChatSystem() {
   // Handle selecting a verified contact from global search results
   const handleSelectContact = (contact: any) => {
     setActiveChat(contact);
-    setCurrentView('conversation');
+    changeView('conversation');
     setGlobalSearchQuery('');
   };
 
@@ -85,20 +102,14 @@ export default function IndiePulseChatSystem() {
   return (
     <main className="min-h-screen w-full bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden">
       
-      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room with Perfect WhatsApp Input Bar & Header) */}
+      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room with Clean Header & Fixed Input Bar) */}
       {currentView === 'conversation' && activeChat ? (
-        <div className="flex-1 flex flex-col h-screen bg-[#0b141a] pb-16">
+        <div className="flex-1 flex flex-col h-screen bg-[#0b141a] pb-20">
           
-          {/* Top WhatsApp Style Header */}
+          {/* Top WhatsApp Style Header (No top back button, pure WhatsApp header) */}
           <div className="bg-[#1f2c34] px-3 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md">
             <div className="flex items-center gap-2.5 min-w-0">
-              <button 
-                onClick={() => setCurrentView('list')}
-                className="w-8 h-8 rounded-full bg-pink-600 hover:bg-pink-500 text-white flex items-center justify-center text-sm font-bold shadow cursor-pointer shrink-0"
-              >
-                ‹
-              </button>
-              <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs text-white shadow shrink-0">
+              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-sm text-white shadow shrink-0">
                 {activeChat.avatar}
               </div>
               <div className="flex flex-col min-w-0">
@@ -106,7 +117,7 @@ export default function IndiePulseChatSystem() {
                 <span className="text-[9px] text-blue-400 font-semibold">online</span>
               </div>
             </div>
-            <div className="flex items-center gap-3 text-slate-300 text-sm shrink-0 pl-2">
+            <div className="flex items-center gap-4 text-slate-300 text-sm shrink-0 pr-1">
               <span className="cursor-pointer">📹</span>
               <span className="cursor-pointer">📞</span>
               <span className="cursor-pointer">⋮</span>
@@ -144,28 +155,28 @@ export default function IndiePulseChatSystem() {
             </div>
           )}
 
-          {/* Bottom WhatsApp Style Input Bar (Exact WhatsApp Alignment & Fit) */}
-          <form onSubmit={handleSendMessage} className="bg-[#0b141a] px-2 py-2 flex items-center gap-2 fixed bottom-0 left-0 right-0 z-50">
-            <div className="flex-1 bg-[#1f2c34] rounded-full px-3 py-1.5 flex items-center gap-2 border border-slate-800 shadow-inner">
-              <span className="text-slate-400 text-sm cursor-pointer">😊</span>
+          {/* Bottom WhatsApp Style Input Bar (Perfect Fit inside screen width) */}
+          <form onSubmit={handleSendMessage} className="bg-[#0b141a] px-3 py-2.5 flex items-center gap-2 fixed bottom-0 left-0 right-0 z-50">
+            <div className="flex-1 bg-[#1f2c34] rounded-full px-3 py-2 flex items-center gap-2 border border-slate-800 shadow-inner min-w-0">
+              <span className="text-slate-400 text-sm cursor-pointer shrink-0">😊</span>
               <input 
                 type="text"
                 placeholder="Message"
                 value={messageText}
                 onChange={(e) => setMessageText(e.target.value)}
-                className="flex-1 bg-transparent text-white text-xs focus:outline-none placeholder-slate-400 min-w-0 py-1"
+                className="flex-1 bg-transparent text-white text-xs focus:outline-none placeholder-slate-400 min-w-0"
               />
               <label className="text-slate-400 hover:text-white cursor-pointer text-base shrink-0">
                 📎
                 <input type="file" onChange={handleFileUpload} className="hidden" />
               </label>
-              <span className="text-slate-400 text-sm cursor-pointer">📷</span>
+              <span className="text-slate-400 text-sm cursor-pointer shrink-0">📷</span>
             </div>
 
-            {/* WhatsApp Style Circular Send / Mic Button */}
+            {/* WhatsApp Style Circular Send / Mic Button (Properly contained) */}
             <button 
               type="submit"
-              className="w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all"
+              className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all"
             >
               {messageText.trim() || attachedFile ? '➤' : '🎤'}
             </button>
@@ -178,10 +189,10 @@ export default function IndiePulseChatSystem() {
         <div className="flex-1 flex flex-col p-4 w-full">
           <div className="flex items-center mb-4">
             <button 
-              onClick={() => setCurrentView('list')} 
-              className="w-8 h-8 rounded-full bg-pink-600 hover:bg-pink-500 text-white flex items-center justify-center text-xs font-bold shadow cursor-pointer shrink-0"
+              onClick={() => changeView('list')} 
+              className="text-xs text-blue-400 font-semibold cursor-pointer"
             >
-              ‹
+              ← Back to Chats
             </button>
           </div>
 
@@ -252,7 +263,7 @@ export default function IndiePulseChatSystem() {
             
             <div className="flex items-center gap-3">
               <button 
-                onClick={() => setCurrentView('search')}
+                onClick={() => changeView('search')}
                 className="w-9 h-9 rounded-xl bg-pink-600 hover:bg-pink-500 text-white flex items-center justify-center text-xs shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer"
               >
                 🔍
@@ -282,7 +293,7 @@ export default function IndiePulseChatSystem() {
                   key={chat.id}
                   onClick={() => {
                     setActiveChat(chat);
-                    setCurrentView('conversation');
+                    changeView('conversation');
                   }}
                   className="flex items-center gap-3 p-3 rounded-2xl hover:bg-[#202c33] cursor-pointer transition-all border-b border-slate-900/50"
                 >
@@ -315,7 +326,7 @@ export default function IndiePulseChatSystem() {
           {/* Floating Plus (+) Button for Global Search */}
           <div className="fixed bottom-20 right-6 z-40">
             <button 
-              onClick={() => setCurrentView('search')}
+              onClick={() => changeView('search')}
               className="w-14 h-14 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white flex items-center justify-center text-3xl font-black shadow-[0_0_25px_rgba(236,72,153,0.7)] border border-pink-400/50 transition-transform hover:scale-105 active:scale-95 cursor-pointer"
               aria-label="New Chat"
             >
