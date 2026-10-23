@@ -82,9 +82,9 @@ export default function IndiePulseChatSystem() {
   };
 
   return (
-    <main className="min-h-screen max-w-md mx-auto bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden shadow-2xl">
+    <main className="min-h-screen w-full bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden">
       
-      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room with Blue Accents) */}
+      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room with Blue Accents & Slim Pink Back Button) */}
       {currentView === 'conversation' && activeChat ? (
         <div className="flex-1 flex flex-col h-screen bg-[#0b141a]">
           
@@ -93,7 +93,7 @@ export default function IndiePulseChatSystem() {
             <div className="flex items-center gap-3">
               <button 
                 onClick={() => setCurrentView('list')}
-                className="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-xl text-xs font-bold shadow-[0_0_12px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer"
+                className="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer"
               >
                 ◀ Back
               </button>
@@ -101,7 +101,7 @@ export default function IndiePulseChatSystem() {
                 {activeChat.avatar}
               </div>
               <div>
-                <h2 className="text-xs font-bold text-white tracking-wide truncate max-w-[150px]">{activeChat.name}</h2>
+                <h2 className="text-xs font-bold text-white tracking-wide truncate max-w-[200px]">{activeChat.name}</h2>
                 <span className="text-[9px] text-blue-400 font-semibold">online</span>
               </div>
             </div>
@@ -178,11 +178,10 @@ export default function IndiePulseChatSystem() {
           <div className="flex items-center gap-3 mb-6">
             <button 
               onClick={() => setCurrentView('list')} 
-              className="px-3.5 py-1.5 bg-pink-600 hover:bg-pink-500 text-white rounded-xl text-xs font-bold shadow-[0_0_12px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer"
+              className="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer"
             >
               ◀ Back
             </button>
-            <h1 className="text-sm font-bold text-white">Search Developer / Gamer Number</h1>
           </div>
 
           {/* Number / Name Search Input Box */}
@@ -238,10 +237,10 @@ export default function IndiePulseChatSystem() {
 
       ) : (
 
-        /* VIEW 3: MAIN CHAT LIST SCREEN (IndiePulse Branding + Plus Button) */
-        <div className="flex-1 flex flex-col w-full">
+        /* VIEW 3: MAIN CHAT LIST SCREEN (IndiePulse Branding + Pink Plus Button) */
+        <div className="flex-1 flex flex-col w-full pb-20">
           
-          {/* Top Header with IndiePulse Logo & Pink Back/Action Styling */}
+          {/* Top Header with IndiePulse Logo */}
           <div className="px-4 py-4 flex items-center justify-between bg-[#0b141a] border-b border-slate-900">
             <div className="flex flex-col">
               <div className="text-xl font-black tracking-wider bg-gradient-to-r from-blue-400 via-pink-500 to-yellow-400 bg-clip-text text-transparent">
@@ -253,7 +252,7 @@ export default function IndiePulseChatSystem() {
             <div className="flex items-center gap-3">
               <button 
                 onClick={() => setCurrentView('search')}
-                className="w-9 h-9 rounded-xl bg-pink-600 hover:bg-pink-500 text-white flex items-center justify-center text-xs shadow-[0_0_12px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer"
+                className="w-9 h-9 rounded-xl bg-pink-600 hover:bg-pink-500 text-white flex items-center justify-center text-xs shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer"
               >
                 🔍
               </button>
@@ -303,8 +302,8 @@ export default function IndiePulseChatSystem() {
             ))}
           </div>
 
-          {/* Floating Plus (+) Button at Bottom Right (Pink Styled) */}
-          <div className="absolute bottom-6 right-6 z-40">
+          {/* Floating Plus (+) Button adjusted nicely to middle-bottom */}
+          <div className="fixed bottom-6 right-6 z-40">
             <button 
               onClick={() => setCurrentView('search')}
               className="w-14 h-14 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white flex items-center justify-center text-3xl font-black shadow-[0_0_25px_rgba(236,72,153,0.7)] border border-pink-400/50 transition-transform hover:scale-105 active:scale-95 cursor-pointer"
