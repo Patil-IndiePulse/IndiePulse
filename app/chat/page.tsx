@@ -93,7 +93,7 @@ export default function IndiePulseChatSystem() {
             <div className="flex items-center gap-3">
               <button 
                 onClick={() => setCurrentView('list')}
-                className="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer"
+                className="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer w-auto self-start"
               >
                 ◀ Back
               </button>
@@ -175,10 +175,10 @@ export default function IndiePulseChatSystem() {
         
         /* VIEW 2: SEARCH NUMBER & SYSTEM AVAILABILITY CHECK */
         <div className="flex-1 flex flex-col p-4 w-full">
-          <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center mb-6">
             <button 
               onClick={() => setCurrentView('list')} 
-              className="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer"
+              className="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(236,72,153,0.5)] border border-pink-400/40 cursor-pointer w-auto self-start"
             >
               ◀ Back
             </button>
@@ -302,8 +302,8 @@ export default function IndiePulseChatSystem() {
             ))}
           </div>
 
-          {/* Floating Plus (+) Button adjusted nicely to middle-bottom */}
-          <div className="fixed bottom-6 right-6 z-40">
+          {/* Floating Plus Button adjusted higher up */}
+          <div className="fixed bottom-20 right-6 z-40">
             <button 
               onClick={() => setCurrentView('search')}
               className="w-14 h-14 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white flex items-center justify-center text-3xl font-black shadow-[0_0_25px_rgba(236,72,153,0.7)] border border-pink-400/50 transition-transform hover:scale-105 active:scale-95 cursor-pointer"
