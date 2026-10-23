@@ -102,12 +102,12 @@ export default function IndiePulseChatSystem() {
   return (
     <main className="min-h-screen w-full bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden">
       
-      {/* VIEW 1: CONVERSATION SCREEN (WhatsApp Style Chat Room with Perfect WhatsApp Input Bar & Header) */}
+      {/* VIEW 1: CONVERSATION SCREEN */}
       {currentView === 'conversation' && activeChat ? (
-        <div className="flex-1 flex flex-col h-screen bg-[#0b141a] pb-16">
+        <div className="flex-1 flex flex-col h-screen bg-[#0b141a] justify-between">
           
           {/* Top WhatsApp Style Header */}
-          <div className="bg-[#1f2c34] px-3 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md">
+          <div className="bg-[#1f2c34] px-3 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md shrink-0">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-sm text-white shadow shrink-0">
                 {activeChat.avatar}
@@ -149,43 +149,45 @@ export default function IndiePulseChatSystem() {
 
           {/* Attached File Preview Bar */}
           {attachedFile && (
-            <div className="bg-[#1f2c34] px-4 py-2 border-t border-slate-800 flex items-center justify-between text-xs text-blue-400">
+            <div className="bg-[#1f2c34] px-4 py-2 border-t border-slate-800 flex items-center justify-between text-xs text-blue-400 shrink-0">
               <span>Attached: {attachedFile}</span>
               <button onClick={() => setAttachedFile(null)} className="text-pink-400 font-bold">✕ Remove</button>
             </div>
           )}
 
-          {/* Bottom WhatsApp Style Input Bar (Fixed Layout Without Overflow) */}
-          <form onSubmit={handleSendMessage} className="bg-[#0b141a] px-2 py-2 flex items-center gap-2 fixed bottom-0 left-0 right-0 z-50 w-full max-w-full">
-            <div className="flex-1 bg-[#1f2c34] rounded-full px-3 py-2 flex items-center gap-2 border border-slate-800 shadow-inner min-w-0">
-              <span className="text-slate-400 text-sm cursor-pointer shrink-0">😊</span>
-              <input 
-                type="text"
-                placeholder="Message"
-                value={messageText}
-                onChange={(e) => setMessageText(e.target.value)}
-                className="flex-1 bg-transparent text-white text-xs focus:outline-none placeholder-slate-400 min-w-0"
-              />
-              <label className="text-slate-400 hover:text-white cursor-pointer text-base shrink-0">
-                📎
-                <input type="file" onChange={handleFileUpload} className="hidden" />
-              </label>
-              <span className="text-slate-400 text-sm cursor-pointer shrink-0">📷</span>
-            </div>
+          {/* Bottom WhatsApp Style Input Bar (Properly aligned without any overflow or stretching) */}
+          <div className="bg-[#0b141a] p-2 shrink-0">
+            <form onSubmit={handleSendMessage} className="flex items-center gap-2 w-full">
+              <div className="flex-1 bg-[#1f2c34] rounded-full px-4 py-2.5 flex items-center gap-3 border border-slate-800 shadow-inner">
+                <span className="text-slate-400 text-base cursor-pointer">😊</span>
+                <input 
+                  type="text"
+                  placeholder="Message"
+                  value={messageText}
+                  onChange={(e) => setMessageText(e.target.value)}
+                  className="flex-1 bg-transparent text-white text-xs focus:outline-none placeholder-slate-400 min-w-0"
+                />
+                <label className="text-slate-400 hover:text-white cursor-pointer text-lg shrink-0">
+                  📎
+                  <input type="file" onChange={handleFileUpload} className="hidden" />
+                </label>
+                <span className="text-slate-400 text-base cursor-pointer">📷</span>
+              </div>
 
-            {/* WhatsApp Style Circular Send / Mic Button (Fixed Sizing) */}
-            <button 
-              type="submit"
-              className="w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all select-none"
-            >
-              {messageText.trim() || attachedFile ? '➤' : '🎤'}
-            </button>
-          </form>
+              {/* WhatsApp Style Circular Send / Mic Button */}
+              <button 
+                type="submit"
+                className="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all"
+              >
+                {messageText.trim() || attachedFile ? '➤' : '🎤'}
+              </button>
+            </form>
+          </div>
 
         </div>
       ) : currentView === 'search' ? (
         
-        /* VIEW 2: GLOBAL NUMBER SEARCH PAGE (Triggered by Plus Button) */
+        /* VIEW 2: GLOBAL NUMBER SEARCH PAGE */
         <div className="flex-1 flex flex-col p-4 w-full">
           <div className="flex items-center mb-4">
             <button 
@@ -196,7 +198,6 @@ export default function IndiePulseChatSystem() {
             </button>
           </div>
 
-          {/* Global Number / Name Search Input Box */}
           <div className="relative mb-4">
             <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">🔍</span>
             <input 
@@ -209,7 +210,6 @@ export default function IndiePulseChatSystem() {
             />
           </div>
 
-          {/* Global Search Results */}
           <div className="flex-1 space-y-2 overflow-y-auto">
             {globalSearchQuery.trim() !== '' ? (
               globalSearchResults.length > 0 ? (
@@ -249,10 +249,9 @@ export default function IndiePulseChatSystem() {
 
       ) : (
 
-        /* VIEW 3: MAIN CHAT LIST SCREEN (WhatsApp Style Search List & Pink Plus Button) */
+        /* VIEW 3: MAIN CHAT LIST SCREEN */
         <div className="flex-1 flex flex-col w-full pb-20">
           
-          {/* Top Header with IndiePulse Logo */}
           <div className="px-4 py-4 flex items-center justify-between bg-[#0b141a] border-b border-slate-900">
             <div className="flex flex-col">
               <div className="text-xl font-black tracking-wider bg-gradient-to-r from-blue-400 via-pink-500 to-yellow-400 bg-clip-text text-transparent">
@@ -271,7 +270,6 @@ export default function IndiePulseChatSystem() {
             </div>
           </div>
 
-          {/* WhatsApp Style Chat List Search Bar */}
           <div className="px-4 my-3">
             <div className="relative flex items-center">
               <span className="absolute left-4 text-slate-400 text-xs">🔍</span>
@@ -285,7 +283,6 @@ export default function IndiePulseChatSystem() {
             </div>
           </div>
 
-          {/* Active Filtered Chats List */}
           <div className="flex-1 space-y-0.5 overflow-y-auto px-2 mt-1">
             {filteredChatList.length > 0 ? (
               filteredChatList.map((chat) => (
@@ -323,7 +320,6 @@ export default function IndiePulseChatSystem() {
             )}
           </div>
 
-          {/* Floating Plus (+) Button for Global Search */}
           <div className="fixed bottom-20 right-6 z-40">
             <button 
               onClick={() => changeView('search')}
