@@ -18,11 +18,14 @@ export default function IndiePulseChatSystem() {
   const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
   const [emojiCategory, setEmojiCategory] = useState<'recents' | 'smileys' | 'animals' | 'food' | 'travel' | 'activities' | 'objects' | 'symbols' | 'flags'>('smileys');
   
-  // WhatsApp Style Voice Recording States
+  // WhatsApp Style Live Voice Recording States
   const [isRecording, setIsRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<any>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   // Expanded Comprehensive Emoji Database without any text strings in flags
   const emojiCategories = {
@@ -68,7 +71,7 @@ export default function IndiePulseChatSystem() {
     { id: '3', name: '+91 80507 64670', lastMsg: 'Direct chat started', time: 'Just now', unread: 0, avatar: '8' }
   ]);
 
-  const [messages, setMessages] = useState<Record<string, { sender: string; text: string; file?: string; time: string; isMe: boolean }[]>>({
+  const [messages, setMessages] = useState<Record<string, { sender: string; text: string; file?: string; audioUrl?: string; time: string; isMe: boolean }[]>>({
     '1': [],
     '2': [],
     '3': []
@@ -118,37 +121,86 @@ export default function IndiePulseChatSystem() {
     }
   };
 
-  // WhatsApp Style Live Voice Note Recording Logic
-  const startRecording = () => {
+  // Real Live WhatsApp Style Voice Note Recording using MediaRecorder API
+  const startRecording = async () => {
     if (!messageText.trim() && !attachedFile) {
-      setIsRecording(true);
-      setIsPaused(false);
-      setRecordingSeconds(0);
-      timerRef.current = setInterval(() => {
-        setRecordingSeconds(prev => prev + 1);
-      }, 1000);
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mediaRecorder = new MediaRecorder(stream);
+        mediaRecorderRef.current = mediaRecorder;
+        audioChunksRef.current = [];
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunksRef.current.push(event.data);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+          const url = URL.createObjectURL(audioBlob);
+          setAudioUrl(url);
+
+          const newMsg = {
+            sender: 'You',
+            text: '🎤 Voice Message (' + recordingSeconds + 's)',
+            audioUrl: url,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            isMe: true
+          };
+
+          setMessages(prev => ({
+            ...prev,
+            [activeChat.id]: [...(prev[activeChat.id] || []), newMsg]
+          }));
+        };
+
+        mediaRecorder.start();
+        setIsRecording(true);
+        setIsPaused(false);
+        setRecordingSeconds(0);
+
+        timerRef.current = setInterval(() => {
+          setRecordingSeconds(prev => prev + 1);
+        }, 1000);
+      } catch (err) {
+        alert('Microphone permission denied or not supported.');
+      }
+    }
+  };
+
+  const pauseOrResumeRecording = () => {
+    if (mediaRecorderRef.current) {
+      if (isPaused) {
+        mediaRecorderRef.current.resume();
+        setIsPaused(false);
+        timerRef.current = setInterval(() => {
+          setRecordingSeconds(prev => prev + 1);
+        }, 1000);
+      } else {
+        mediaRecorderRef.current.pause();
+        setIsPaused(true);
+        clearInterval(timerRef.current);
+      }
     }
   };
 
   const stopRecordingAndSend = () => {
     clearInterval(timerRef.current);
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+    }
     setIsRecording(false);
     setRecordingSeconds(0);
-    // Simulate sending voice note
-    const newMsg = {
-      sender: 'You',
-      text: '🎤 Voice Note (' + recordingSeconds + 's)',
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isMe: true
-    };
-    setMessages(prev => ({
-      ...prev,
-      [activeChat.id]: [...(prev[activeChat.id] || []), newMsg]
-    }));
   };
 
   const cancelRecording = () => {
     clearInterval(timerRef.current);
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+    }
     setIsRecording(false);
     setRecordingSeconds(0);
   };
@@ -187,7 +239,7 @@ export default function IndiePulseChatSystem() {
           <div className="p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a] w-full">
             <div className="text-center my-2">
               <span className="px-3 py-1 rounded-lg bg-[#182229] text-[10px] text-slate-400 shadow border border-slate-800">
-                🔒 Messages & file transfers are end-to-end encrypted[span_9](start_span)[span_9](end_span).
+                🔒 Messages & file transfers are end-to-end encrypted[span_3](start_span)[span_3](end_span).
               </span>
             </div>
 
@@ -199,7 +251,17 @@ export default function IndiePulseChatSystem() {
                       <span>📎 {msg.file}</span>
                     </div>
                   )}
-                  {msg.text && <p className="leading-relaxed">{msg.text}</p>}
+                  {msg.audioUrl ? (
+                    <div className="flex flex-col gap-1.5 min-w-[160px]">
+                      <div className="flex items-center gap-2">
+                        <span>🎤</span>
+                        <audio controls src={msg.audioUrl} className="h-8 w-full max-w-[200px]" />
+                      </div>
+                      <span className="text-[9px] text-blue-200">Voice Note</span>
+                    </div>
+                  ) : (
+                    msg.text && <p className="leading-relaxed">{msg.text}</p>
+                  )}
                   <span className="block text-[8px] text-slate-300 text-right mt-1">{msg.time}</span>
                 </div>
               </div>
@@ -216,22 +278,23 @@ export default function IndiePulseChatSystem() {
               </div>
             )}
 
-            {/* Main Bottom Input Bar or Live Voice Recording Bar */}
+            {/* Main Bottom Input Bar or Clean WhatsApp Style Live Voice Recording Bar */}
             <div className="bg-[#0b141a] px-2 py-2 w-full shrink-0">
               {isRecording ? (
-                <div className="bg-[#1f2c34] rounded-full px-4 py-2.5 flex items-center justify-between border border-slate-800 shadow-inner w-full animate-pulse">
+                <div className="bg-[#1f2c34] rounded-full px-4 py-2.5 flex items-center justify-between border border-slate-800 shadow-inner w-full">
                   <div className="flex items-center gap-3">
-                    <button onClick={cancelRecording} className="text-red-500 text-lg cursor-pointer">🗑️</button>
+                    <button onClick={cancelRecording} className="text-red-400 text-base cursor-pointer hover:scale-110 transition-transform">🗑️</button>
                     <span className="text-xs font-mono text-red-400 font-bold">{formatTime(recordingSeconds)}</span>
                   </div>
-                  <div className="text-[11px] text-slate-300 tracking-wider">
-                    {isPaused ? 'Recording paused...' : 'Recording voice note...'}
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-300">
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                    <span>{isPaused ? 'Paused' : 'Recording...'}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <button onClick={() => setIsPaused(!isPaused)} className="text-slate-300 text-xs cursor-pointer font-bold">
-                      {isPaused ? '▶ Resume' : '⏸ Pause'}
+                    <button onClick={pauseOrResumeRecording} className="text-slate-300 text-xs cursor-pointer px-2 py-1 rounded bg-black/30 font-bold">
+                      {isPaused ? '▶' : '⏸'}
                     </button>
-                    <button onClick={stopRecordingAndSend} className="w-9 h-9 rounded-full bg-green-600 text-white flex items-center justify-center text-sm shadow cursor-pointer">
+                    <button onClick={stopRecordingAndSend} className="w-9 h-9 rounded-full bg-green-600 text-white flex items-center justify-center text-sm shadow cursor-pointer hover:bg-green-500 transition-colors">
                       ➤
                     </button>
                   </div>
@@ -268,13 +331,20 @@ export default function IndiePulseChatSystem() {
                     </label>
                   </div>
 
-                  {/* Fixed Send / WhatsApp Style Mic Button */}
+                  {/* Fixed Send / Exact WhatsApp Style SVG Mic Button */}
                   <button 
                     type={messageText.trim() || attachedFile ? 'submit' : 'button'}
                     onClick={messageText.trim() || attachedFile ? undefined : startRecording}
-                    className="w-11 h-11 rounded-full bg-green-600 hover:bg-green-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all select-none"
+                    className="w-11 h-11 rounded-full bg-green-600 hover:bg-green-500 text-white flex items-center justify-center shadow-lg cursor-pointer shrink-0 transition-all select-none"
+                    title="Hold or click to record voice note"
                   >
-                    {messageText.trim() || attachedFile ? '➤' : '🎤'}
+                    {messageText.trim() || attachedFile ? (
+                      <span className="text-sm font-bold">➤</span>
+                    ) : (
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M11.999 14.942c2.001 0 3.631-1.63 3.631-3.631V5.685c0-2.001-1.63-3.631-3.631-3.631-2.001 0-3.631 1.63-3.631 3.631v5.626c0 2.001 1.63 3.631 3.631 3.631zM18.106 11.31c0 3.38-2.748 6.128-6.128 6.128S5.85 14.69 5.85 11.31H4.35c0 3.82 2.943 6.96 6.721 7.437v3.003h1.857v-3.003c3.778-.477 6.721-3.617 6.721-7.437h-1.503z"/>
+                      </svg>
+                    )}
                   </button>
 
                 </form>
