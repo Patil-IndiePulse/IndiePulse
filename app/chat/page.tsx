@@ -26,6 +26,25 @@ export default function IndiePulseChatSystem() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
+  // Audio Bip Sound Function for WhatsApp Mic Click
+  const playMicClickSound = () => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.1);
+    } catch (e) {
+      // AudioContext fallback if blocked by browser autoplay policy
+    }
+  };
+
   // Expanded Comprehensive Emoji Database without any text strings in flags
   const emojiCategories = {
     recents: ['😀', '😂', '❤️', '🔥', '👍', '🎉', '🚀', '⭐', '😎', '🙏', '💯', '✨', '🇮🇳', '💻', '🎮'],
@@ -123,6 +142,7 @@ export default function IndiePulseChatSystem() {
   // Real Live WhatsApp Style Voice Note Recording using MediaRecorder API
   const startRecording = async () => {
     if (!messageText.trim() && !attachedFile) {
+      playMicClickSound();
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const mediaRecorder = new MediaRecorder(stream);
@@ -238,13 +258,14 @@ export default function IndiePulseChatSystem() {
           <div className="p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a] w-full">
             <div className="text-center my-2">
               <span className="px-3 py-1 rounded-lg bg-[#182229] text-[10px] text-slate-400 shadow border border-slate-800">
-                🔒 Messages & file transfers are end-to-end encrypted[span_3](start_span)[span_3](end_span).
+                🔒 Messages & file transfers are end-to-end encrypted[span_0](start_span)[span_0](end_span).
               </span>
             </div>
 
             {(messages[activeChat.id] || []).map((msg, idx) => (
               <div key={idx} className={`flex flex-col max-w-[85%] ${msg.isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
-                <div className={`p-3 rounded-2xl text-xs shadow-md ${msg.isMe ? 'bg-[#005c4b] text-white rounded-tr-none shadow' : 'bg-[#202c33] text-slate-100 rounded-tl-none'}`}>
+                {/* Single Gradient Mixing Color Bubble (Pink + Blue Mixing) */}
+                <div className={`p-3 rounded-2xl text-xs shadow-md ${msg.isMe ? 'bg-gradient-to-r from-pink-600 to-blue-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'bg-[#202c33] text-slate-100 rounded-tl-none'}`}>
                   {msg.file && (
                     <div className="mb-2 p-2 bg-black/40 rounded-lg flex items-center gap-2 border border-white/10 text-[11px] text-blue-300">
                       <span>📎 {msg.file}</span>
@@ -258,13 +279,13 @@ export default function IndiePulseChatSystem() {
                           <div className="w-10 h-10 rounded-full bg-slate-600 flex items-center justify-center font-bold text-xs text-white overflow-hidden border border-white/20">
                             {activeChat.avatar}
                           </div>
-                          <span className="absolute -bottom-1 -right-1 text-[10px] bg-emerald-600 rounded-full p-0.5">🎤</span>
+                          <span className="absolute -bottom-1 -right-1 text-[10px] bg-pink-600 rounded-full p-0.5 shadow">🎤</span>
                         </div>
                         <div className="flex-1 flex flex-col gap-1">
-                          <audio controls src={msg.audioUrl} className="h-8 w-full accent-emerald-500" />
+                          <audio controls src={msg.audioUrl} className="h-8 w-full accent-pink-400" />
                         </div>
                       </div>
-                      <div className="flex justify-between items-center text-[9px] text-slate-300 px-1">
+                      <div className="flex justify-between items-center text-[9px] text-slate-200 px-1 font-mono">
                         <span>{msg.duration || '0:03'}</span>
                         <span>{msg.time} ✓✓</span>
                       </div>
@@ -272,7 +293,7 @@ export default function IndiePulseChatSystem() {
                   ) : (
                     msg.text && <p className="leading-relaxed">{msg.text}</p>
                   )}
-                  {!msg.audioUrl && <span className="block text-[8px] text-slate-300 text-right mt-1">{msg.time} ✓✓</span>}
+                  {!msg.audioUrl && <span className="block text-[8px] text-slate-200 text-right mt-1 font-mono">{msg.time} ✓✓</span>}
                 </div>
               </div>
             ))}
@@ -302,7 +323,7 @@ export default function IndiePulseChatSystem() {
                   </div>
                   <div className="flex items-center gap-3">
                     <button onClick={pauseOrResumeRecording} className="text-slate-300 text-xs cursor-pointer px-2 py-1 rounded bg-black/30 font-bold">
-                      {isPaused ? '▶' : '⏸'}
+                    {isPaused ? '▶' : '⏸'}
                     </button>
                     <button onClick={stopRecordingAndSend} className="w-9 h-9 rounded-full bg-green-600 text-white flex items-center justify-center text-sm shadow cursor-pointer hover:bg-green-500 transition-colors">
                       ➤
@@ -341,7 +362,7 @@ export default function IndiePulseChatSystem() {
                     </label>
                   </div>
 
-                  {/* Fixed Send / Exact WhatsApp Style SVG Mic Button */}
+                  {/* Fixed Send / Exact WhatsApp Style SVG Mic Button with Click Bip Sound */}
                   <button 
                     type={messageText.trim() || attachedFile ? 'submit' : 'button'}
                     onClick={messageText.trim() || attachedFile ? undefined : startRecording}
