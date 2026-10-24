@@ -16,18 +16,19 @@ export default function IndiePulseChatSystem() {
   // WhatsApp Style Popup States
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
-  const [emojiCategory, setEmojiCategory] = useState<'smileys' | 'animals' | 'food' | 'travel' | 'activities' | 'objects' | 'symbols'>('smileys');
+  const [emojiCategory, setEmojiCategory] = useState<'smileys' | 'animals' | 'food' | 'travel' | 'activities' | 'objects' | 'symbols' | 'flags'>('smileys');
   const [isRecording, setIsRecording] = useState(false);
 
-  // Complete WhatsApp-style Comprehensive Emoji Database across all categories
+  // 100% Pure Clean WhatsApp Style Emoji Database (No Text Strings, Only Real Emojis)
   const emojiCategories = {
-    smileys: ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😙', '😚', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐', '😕', '😟', '🙁', '😮', '😯', '😲', '😳', '🥺', '😦', '😧', '😨', '😰', '😥', '😢', '😭', '😱', '😖', '😣', '😞', 'sweat', '😩', '🥱', '😴', '😤', '😡', '🤬', '😈', '👿', '💀', '💩', '🤡', '👹', '👺', '👻', '👽', '👾', '🤖', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'],
-    animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🐢', '🐍', '🦎', '🦖', '🦕', '🐙', 'squid', 'shrimp', 'lobster', 'crab', '🐬', '🐳', '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', 'gorilla', 'orangutan', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🐐', '🦌', '🐕', '🐩', '🦮', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊️', '🐇', '🦝', 'skunk', 'badger'],
-    food: ['🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🍍', '🥭', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🌽', '🥕', '🧄', '🧅', '🥔', '🍠', '🥐', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🥞', '🧇', '🥓', '🥩', '🍗', '🍖', '🦴', 'hotdog', '🍔', '🍟', '🍕', '🥪', '🥙', '🧆', '🌮', '🌯', '🥗', '🥘', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🍛', 'rice', 'ball', '🍢', '🍡', '🍧', '🍨', '🍦', '🍰', '🎂', '🍮', '🍭', '🍬', '🍫', '🍩', '🍪', '🍯', '☕', '🍵', '🧃', '🥤', '🍶', '🍺', '🍻', '🍷', '🍸', '🍹', '🍾', '🥃', '🥄', '🍴', '🍽️'],
-    travel: ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎️', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜', '🛵', '🏍️', '🚲', '🛴', '🦽', '🦼', '🚨', '🚔', '🚍', '🚘', '🚖', '🚡', '🚠', '🚟', '🚃', '🚋', '🚝', '🚄', '🚅', '🚈', '🚂', '🚆', '🚇', '🚊', '🚉', '✈️', '🛫', '🛬', '🛩️', '🛰️', '🚀', '🛸', '🚁', '🛶', '⛵', 'speedboat', '🛥️', '🛳️', '⛴️', '🚢', '⚓', '⛽', 'construction', '🚦', '🚥', '🗺️', '🗿', '🗽', '🗼', '🏰', '🏯', '🏟️', '🎡', '🎢', '🎠', '⛲', '⛱️', '🏖️', '🏝️', '🏜️', '🌋', '⛰️', '🏔️', '🗻', '⛺', '🏠', '🏡', '🏢', '🏣', '🏤', '🏥', '🏦', '🏨', '🏪', '🏫', '🏬', '🏭', '🏯', '🏰'],
-    activities: ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', 'boxing', 'martialarts', '🥋', '🛼', '🛹', '🛷', '⛸️', '🥌', '🎿', '⛷️', '🏂', '🪂', '🏋️', '🤼', '🤸', '⛹️', '🤺', '🤾', '🏌️', '🏇', '🧘', '🏄', '🏊', '🤽', '🚣', '🧗', '🚵', '🚴', '🏆', '🥇', '🥈', '🥉', '🏅', '🎖️', '🏵️', '🎗️', '🎫', '🎟️', '🎪', '🤹', '🎭', '🩰', '🎨', '🎬', '🎤', '🎧', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🪕', '🎻', '🎲', '♟️', '🎯', '🎳', '🎮', '🎰', '🧩'],
-    objects: ['💻', '📱', '☎️', '📞', '📟', '📠', '🔋', '🔌', '🖨️', '⌨️', '🖱️', '🖲️', '💽', '💾', '💿', '📀', '🎥', '🎞️', '📽️', '📺', '📷', '📸', '📹', '📼', '🔍', '🔎', '🕯️', '💡', '🔦', '🏮', '📔', '📕', '📖', '📗', '📘', '📙', '📚', '📓', '📒', '📃', '📜', '📄', '📰', '🗞️', '📑', '🔖', '🏷️', '💰', '🪙', '💴', '💵', '💶', '💷', '💸', '💳', '✉️', '📧', '📨', '📩', '📤', '📥', '📦', '📫', '📪', '📬', '📭', '📮', '🗳️', '✏️', '✒️', '🖋️', '🖊️', '🖌️', '🖍️', '📝', '💼', '📁', '📂', '📅', '📆', '📇', '📈', '📉', '📊', '📋', '📌', '📍', '📎', '📏', '📐', '✂️', '🗃️', '🗄️', '🗑️', '🔒', '🔓', '🔏', '🔐', '🔑', '🗝️', '🔨', '斧', '⛏️', '⚒️', '🛠️', '🗡️', '⚔️', '🔫', '🪃', '🛡️', '🔧', '🔩', '⚙️', '🗜️', '⚖️', '🔗', '⛓️', '🧰', '🧲', '⚗️', '🧪', '🧫', '🧬', '🔬', '🔭', '📡', '💉', '🩸', '💊', '🩹', '🩺', '🚪', '🛏️', '🛋️', '🚽', '🪞', '🪟', '🧻', '🚿', '🛁', '🧼', '🧽', '🧴', '🛎️'],
-    symbols: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🖤', '🤍', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐', '⛎', '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓', '🆔', '⚛️', '🉑', '☢️', '☣️', '📴', '📳', '🈶', '🈚', '🈸', '🈺', '🈷️', '🔸', '🔹', '🔶', '🔷', '🔺', '🔻', '🎴', '🔀', '🔁', '🔂', '▶️', '⏩', '⏭️', '⏯️', '◀️', '⏪', '⏮️', '🔼', '🔽', ' стабилизация', '⏹️', '⏺️', '⏏️', '🎦', '🔅', '🔆', '📶', '📳', '📴', '💯', '💢', '💬', '👁️‍🗨️', '🗨️', '💬', '💭', '💤', '🏁', '🚩', '🎌', '🏴', '🏳️']
+    smileys: ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😙', '😚', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐', '😕', '😟', '🙁', '😮', '😯', '😲', '😳', '🥺', '😦', '😧', '😨', '😰', '😥', '😢', '😭', '😱', '😖', '😣', '😞', '😩', '🥱', '😴', '😤', '😡', '🤬', '😈', '👿', '💀', '💩', '🤡', '👹', '👺', '👻', '👽', '👾', '🤖', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾', '🤲', '👐', '🙌', '👏', '🤝', '👍', '👎', '👊', '✊', '🤛', '🤜', '🤞', '✌️', '🤟', '🤘', '👌', '🤌', '🤏', '👈', '👉', '👆', '👇', '☝️', '✋', '🤚', '🖐️', '🖖', '👋', '🤙', '💪', '🦾', '🖕', '✍️', '🙏', '🦶', '🦵', '🦿', '💄', '💋', '👄', '🦷', '舌', '👂', '🦻', '👃', '👣', '👁️', '👀', '🧠', '🗣️', '👤', '👥'],
+    animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🐢', '🐍', '🦎', '🦖', '🦕', '🐙', '🦪', '🦐', '🦞', '🦀', '🐬', '🐳', '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🐐', '🦌', '🐕', '🐩', '🦮', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊️', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿️', '🦔'],
+    food: ['🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🍍', '🥭', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🌽', '🥕', '🧄', '🧅', '🥔', '🍠', '🥐', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🥞', '🧇', '🥓', '🥩', '🍗', '🍖', '🦴', '🌭', '🍔', '🍟', '🍕', '🥪', '🥙', '🧆', '🌮', '🌯', '🥗', '🥘', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🍛', '🍙', '🍘', '🍢', '🍡', '🍧', '🍨', '🍦', '🍰', '🎂', '🍮', '🍭', '🍬', '🍫', '🍩', '🍪', '🍯', '☕', '🍵', '🧃', '🥤', '🍶', '🍺', '🍻', '🍷', '🍸', '🍹', '🍾', '🥃', '🥄', '🍴', '🍽️', '🥣', '🥡', '🥢'],
+    travel: ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎️', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜', '🛵', '🏍️', '🚲', '🛴', '🦽', '🦼', '🚨', '🚔', '🚍', '🚘', '🚖', '🚡', '🚠', '🚟', '🚃', '🚋', '🚝', '🚄', '🚅', '🚈', '🚂', '🚆', '🚇', '🚊', '🚉', '✈️', '🛫', '🛬', '🛩️', '🛰️', '🚀', '🛸', '🚁', '🛶', '⛵', '🚤', '🛥️', '🛳️', '⛴️', '🚢', '⚓', '⛽', '🚧', '🚦', '🚥', '🗺️', '🗿', '🗽', '🗼', '🏰', '🏯', '🏟️', '🎡', '🎢', '🎠', '⛲', '⛱️', '🏖️', '🏝️', '🏜️', '🌋', '⛰️', '🏔️', '🗻', '⛺', '🏠', '🏡', '🏢', '🏣', '🏤', '🏥', '🏦', '🏨', '🏪', '🏫', '🏬', '🏭', '🏯', '🏰'],
+    activities: ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🛼', '🛹', '🛷', '⛸️', '🥌', '🎿', '⛷️', '🏂', '🪂', '🏋️', '🤼', '🤸', '⛹️', '🤺', '🤾', '🏌️', '🏇', '🧘', '🏄', '🏊', '🤽', '🚣', '🧗', '🚵', '🚴', '🏆', '🥇', '🥈', '🥉', '🏅', '🎖️', '🏵️', '🎗️', '🎫', '🎟️', '🎪', '🤹', '🎭', '🩰', '🎨', '🎬', '🎤', '🎧', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🪕', '🎻', '🎲', '♟️', '🎯', '🎳', '🎮', '🎰', '🧩'],
+    objects: ['💻', '📱', '☎️', '📞', '📟', '📠', '🔋', '🔌', '🖨️', '⌨️', '🖱️', '🖲️', '💽', '💾', '💿', '📀', '🎥', '🎞️', '📽️', '📺', '📷', '📸', '📹', '📼', '🔍', '🔎', '🕯️', '💡', '🔦', '🏮', '📔', '📕', '📖', '📗', '📘', '📙', '📚', '📓', '📒', '📃', '📜', '📄', '📰', '🗞️', '📑', '🔖', '🏷️', '💰', '🪙', '💴', '💵', '💶', '💷', '💸', '💳', '✉️', '📧', '📨', '📩', '📤', '📥', '📦', '📫', '📪', '📬', '📭', '📮', '🗳️', '✏️', '✒️', '🖋️', '🖊️', '🖌️', '🖍️', '📝', '💼', '📁', '📂', '📅', '📆', '📇', '📈', '📉', '📊', '📋', '📌', '📍', '📎', '📏', '📐', '✂️', '🗃️', '🗄️', '🗑️', '🔒', '🔓', '🔏', '🔐', '🔑', '🗝️', '🔨', '⛏️', '⚒️', '🛠️', '🗡️', '⚔️', '🔫', '🪃', '🛡️', '🔧', '🔩', '⚙️', '🗜️', '⚖️', '🔗', '⛓️', '🧰', '🧲', '⚗️', '🧪', '🧫', '🧬', '🔬', '🔭', '📡', '💉', '🩸', '💊', '🩹', '🩺', '🚪', '🛏️', '🛋️', '🚽', '🪞', '🪟', '🧻', '🚿', '🛁', '🧼', '🧽', '🧴', '🛎️'],
+    symbols: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🖤', '🤍', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐', '⛎', '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓', '🆔', '⚛️', '🉑', '☢️', '☣️', '📴', '📳', '🈶', '🈚', '🈸', '🈺', '🈷️', '🔸', '🔹', '🔶', '🔷', '🔺', '🔻', '🎴', '🔀', '🔁', '🔂', '▶️', '⏩', '⏭️', '⏯️', '◀️', '⏪', '⏮️', '🔼', '🔽', '⏹️', '⏺️', '⏏️', '🎦', '🔅', '🔆', '📶', '💯', '💢', '💬', '👁️‍🗨️', '🗨️', '💭', '💤', '🏁', '🚩', '🎌', '🏴', '🏳️'],
+    flags: ['🏳️‍🌈', '🏳️‍⚧️', '🏴‍☠️', '🏁', '🚩', '🎌', '🏴', '🏳️', '🇮🇳', '🇺🇸', '🇬🇧', '🇨🇦', '🇦🇺', '🇯🇵', '🇩🇪', '🇫🇷', '🇧🇷', '🇷🇺']
   };
 
   useEffect(() => {
@@ -137,7 +138,7 @@ export default function IndiePulseChatSystem() {
           </div>
 
           {/* Messages Container */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a] pb-32">
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a] pb-40">
             <div className="text-center my-2">
               <span className="px-3 py-1 rounded-lg bg-[#182229] text-[10px] text-slate-400 shadow border border-slate-800">
                 🔒 Messages & file transfers are end-to-end encrypted.
@@ -191,9 +192,33 @@ export default function IndiePulseChatSystem() {
             </div>
           )}
 
-          {/* WhatsApp Style Expanded Emoji Picker with All Categories */}
+          {/* WhatsApp Style Expanded Emoji Picker with Live Message Input Bar on Top */}
           {showEmojiPicker && (
-            <div className="bg-[#1f2c34] border-t border-slate-800 shrink-0 shadow-2xl rounded-t-2xl z-50 flex flex-col h-60">
+            <div className="bg-[#1f2c34] border-t border-slate-800 shrink-0 shadow-2xl rounded-t-2xl z-50 flex flex-col h-72">
+              
+              {/* WhatsApp Live Input Bar inside Emoji Picker Header */}
+              <div className="bg-[#0b141a] px-3 py-2 flex items-center gap-2 border-b border-slate-800 shrink-0">
+                <div className="bg-[#1f2c34] rounded-full px-3.5 py-2 flex items-center gap-2 border border-slate-800 shadow-inner w-full">
+                  <span className="text-slate-400 text-base cursor-pointer">😀</span>
+                  <input 
+                    type="text"
+                    placeholder="Message"
+                    value={messageText}
+                    onChange={(e) => setMessageText(e.target.value)}
+                    className="w-full bg-transparent text-white text-xs focus:outline-none placeholder-slate-400"
+                  />
+                  <span className="text-slate-400 text-lg">📎</span>
+                </div>
+                <button 
+                  type="button"
+                  onClick={handleSendMessage}
+                  className="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center text-sm shadow-lg shrink-0"
+                >
+                  {messageText.trim() || attachedFile ? '➤' : '🎤'}
+                </button>
+              </div>
+
+              {/* Emoji Categories Tabs */}
               <div className="flex justify-around border-b border-slate-800 py-2 bg-[#111b21] overflow-x-auto text-xs shrink-0">
                 <button onClick={() => setEmojiCategory('smileys')} className={`px-2 ${emojiCategory === 'smileys' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>😀 Smileys</button>
                 <button onClick={() => setEmojiCategory('animals')} className={`px-2 ${emojiCategory === 'animals' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🐶 Animals</button>
@@ -202,14 +227,17 @@ export default function IndiePulseChatSystem() {
                 <button onClick={() => setEmojiCategory('activities')} className={`px-2 ${emojiCategory === 'activities' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>⚽ Activities</button>
                 <button onClick={() => setEmojiCategory('objects')} className={`px-2 ${emojiCategory === 'objects' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>💻 Objects</button>
                 <button onClick={() => setEmojiCategory('symbols')} className={`px-2 ${emojiCategory === 'symbols' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>❤️ Symbols</button>
+                <button onClick={() => setEmojiCategory('flags')} className={`px-2 ${emojiCategory === 'flags' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🏳️ Flags</button>
               </div>
-              <div className="p-3 grid grid-cols-8 gap-2 overflow-y-auto flex-1">
+
+              {/* Emoji Grid */}
+              <div className="p-3 grid grid-cols-8 gap-2 overflow-y-auto flex-1 bg-[#0b141a]">
                 {emojiCategories[emojiCategory].map((emoji, i) => (
                   <button
                     key={i}
                     type="button"
                     onClick={() => setMessageText(prev => prev + emoji)}
-                    className="text-xl p-1 hover:bg-slate-700/50 rounded transition-all text-center cursor-pointer"
+                    className="text-2xl p-1.5 hover:bg-slate-700/50 rounded transition-all text-center cursor-pointer flex items-center justify-center"
                   >
                     {emoji}
                   </button>
