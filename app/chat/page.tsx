@@ -118,11 +118,11 @@ export default function IndiePulseChatSystem() {
     <main className="min-h-screen w-full bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden">
       
       {currentView === 'conversation' && activeChat ? (
-        // CSS Grid Layout to lock screen bounds and prevent any scrolling/overflow issues
-        <div className="h-screen w-full bg-[#0b141a] grid grid-rows-[auto_1fr_auto] overflow-hidden">
+        // Strict CSS Grid Layout locked to exact dynamic viewport height (h-[100dvh])
+        <div className="h-[100dvh] w-full bg-[#0b141a] grid grid-rows-[auto_1fr_auto] overflow-hidden">
           
           {/* Top WhatsApp Style Header */}
-          <div className="bg-[#1f2c34] px-3 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md w-full z-20">
+          <div className="bg-[#1f2c34] px-3 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md w-full z-20 shrink-0">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-sm text-white shadow shrink-0">
                 {activeChat.avatar}
@@ -162,11 +162,11 @@ export default function IndiePulseChatSystem() {
             ))}
           </div>
 
-          {/* Bottom Footer Section (Grid Row 3) containing Attachments, Emoji Picker, and Input Bar */}
-          <div className="w-full bg-[#0b141a] flex flex-col z-40 border-t border-slate-900 shadow-lg">
+          {/* Bottom Footer Section (Grid Row 3) containing Popups and Input Bar */}
+          <div className="w-full bg-[#0b141a] flex flex-col shrink-0 z-40 border-t border-slate-900 shadow-lg">
 
             {attachedFile && (
-              <div className="bg-[#1f2c34] px-4 py-2 border-t border-slate-800 flex items-center justify-between text-xs text-blue-400">
+              <div className="bg-[#1f2c34] px-4 py-2 border-t border-slate-800 flex items-center justify-between text-xs text-blue-400 shrink-0">
                 <span>Attached: {attachedFile}</span>
                 <button onClick={() => setAttachedFile(null)} className="text-pink-400 font-bold">✕ Remove</button>
               </div>
@@ -174,7 +174,7 @@ export default function IndiePulseChatSystem() {
 
             {/* WhatsApp Style Attachment Popup Menu */}
             {showAttachmentMenu && (
-              <div className="bg-[#1f2c34] p-4 border-t border-slate-800 grid grid-cols-4 gap-4 text-center shadow-2xl rounded-t-2xl z-50">
+              <div className="bg-[#1f2c34] p-4 border-t border-slate-800 grid grid-cols-4 gap-4 text-center shadow-2xl rounded-t-2xl z-50 shrink-0">
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center text-lg text-white shadow">🖼️</div>
                   <span className="text-[10px] text-slate-300 font-medium">Gallery</span>
@@ -197,9 +197,9 @@ export default function IndiePulseChatSystem() {
               </div>
             )}
 
-            {/* WhatsApp Style Expanded Emoji Picker with Live Input Bar on Top */}
+            {/* WhatsApp Style Expanded Emoji Picker with Live Input Bar on Top inside Grid Footer */}
             {showEmojiPicker && (
-              <div className="bg-[#1f2c34] border-t border-slate-800 shadow-2xl rounded-t-2xl z-50 flex flex-col h-64 w-full">
+              <div className="bg-[#1f2c34] border-t border-slate-800 shadow-2xl rounded-t-2xl z-50 flex flex-col h-56 w-full shrink-0">
                 
                 {/* WhatsApp Live Input Bar inside Emoji Picker Header */}
                 <div className="bg-[#0b141a] px-3 py-2 flex items-center gap-2 border-b border-slate-800 shrink-0">
@@ -224,7 +224,7 @@ export default function IndiePulseChatSystem() {
                 </div>
 
                 {/* Emoji Categories Tabs */}
-                <div className="flex justify-around border-b border-slate-800 py-2 bg-[#111b21] overflow-x-auto text-xs shrink-0">
+                <div className="flex justify-around border-b border-slate-800 py-1.5 bg-[#111b21] overflow-x-auto text-xs shrink-0">
                   <button onClick={() => setEmojiCategory('recents')} className={`px-2 ${emojiCategory === 'recents' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🕒</button>
                   <button onClick={() => setEmojiCategory('smileys')} className={`px-2 ${emojiCategory === 'smileys' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>😀</button>
                   <button onClick={() => setEmojiCategory('animals')} className={`px-2 ${emojiCategory === 'animals' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🐶</button>
@@ -237,13 +237,13 @@ export default function IndiePulseChatSystem() {
                 </div>
 
                 {/* Emoji Grid */}
-                <div className="p-3 grid grid-cols-8 gap-2 overflow-y-auto flex-1 bg-[#0b141a]">
+                <div className="p-2 grid grid-cols-8 gap-1.5 overflow-y-auto flex-1 bg-[#0b141a]">
                   {emojiCategories[emojiCategory].map((emoji, i) => (
                     <button
                       key={i}
                       type="button"
                       onClick={() => setMessageText(prev => prev + emoji)}
-                      className="text-2xl p-1.5 hover:bg-slate-700/50 rounded transition-all text-center cursor-pointer flex items-center justify-center"
+                      className="text-xl p-1 hover:bg-slate-700/50 rounded transition-all text-center cursor-pointer flex items-center justify-center"
                     >
                       {emoji}
                     </button>
@@ -254,13 +254,13 @@ export default function IndiePulseChatSystem() {
 
             {/* Recording Status Overlay */}
             {isRecording && (
-              <div className="bg-red-600/90 text-white text-center py-2 text-xs font-bold animate-pulse">
+              <div className="bg-red-600/90 text-white text-center py-1.5 text-xs font-bold animate-pulse shrink-0">
                 🎙️ Recording audio... (Release to send)
               </div>
             )}
 
             {/* Main Bottom Input Bar */}
-            <div className="bg-[#0b141a] px-2 py-2 w-full">
+            <div className="bg-[#0b141a] px-2 py-2 w-full shrink-0">
               <form onSubmit={handleSendMessage} className="grid grid-cols-[1fr_auto] items-center gap-2 w-full">
                 
                 {/* Input Box Container */}
@@ -280,7 +280,7 @@ export default function IndiePulseChatSystem() {
                   />
                   <span 
                     onClick={() => { setShowAttachmentMenu(!showAttachmentMenu); setShowEmojiPicker(false); }}
-                    className="text-slate-400 hover:text-white cursor-pointer text-lg shrink-0" 
+                    className="text-slate-400 hover:text-white cursor-pointer text-lg shrink-0"
                     title="Attach File"
                   >
                     📎
