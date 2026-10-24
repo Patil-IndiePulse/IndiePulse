@@ -136,19 +136,19 @@ export default function IndiePulseChatSystem() {
             </div>
           )}
 
-          {/* Bottom Input Bar - Strictly Fixed Mobile Layout */}
-          <div className="bg-[#0b141a] p-2 shrink-0 w-full">
-            <form onSubmit={handleSendMessage} className="flex items-center gap-2 w-full">
+          {/* Bottom Input Bar - WhatsApp Exact Layout using CSS Grid to prevent overflow/disappearing */}
+          <div className="bg-[#0b141a] px-2 py-2 shrink-0 w-full">
+            <form onSubmit={handleSendMessage} className="grid grid-cols-[1fr_auto] items-center gap-2 w-full max-w-full">
               
-              {/* Input Box with min-w-0 to prevent disappearing */}
-              <div className="flex-1 min-w-0 bg-[#1f2c34] rounded-full px-3 py-2 flex items-center gap-2 border border-slate-800 shadow-inner">
+              {/* Input Box Container */}
+              <div className="bg-[#1f2c34] rounded-full px-3.5 py-2 flex items-center gap-2 border border-slate-800 shadow-inner w-full">
                 <span className="text-slate-400 text-base cursor-pointer shrink-0">😊</span>
                 <input 
                   type="text"
                   placeholder="Message"
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
-                  className="w-full bg-transparent text-white text-xs focus:outline-none placeholder-slate-400 min-w-0"
+                  className="w-full bg-transparent text-white text-xs focus:outline-none placeholder-slate-400"
                 />
                 <label className="text-slate-400 hover:text-white cursor-pointer text-lg shrink-0">
                   📎
@@ -157,7 +157,7 @@ export default function IndiePulseChatSystem() {
                 <span className="text-slate-400 text-base cursor-pointer shrink-0">📷</span>
               </div>
 
-              {/* Fixed Size Circular Send / Mic Button (Shrink-0 prevents stretching) */}
+              {/* Fixed Send / Mic Button */}
               <button 
                 type="submit"
                 className="w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all select-none"
