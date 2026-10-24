@@ -156,22 +156,7 @@ export default function IndiePulseChatSystem() {
         };
 
         mediaRecorder.onstop = () => {
-          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-          const url = URL.createObjectURL(audioBlob);
-
-          const newMsg = {
-            sender: 'You',
-            text: '',
-            audioUrl: url,
-            duration: formatTime(recordingSeconds),
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isMe: true
-          };
-
-          setMessages(prev => ({
-            ...prev,
-            [activeChat.id]: [...(prev[activeChat.id] || []), newMsg]
-          }));
+          // Do nothing on stop if cancelled
         };
 
         mediaRecorder.start();
@@ -207,8 +192,27 @@ export default function IndiePulseChatSystem() {
   const stopRecordingAndSend = () => {
     clearInterval(timerRef.current);
     if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      const recorder = mediaRecorderRef.current;
+      recorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const url = URL.createObjectURL(audioBlob);
+
+        const newMsg = {
+          sender: 'You',
+          text: '',
+          audioUrl: url,
+          duration: formatTime(recordingSeconds),
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          isMe: true
+        };
+
+        setMessages(prev => ({
+          ...prev,
+          [activeChat.id]: [...(prev[activeChat.id] || []), newMsg]
+        }));
+      };
+      recorder.stop();
+      recorder.stream.getTracks().forEach(track => track.stop());
     }
     setIsRecording(false);
     setRecordingSeconds(0);
@@ -217,11 +221,15 @@ export default function IndiePulseChatSystem() {
   const cancelRecording = () => {
     clearInterval(timerRef.current);
     if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      const recorder = mediaRecorderRef.current;
+      // Clear onstop so it won't send anything when stopped
+      recorder.onstop = null;
+      recorder.stop();
+      recorder.stream.getTracks().forEach(track => track.stop());
     }
     setIsRecording(false);
     setRecordingSeconds(0);
+    audioChunksRef.current = [];
   };
 
   const formatTime = (secs: number) => {
@@ -258,13 +266,13 @@ export default function IndiePulseChatSystem() {
           <div className="p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a] w-full">
             <div className="text-center my-2">
               <span className="px-3 py-1 rounded-lg bg-[#182229] text-[10px] text-slate-400 shadow border border-slate-800">
-                🔒 Messages & file transfers are end-to-end encrypted[span_3](start_span)[span_3](end_span).
+                🔒 Messages & file transfers are end-to-end encrypted[span_0](start_span)[span_0](end_span).
               </span>
             </div>
 
             {(messages[activeChat.id] || []).map((msg, idx) => (
               <div key={idx} className={`flex flex-col max-w-[85%] ${msg.isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
-                {/* Clean Full Gradient Mixing Color Bubble without white inner box */}
+                {/* Clean Full Gradient Mixing Color Bubble without any inner box */}
                 <div className={`p-3 rounded-2xl text-xs shadow-md ${msg.isMe ? 'bg-gradient-to-r from-pink-600 to-blue-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'bg-[#202c33] text-slate-100 rounded-tl-none'}`}>
                   {msg.file && (
                     <div className="mb-2 p-2 bg-black/40 rounded-lg flex items-center gap-2 border border-white/10 text-[11px] text-blue-300">
@@ -311,8 +319,8 @@ export default function IndiePulseChatSystem() {
               {isRecording ? (
                 <div className="bg-[#1f2c34] rounded-full px-4 py-2.5 flex items-center justify-between border border-slate-800 shadow-inner w-full">
                   <div className="flex items-center gap-3">
-                    {/* WhatsApp Style Delete Icon Button during recording */}
-                    <button onClick={cancelRecording} className="w-9 h-9 rounded-full bg-red-600/20 text-red-400 flex items-center justify-center text-sm cursor-pointer hover:bg-red-600/40 transition-colors" title="Delete Recording">
+                    {/* Working WhatsApp Style Delete Trash Icon Button */}
+                    <button type="button" onClick={cancelRecording} className="w-9 h-9 rounded-full bg-red-600/20 text-red-400 flex items-center justify-center text-sm cursor-pointer hover:bg-red-600/40 transition-colors" title="Delete Recording">
                       🗑️
                     </button>
                     <span className="text-xs font-mono text-red-400 font-bold">{formatTime(recordingSeconds)}</span>
@@ -322,10 +330,10 @@ export default function IndiePulseChatSystem() {
                     <span>{isPaused ? 'Paused' : 'Recording...'}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <button onClick={pauseOrResumeRecording} className="text-slate-300 text-xs cursor-pointer px-2 py-1 rounded bg-black/30 font-bold">
+                    <button type="button" onClick={pauseOrResumeRecording} className="text-slate-300 text-xs cursor-pointer px-2 py-1 rounded bg-black/30 font-bold">
                       {isPaused ? '▶' : '⏸'}
                     </button>
-                    <button onClick={stopRecordingAndSend} className="w-9 h-9 rounded-full bg-green-600 text-white flex items-center justify-center text-sm shadow cursor-pointer hover:bg-green-500 transition-colors">
+                    <button type="button" onClick={stopRecordingAndSend} className="w-9 h-9 rounded-full bg-green-600 text-white flex items-center justify-center text-sm shadow cursor-pointer hover:bg-green-500 transition-colors">
                       ➤
                     </button>
                   </div>
