@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function IndiePulseChatSystem() {
@@ -17,18 +17,23 @@ export default function IndiePulseChatSystem() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
   const [emojiCategory, setEmojiCategory] = useState<'recents' | 'smileys' | 'animals' | 'food' | 'travel' | 'activities' | 'objects' | 'symbols' | 'flags'>('smileys');
+  
+  // WhatsApp Style Voice Recording States
   const [isRecording, setIsRecording] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const timerRef = useRef<any>(null);
 
-  // Expanded Comprehensive Emoji Database with All World Flags and Maximum Emojis
+  // Expanded Comprehensive Emoji Database without any text strings in flags
   const emojiCategories = {
     recents: ['😀', '😂', '❤️', '🔥', '👍', '🎉', '🚀', '⭐', '😎', '🙏', '💯', '✨', '🇮🇳', '💻', '🎮'],
-    smileys: ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😙', '😚', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐', '😕', '😟', '🙁', '😮', '😯', '😲', '😳', '🥺', '😦', '😧', '😨', '😰', '😥', '😢', '😭', '😱', '😖', '😣', '😞', '😩', '🥱', '😴', '😤', '😡', '🤬', '😈', '👿', '💀', '💩', '🤡', '👹', '👺', '👻', '👽', '👾', '🤖', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾', '🤲', '👐', '🙌', '👏', '🤝', '👍', '👎', '👊', '✊', '🤛', '🤜', '🤞', '✌️', '🤟', '🤘', '👌', '🤌', '🤏', '👈', '👉', '👆', '👇', '☝️', '✋', '🤚', '🖐️', '🖖', '👋', '🤙', '💪', '🦾', '🖕', '✍️', '🙏', '🦶', '🦵', '🦿', '💄', '💋', '👄', '🦷', '👂', '🦻', '👃', '👣', '👁️', '👀', '🧠', '🗣️', '👤', '👥', '👶', '👧', '🧒', '👦', '👩', '🧑', '👨', '👩‍🦱', '👨‍🦱', '👩‍🦰', '👨‍🦰', '👱‍♀️', '👱‍♂️', '👩‍🦳', '👨‍🦳', '👩‍🦲', '👨‍🦲', '🧔', '👵', '🧓', '👴', '👲', '👳‍♀️', '👳‍♂️', '🧕', '👮‍♀️', '👮‍♂️', '👷‍♀️', '👷‍♂️', '💂‍♀️', '💂‍♂️', '🕵️‍♀️', '🕵️‍♂️', '👩‍⚕️', '👨‍⚕️', '👩‍🌾', '👨‍🌾', '👩‍🍳', '👨‍🍳', '👩‍🎓', '👨‍🎓', '👩‍🎤', '👨‍🎤', '👩‍🏫', '👨‍🏫', '👩‍🏭', '👨‍🏭', '👩‍💻', '👨‍💻', '👩‍💼', '👨‍💼', '👩‍🔧', '👨‍🔧', '👩‍🔬', '👨‍🔬', '👩‍🎨', '👨‍🎨', '👩‍🚒', '👨‍🚒', '👩‍✈️', '👨‍✈️', '👩‍🚀', '👨‍🚀', '👩‍⚖️', '👨‍⚖️', '👰', '🤵', '👸', '🤴', '🦸‍♀️', '🦸‍♂️', '🦹‍♀️', '🦹‍♂️', '🤶', '🎅', '🧙‍♀️', '🧙‍♂️', '🧚‍♀️', '🧚‍♂️', '🧛‍♀️', '🧛‍♂️', '🧜‍♀️', '🧜‍♂️', '🧝‍♀️', '🧝‍♂️', '🧞‍♀️', '🧞‍♂️', 'ゾンビ', '🧟‍♀️', '🧟‍♂️'],
-    animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🐢', '🐍', '🦎', '🦖', '🦕', '🐙', '🦪', '🦐', '🦞', '🦀', '🐬', '🐳', '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🐐', '🦌', '🐕', '🐩', '🦮', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊️', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿️', '🦔', '🐉', '🐲', '🌵', '🎄', '🌲', '🌳', '🌴', '🌱', '🌿', '☘️', '🍀', '🎍', '🎋', '🍃', '🍂', '🍁', '🍄', '🌾', '💐', '🌷', '🌹', '🥀', '🌺', '🌸', '🌼', '🌻', '🌞', '🌝', '🌛', '🌜', '🌕', '🌖', '🌗', '🌘', '🌑', '🌒', '🌓', '🌔', '🌙', '🌎', '🌍', '🌏', '🪐', '💫', '⭐️', '🌟', '✨', '⚡️', '☄️', '💥', '🔥', '🌪️', '🌈', '☀️', '🌤️', '⛅', '🌥️', '☁️', '🌦️', '🌧️', '⛈️', '🌩️', '🌨️', '❄️', '☃️', '⛄️', '风', '🌬️', '💧', '💦', '☔️', '☂️', '🌊'],
-    food: ['🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🍍', '🥭', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🌽', '🥕', '🧄', '🧅', '🥔', '🍠', '🥐', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🥞', '🧇', '🥓', '🥩', '🍗', '🍖', '🦴', '🌭', '🍔', '🍟', '🍕', '🥪', '🥙', '🧆', '🌮', '🌯', '🥗', '🥘', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🍙', '🍘', '🍢', '🍡', '🍧', '🍨', '🍦', '🍰', '🎂', '🍮', '🍭', '🍬', '🍫', '🍩', '🍪', '🍯', '☕', '🍵', '🧃', '🥤', '🍶', '🍺', '🍻', '🍷', '🍸', '🍹', '🍾', '🥃', '🥄', '🍴', '🍽️', '🥣', '🥡', '🥢', '🧋', '🧊', '🧄', '🧅', '🧆', 'バター', 'パンケーキ'],
-    travel: ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎️', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜', '🛵', '🏍️', '🚲', '🛴', '🦽', '🦼', '🚨', '🚔', '🚍', '🚘', '🚖', '🚡', '🚠', '🚟', '🚃', '🚋', '🚝', '🚄', '🚅', '🚈', '🚂', '🚆', '🚇', '🚊', '🚉', '✈️', '🛫', '🛬', '🛩️', '🛰️', '🚀', '🛸', '🚁', '🛶', '⛵', '🚤', '🛥️', '🛳️', '⛴️', '🚢', '⚓', '⛽', '🚧', '🚦', '🚥', '🗺️', '🗿', '🗽', '🗼', '🏰', '🏯', '🏟️', '🎡', '🎢', '🎠', '⛲', '⛱️', '🏖️', '🏝️', '🏜️', '🌋', '⛰️', '🏔️', '🗻', '⛺', '🏠', '🏡', '🏢', '🏣', '🏤', '🏥', '🏦', '🏨', '🏪', '🏫', '🏬', '🏭', '🛕', '⛩️', '🛤️', '🛣️', '🏢', '🏬', '🏣', '🏤', '🏥', '🏦', '🏨', '🏪', '🏫', 'ۛ', '⛺', '🌁', '🌃', '🏙️', '🌄', '🌅', '🌆', '🌇', '🌉', '♨️', '🎠', '🛝'],
-    activities: ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🛼', '🛹', '🛷', '⛸️', '🥌', '🎿', '⛷️', '🏂', '🪂', '🏋️', '🤼', '🤸', '⛹️', '🤺', '🤾', '🏌️', '🏇', '🧘', '🏄', '🏊', '🤽', '🚣', '🧗', '🚵', '🚴', '🏆', '🥇', '🥈', '🥉', '🏅', '🎖️', '🏵️', '🎗️', '🎫', '🎟️', '🎪', '🤹', '🎭', '🩰', '🎨', '🎬', '🎤', '🎧', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🪕', '🎻', '🎲', '♟️', '🎯', '🎳', '🎮', '🎰', '🧩', '🧸', '🪅', '🪆', '🪩', '🪃', '🎣', '🎽', '🥼', '🦺', '👔', '👕', '👖', '🧣', '🧤', '🧥', '🧦', '👗', '👘', '🥻', '🩱', '🩲', '🩳', '👙', '👚', '👛', '👜', '👝', '🎒', '👞', '👟', '🥾', '🥿', '👠', '👡', '👢', '👑', '👒', '🎩', '🎓', '🧢', '⛑️', '📿', '💄', '💍', '💎'],
-    objects: ['💻', '📱', '☎️', '📞', '📟', '📠', '🔋', '🔌', '🖨️', '⌨️', '🖱️', '🖲️', '💽', '💾', '💿', '📀', '🎥', '🎞️', '📽️', '📺', '📷', '📸', '📹', '📼', '🔍', '🔎', '🕯️', '💡', '🔦', '🏮', '📔', '📕', '📖', '📗', '📘', '📙', '📚', '📓', '📒', '📃', '📜', '📄', '📰', '🗞️', '📑', '🔖', '🏷️', '💰', '🪙', '💴', '💵', '💶', '💷', '💸', '💳', '✉️', '📧', '📨', '📩', '📤', '📥', '📦', '📫', '📪', '📬', '📭', '📮', '🗳️', '✏️', '✒️', '🖋️', '🖊️', '🖌️', '🖍️', '📝', '💼', '📁', '📂', '📅', '📆', '📇', '📈', '📉', '📊', '📋', '📌', '📍', '📎', '📏', '📐', '✂️', '🗃️', '🗄️', '🗑️', '🔒', '🔓', '🔏', '🔐', '🔑', '🗝️', '🔨', '⛏️', '⚒️', '🛠️', '🗡️', '⚔️', '🔫', '🪃', '🛡️', '🔧', '🔩', '⚙️', '🗜️', '⚖️', '🔗', '⛓️', '🧰', '🧲', '⚗️', '🧪', '🧫', '🧬', '🔬', '🔭', '📡', '💉', '🩸', '💊', '🩹', '🩺', '🚪', '🛏️', '🛋️', '🚽', '🪞', '🪟', '🧻', '🚿', '🛁', '🧼', '🧽', '🧴', '🛎️', '🔑', '🗝️', '🛋️', '🛏️', '🪑', '🚿', '🛁', '🪒', '🧷', '🧹', '🧺', '🧻', '🪣', '🧽', '🧼', '🪥', '🧯', '🛒', '🚬', '⚰️', '⚱️', '🗿'],
-    symbols: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🖤', '🤍', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐', '⛎', '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓', '🆔', '⚛️', '🉑', '☢️', '☣️', '📴', '📳', '🈶', '🈚', '🈸', '🈺', '🈷️', '🔸', '🔹', '🔶', '🔷', '🔺', '🔻', '🎴', '🔀', '🔁', '🔂', '▶️', '⏩', '⏭️', '⏯️', '◀️', '⏪', '⏮️', '🔼', '🔽', '⏹️', '⏺️', '⏏️', '🎦', '🔅', '🔆', '📶', '💯', '💢', '💬', '🗨️', '💭', '💤', '🏁', '🚩', '🎌', '🏴', '🏳️', '💱', '💲', '💱', '✖️', '➕', '➗', '🞎', '💱', '〰️', '💱', '©️', '®️', '™️', '🔚', '🔙', '🔛', '🔝', '🔜', '〰️', '✔️', '☑️', '🔘', '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '🟤', '⚫', '⚪', '🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '🟫', '⬛', '⬜', '◼️', '◻️', '◾', '◽', '▪️', '▫️', '🔶', '🔷', '🔸', '🔹', '🔺', '🔻', '💠', '🔘', '🔲', '🔳', '🧮'],
+    smileys: ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😙', '😚', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐', '😕', '😟', '🙁', '😮', '😯', '😲', '😳', '🥺', '😦', '😧', '😨', '😰', '😥', '😢', '😭', '😱', '😖', '😣', '😞', '😩', '🥱', '😴', '😤', '😡', '🤬', '😈', '👿', '💀', '💩', '🤡', '👹', '👺', '👻', '👽', '👾', '🤖', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾', '🤲', '👐', '🙌', '👏', '🤝', '👍', '👎', '👊', '✊', '🤛', '🤜', '🤞', '✌️', '🤟', '🤘', '👌', '🤌', '🤏', '👈', '👉', '👆', '👇', '☝️', '✋', '🤚', '🖐️', '🖖', '👋', '🤙', '💪', '🦾', '🖕', '✍️', '🙏', '🦶', '🦵', '🦿', '💄', '💋', '👄', '🦷', '👂', '🦻', '👃', '👣', '👁️', '👀', '🧠', '🗣️', '👤', '👥'],
+    animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🐢', '🐍', '🦎', '🦖', '🦕', '🐙', '🦪', '🦐', '🦞', '🦀', '🐬', '🐳', '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🐐', '🦌', '🐕', '🐩', '🦮', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊️', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿️', '🦔', '🌵', '🎄', '🌲', '🌳', '🌴', '🌱', '🌿', '☘️', '🍀', '🎍', '🎋', '🍃', '🍂', '🍁', '🍄', '🌾', '💐', '🌷', '🌹', '🥀', '🌺', '🌸', '🌼', '🌻', '🌞', '🌝', '🌛', '🌜', '🌕', '🌖', '🌗', '🌘', '🌑', '🌒', '🌓', '🌔', '🌙', '🌎', '🌍', '🌏', '🪐', '💫', '⭐️', '🌟', '✨', '⚡️', '☄️', '💥', '🔥', '🌪️', '🌈', '☀️', '🌤️', '⛅', '🌥️', '☁️', '🌦️', '🌧️', '⛈️', '🌩️', '🌨️', '❄️', '☃️', '⛄️', '🌬️', '💧', '💦', '☔️', '☂️', '🌊'],
+    food: ['🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🍍', '🥭', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🌽', '🥕', '🧄', '🧅', '🥔', '🍠', '🥐', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🥞', '🧇', '🥓', '🥩', '🍗', '🍖', '🦴', '🌭', '🍔', '🍟', '🍕', '🥪', '🥙', '🧆', '🌮', '🌯', '🥗', '🥘', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🍙', '🍘', '🍢', '🍡', '🍧', '🍨', '🍦', '🍰', '🎂', '🍮', '🍭', '🍬', '🍫', '🍩', '🍪', '🍯', '☕', '🍵', '🧃', '🥤', '🍶', '🍺', '🍻', '🍷', '🍸', '🍹', '🍾', '🥃', '🥄', '🍴', '🍽️', '🥣', '🥡', '🥢', '🧋', '🧊'],
+    travel: ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎️', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜', '🛵', '🏍️', '🚲', '🛴', '🦽', '🦼', '🚨', '🚔', '🚍', '🚘', '🚖', '🚡', '🚠', '🚟', '🚃', '🚋', '🚝', '🚄', '🚅', '🚈', '🚂', '🚆', '🚇', '🚊', '🚉', '✈️', '🛫', '🛬', '🛩️', '🛰️', '🚀', '🛸', '🚁', '🛶', '⛵', '🚤', '🛥️', '🛳️', '⛴️', '🚢', '⚓', '⛽', '🚧', '🚦', '🚥', '🗺️', '🗿', '🗽', '🗼', '🏰', '🏯', '🏟️', '🎡', '🎢', '🎠', '⛲', '⛱️', '🏖️', '🏝️', '🏜️', '🌋', '⛰️', '🏔️', '🗻', '⛺', '🏠', '🏡', '🏢', '🏣', '🏤', '🏥', '🏦', '🏨', '🏪', '🏫', '🏬', '🏭', '🛕', '⛩️', '🛤️', '🛣️', '🌁', '🌃', '🏙️', '🌄', '🌅', '🌆', '🌇', '🌉', '♨️'],
+    activities: ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🛼', '🛹', '🛷', '⛸️', '🥌', '🎿', '⛷️', '🏂', '🪂', '🏋️', '🤼', '🤸', '⛹️', '🤺', '🤾', '🏌️', '🏇', '🧘', '🏄', '🏊', '🤽', '🚣', '🧗', '🚵', '🚴', '🏆', '🥇', '🥈', '🥉', '🏅', '🎖️', '🏵️', '🎗️', '🎫', '🎟️', '🎪', '🤹', '🎭', '🩰', '🎨', '🎬', '🎤', '🎧', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🪕', '🎻', '🎲', '♟️', '🎯', '🎳', '🎮', '🎰', '🧩', '🧸', '🪅', '🪆', '🪩', '🎽', '🥼', '🦺', '👔', '👕', '👖', '🧣', '🧤', '🧥', '🧦', '👗', '👘', '🥻', '🩱', '🩲', '🩳', '👙', '👚', '👛', '👜', '👝', '🎒', '👞', '👟', '🥾', '🥿', '👠', '👡', '👢', '👑', '👒', '🎩', '🎓', '🧢', '⛑️', '📿', '💄', '💍', '💎'],
+    objects: ['💻', '📱', '☎️', '📞', '📟', '📠', '🔋', '🔌', '🖨️', '⌨️', '🖱️', '🖲️', '💽', '💾', '💿', '📀', '🎥', '🎞️', '📽️', '📺', '📷', '📸', '📹', '📼', '🔍', '🔎', '🕯️', '💡', '🔦', '🏮', '📔', '📕', '📖', '📗', '📘', '📙', '📚', '📓', '📒', '📃', '📜', '📄', '📰', '🗞️', '📑', '🔖', '🏷️', '💰', '🪙', '💴', '💵', '💶', '💷', '💸', '💳', '✉️', '📧', '📨', '📩', '📤', '📥', '📦', '📫', '📪', '📬', '📭', '📮', '🗳️', '✏️', '✒️', '🖋️', '🖊️', '🖌️', '🖍️', '📝', '💼', '📁', '📂', '📅', '📆', '📇', '📈', '📉', '📊', '📋', '📌', '📍', '📎', '📏', '📐', '✂️', '🗃️', '🗄️', '🗑️', '🔒', '🔓', '🔏', '🔐', '🔑', '🗝️', '🔨', '⛏️', '⚒️', '🛠️', '🗡️', '⚔️', '🔫', '🪃', '🛡️', '🔧', '🔩', '⚙️', '🗜️', '⚖️', '🔗', '⛓️', '🧰', '🧲', '⚗️', '🧪', '🧫', '🧬', '🔬', '🔭', '📡', '💉', '🩸', '💊', '🩹', '🩺', '🚪', '🛏️', '🛋️', '🚽', '🪞', '🪟', '🧻', '🚿', '🛁', '🧼', '🧽', '🧴', '🛎️', '🪑', '🪒', '🧷', '🧹', '🧺', '🪣', '🪥', '🧯', '🛒', '🚬', '⚰️', '⚱️', '🗿'],
+    symbols: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🖤', '🤍', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐', '⛎', '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓', '🆔', '⚛️', '🉑', '☢️', '☣️', '📴', '📳', '🈶', '🈚', '🈸', '🈺', '🈷️', '🔸', '🔹', '🔶', '🔷', '🔺', '🔻', '🎴', '🔀', '🔁', '🔂', '▶️', '⏩', '⏭️', '⏯️', '◀️', '⏪', '⏮️', '🔼', '🔽', '⏹️', '⏺️', '⏏️', '🎦', '🔅', '🔆', '📶', '💯', '💢', '💬', '🗨️', '💭', '💤', '🏁', '🚩', '🎌', '🏴', '🏳️', '💱', '💲', '✖️', '➕', '➗', '©️', '®️', '™️', '🔚', '🔙', '🔛', '🔝', '🔜', '✔️', '☑️', '🔘', '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '🟤', '⚫', '⚪', '🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '🟫', '⬛', '⬜', '◼️', '◻️', '◾', '◽', '▪️', '▫️', '💠', '🔲', '🔳', '🧮'],
     flags: [
       '🇮🇳', '🇺🇸', '🇬🇧', '🇨🇦', '🇦🇺', '🇯🇵', '🇩🇪', '🇫🇷', '🇧🇷', '🇷🇺', 
       '🇮🇹', '🇪🇸', '🇨🇳', '🇰🇷', '🇲🇽', '🇦🇷', '🇿🇦', '🇸🇦', '🇦🇪', '🇳🇱', 
@@ -36,7 +41,7 @@ export default function IndiePulseChatSystem() {
       '🇵🇹', '🇮🇪', '🇳🇿', '🇸🇬', '🇲🇾', '🇹🇭', '🇮🇩', '🇵🇭', '🇻🇳', '🇵🇰', 
       '🇧🇩', '🇪🇬', '🇳🇬', '🇰🇪', '🇮🇱', '🇨🇱', '🇨🇴', '🇵🇪', '🇻🇪', '🇺🇦', 
       '🇨🇿', '🇭🇺', '🇷🇴', '🇧🇬', '🇭🇷', '🇷🇸', '🇸🇰', '🇸🇮', '🇪🇪', '🇱🇻', 
-      '🇱🇹', 'CY', 'LU', 'MT', 'IS', 'LI', 'MC', 'AD', 'SM', 'VA', 
+      '🇱🇹', '🇨🇾', '🇱🇺', '🇲🇹', '🇮🇸', '🇱🇮', '🇲🇨', '🇦🇩', '🇸🇲', '🇻🇦', 
       '🏳️‍🌈', '🏳️‍⚧️', '🏴‍☠️', '🏁', '🚩', '🎌', '🏴', '🏳️'
     ]
   };
@@ -113,14 +118,45 @@ export default function IndiePulseChatSystem() {
     }
   };
 
-  const handleMicClick = () => {
+  // WhatsApp Style Live Voice Note Recording Logic
+  const startRecording = () => {
     if (!messageText.trim() && !attachedFile) {
       setIsRecording(true);
-      setTimeout(() => {
-        setIsRecording(false);
-        alert('Voice note simulated successfully!');
-      }, 2000);
+      setIsPaused(false);
+      setRecordingSeconds(0);
+      timerRef.current = setInterval(() => {
+        setRecordingSeconds(prev => prev + 1);
+      }, 1000);
     }
+  };
+
+  const stopRecordingAndSend = () => {
+    clearInterval(timerRef.current);
+    setIsRecording(false);
+    setRecordingSeconds(0);
+    // Simulate sending voice note
+    const newMsg = {
+      sender: 'You',
+      text: '🎤 Voice Note (' + recordingSeconds + 's)',
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      isMe: true
+    };
+    setMessages(prev => ({
+      ...prev,
+      [activeChat.id]: [...(prev[activeChat.id] || []), newMsg]
+    }));
+  };
+
+  const cancelRecording = () => {
+    clearInterval(timerRef.current);
+    setIsRecording(false);
+    setRecordingSeconds(0);
+  };
+
+  const formatTime = (secs: number) => {
+    const mins = Math.floor(secs / 60);
+    const remainingSecs = secs % 60;
+    return `${mins}:${remainingSecs < 10 ? '0' : ''}${remainingSecs}`;
   };
 
   return (
@@ -151,7 +187,7 @@ export default function IndiePulseChatSystem() {
           <div className="p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a] w-full">
             <div className="text-center my-2">
               <span className="px-3 py-1 rounded-lg bg-[#182229] text-[10px] text-slate-400 shadow border border-slate-800">
-                🔒 Messages & file transfers are end-to-end encrypted.
+                🔒 Messages & file transfers are end-to-end encrypted[span_9](start_span)[span_9](end_span).
               </span>
             </div>
 
@@ -170,7 +206,7 @@ export default function IndiePulseChatSystem() {
             ))}
           </div>
 
-          {/* Bottom Footer Section with Fixed WhatsApp Ordering: Input Bar Above, Emojis/Popups Below */}
+          {/* Bottom Footer Section with Fixed WhatsApp Ordering */}
           <div className="w-full bg-[#0b141a] flex flex-col shrink-0 z-40 border-t border-slate-900 shadow-lg">
 
             {attachedFile && (
@@ -180,48 +216,69 @@ export default function IndiePulseChatSystem() {
               </div>
             )}
 
-            {/* Main Bottom Input Bar - Positioned Above Emoji Picker */}
+            {/* Main Bottom Input Bar or Live Voice Recording Bar */}
             <div className="bg-[#0b141a] px-2 py-2 w-full shrink-0">
-              <form onSubmit={handleSendMessage} className="grid grid-cols-[1fr_auto] items-center gap-2 w-full">
-                
-                {/* Input Box Container */}
-                <div className="bg-[#1f2c34] rounded-full px-3.5 py-2 flex items-center gap-2 border border-slate-800 shadow-inner w-full min-w-0">
-                  <span 
-                    onClick={() => { setShowEmojiPicker(!showEmojiPicker); setShowAttachmentMenu(false); }}
-                    className="text-slate-400 text-base cursor-pointer shrink-0 hover:text-white transition-colors"
-                  >
-                    😊
-                  </span>
-                  <input 
-                    type="text"
-                    placeholder="Message"
-                    value={messageText}
-                    onChange={(e) => setMessageText(e.target.value)}
-                    className="w-full bg-transparent text-white text-xs focus:outline-none placeholder-slate-400 min-w-0"
-                  />
-                  <span 
-                    onClick={() => { setShowAttachmentMenu(!showAttachmentMenu); setShowEmojiPicker(false); }}
-                    className="text-slate-400 hover:text-white cursor-pointer text-lg shrink-0" 
-                    title="Attach File"
-                  >
-                    📎
-                  </span>
-                  <label className="text-slate-400 hover:text-white cursor-pointer text-base shrink-0" title="Camera">
-                    📷
-                    <input type="file" accept="image/*" capture="environment" onChange={handleFileUpload} className="hidden" />
-                  </label>
+              {isRecording ? (
+                <div className="bg-[#1f2c34] rounded-full px-4 py-2.5 flex items-center justify-between border border-slate-800 shadow-inner w-full animate-pulse">
+                  <div className="flex items-center gap-3">
+                    <button onClick={cancelRecording} className="text-red-500 text-lg cursor-pointer">🗑️</button>
+                    <span className="text-xs font-mono text-red-400 font-bold">{formatTime(recordingSeconds)}</span>
+                  </div>
+                  <div className="text-[11px] text-slate-300 tracking-wider">
+                    {isPaused ? 'Recording paused...' : 'Recording voice note...'}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => setIsPaused(!isPaused)} className="text-slate-300 text-xs cursor-pointer font-bold">
+                      {isPaused ? '▶ Resume' : '⏸ Pause'}
+                    </button>
+                    <button onClick={stopRecordingAndSend} className="w-9 h-9 rounded-full bg-green-600 text-white flex items-center justify-center text-sm shadow cursor-pointer">
+                      ➤
+                    </button>
+                  </div>
                 </div>
+              ) : (
+                <form onSubmit={handleSendMessage} className="grid grid-cols-[1fr_auto] items-center gap-2 w-full">
+                  
+                  {/* Input Box Container */}
+                  <div className="bg-[#1f2c34] rounded-full px-3.5 py-2 flex items-center gap-2 border border-slate-800 shadow-inner w-full min-w-0">
+                    <span 
+                      onClick={() => { setShowEmojiPicker(!showEmojiPicker); setShowAttachmentMenu(false); }}
+                      className="text-slate-400 text-base cursor-pointer shrink-0 hover:text-white transition-colors"
+                    >
+                      😊
+                    </span>
+                    <input 
+                      type="text"
+                      placeholder="Message"
+                      value={messageText}
+                      onChange={(e) => setMessageText(e.target.value)}
+                      className="w-full bg-transparent text-white text-xs focus:outline-none placeholder-slate-400 min-w-0"
+                    />
+                    <span 
+                      onClick={() => { setShowAttachmentMenu(!showAttachmentMenu); setShowEmojiPicker(false); }}
+                      className="text-slate-400 hover:text-white cursor-pointer text-lg shrink-0" 
+                      title="Attach File"
+                    >
+                      📎
+                    </span>
+                    {/* Direct Live Camera Capture Option + Gallery Upload */}
+                    <label className="text-slate-400 hover:text-white cursor-pointer text-base shrink-0" title="Camera">
+                      📷
+                      <input type="file" accept="image/*" capture="environment" onChange={handleFileUpload} className="hidden" />
+                    </label>
+                  </div>
 
-                {/* Fixed Send / Mic Button */}
-                <button 
-                  type="submit"
-                  onClick={handleMicClick}
-                  className="w-11 h-11 rounded-full bg-green-600 hover:bg-green-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all select-none"
-                >
-                  {messageText.trim() || attachedFile ? '➤' : '🎤'}
-                </button>
+                  {/* Fixed Send / WhatsApp Style Mic Button */}
+                  <button 
+                    type={messageText.trim() || attachedFile ? 'submit' : 'button'}
+                    onClick={messageText.trim() || attachedFile ? undefined : startRecording}
+                    className="w-11 h-11 rounded-full bg-green-600 hover:bg-green-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all select-none"
+                  >
+                    {messageText.trim() || attachedFile ? '➤' : '🎤'}
+                  </button>
 
-              </form>
+                </form>
+              )}
             </div>
 
             {/* WhatsApp Style Attachment Popup Menu */}
@@ -249,7 +306,7 @@ export default function IndiePulseChatSystem() {
               </div>
             )}
 
-            {/* WhatsApp Style Clean Emoji Picker (Positioned Below Input Bar) */}
+            {/* Clean Emoji Picker */}
             {showEmojiPicker && (
               <div className="bg-[#1f2c34] border-t border-slate-800 shadow-2xl rounded-t-2xl z-50 flex flex-col h-56 w-full shrink-0">
                 
@@ -279,13 +336,6 @@ export default function IndiePulseChatSystem() {
                     </button>
                   ))}
                 </div>
-              </div>
-            )}
-
-            {/* Recording Status Overlay */}
-            {isRecording && (
-              <div className="bg-red-600/90 text-white text-center py-1.5 text-xs font-bold animate-pulse shrink-0">
-                🎙️ Recording audio... (Release to send)
               </div>
             )}
 
