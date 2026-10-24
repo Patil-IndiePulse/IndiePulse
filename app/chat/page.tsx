@@ -25,7 +25,6 @@ export default function IndiePulseChatSystem() {
   const timerRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   // Expanded Comprehensive Emoji Database without any text strings in flags
   const emojiCategories = {
@@ -71,7 +70,7 @@ export default function IndiePulseChatSystem() {
     { id: '3', name: '+91 80507 64670', lastMsg: 'Direct chat started', time: 'Just now', unread: 0, avatar: '8' }
   ]);
 
-  const [messages, setMessages] = useState<Record<string, { sender: string; text: string; file?: string; audioUrl?: string; time: string; isMe: boolean }[]>>({
+  const [messages, setMessages] = useState<Record<string, { sender: string; text: string; file?: string; audioUrl?: string; duration?: string; time: string; isMe: boolean }[]>>({
     '1': [],
     '2': [],
     '3': []
@@ -139,12 +138,12 @@ export default function IndiePulseChatSystem() {
         mediaRecorder.onstop = () => {
           const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
           const url = URL.createObjectURL(audioBlob);
-          setAudioUrl(url);
 
           const newMsg = {
             sender: 'You',
-            text: '🎤 Voice Message (' + recordingSeconds + 's)',
+            text: '',
             audioUrl: url,
+            duration: formatTime(recordingSeconds),
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             isMe: true
           };
@@ -245,24 +244,35 @@ export default function IndiePulseChatSystem() {
 
             {(messages[activeChat.id] || []).map((msg, idx) => (
               <div key={idx} className={`flex flex-col max-w-[85%] ${msg.isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
-                <div className={`p-3 rounded-2xl text-xs shadow-md ${msg.isMe ? 'bg-blue-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(37,99,235,0.4)]' : 'bg-[#202c33] text-slate-100 rounded-tl-none'}`}>
+                <div className={`p-3 rounded-2xl text-xs shadow-md ${msg.isMe ? 'bg-[#005c4b] text-white rounded-tr-none shadow' : 'bg-[#202c33] text-slate-100 rounded-tl-none'}`}>
                   {msg.file && (
                     <div className="mb-2 p-2 bg-black/40 rounded-lg flex items-center gap-2 border border-white/10 text-[11px] text-blue-300">
                       <span>📎 {msg.file}</span>
                     </div>
                   )}
                   {msg.audioUrl ? (
-                    <div className="flex flex-col gap-1.5 min-w-[160px]">
-                      <div className="flex items-center gap-2">
-                        <span>🎤</span>
-                        <audio controls src={msg.audioUrl} className="h-8 w-full max-w-[200px]" />
+                    <div className="flex flex-col gap-1.5 min-w-[220px]">
+                      {/* WhatsApp Exact Audio Format with DP and waveform */}
+                      <div className="flex items-center gap-3">
+                        <div className="relative shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-slate-600 flex items-center justify-center font-bold text-xs text-white overflow-hidden border border-white/20">
+                            {activeChat.avatar}
+                          </div>
+                          <span className="absolute -bottom-1 -right-1 text-[10px] bg-emerald-600 rounded-full p-0.5">🎤</span>
+                        </div>
+                        <div className="flex-1 flex flex-col gap-1">
+                          <audio controls src={msg.audioUrl} className="h-8 w-full accent-emerald-500" />
+                        </div>
                       </div>
-                      <span className="text-[9px] text-blue-200">Voice Note</span>
+                      <div className="flex justify-between items-center text-[9px] text-slate-300 px-1">
+                        <span>{msg.duration || '0:03'}</span>
+                        <span>{msg.time} ✓✓</span>
+                      </div>
                     </div>
                   ) : (
                     msg.text && <p className="leading-relaxed">{msg.text}</p>
                   )}
-                  <span className="block text-[8px] text-slate-300 text-right mt-1">{msg.time}</span>
+                  {!msg.audioUrl && <span className="block text-[8px] text-slate-300 text-right mt-1">{msg.time} ✓✓</span>}
                 </div>
               </div>
             ))}
