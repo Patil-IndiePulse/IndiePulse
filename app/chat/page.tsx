@@ -12,11 +12,23 @@ export default function IndiePulseChatSystem() {
   const [activeChat, setActiveChat] = useState<any>(null);
   const [messageText, setMessageText] = useState('');
   const [attachedFile, setAttachedFile] = useState<string | null>(null);
+  
+  // WhatsApp Style Popup States
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
+  const [emojiCategory, setEmojiCategory] = useState<'smileys' | 'animals' | 'food' | 'travel' | 'activities' | 'objects' | 'symbols'>('smileys');
   const [isRecording, setIsRecording] = useState(false);
 
-  // Common WhatsApp style emojis list
-  const emojisList = ['😀', '😂', '😍', '🔥', '👍', '🎉', '💻', '🚀', '⭐', '❤️', '😎', '🙌', '💡', '⚡', '🎯', '✨'];
+  // Complete WhatsApp-style Comprehensive Emoji Database across all categories
+  const emojiCategories = {
+    smileys: ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😙', '😚', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐', '😕', '😟', '🙁', '😮', '😯', '😲', '😳', '🥺', '😦', '😧', '😨', '😰', '😥', '😢', '😭', '😱', '😖', '😣', '😞', 'sweat', '😩', '🥱', '😴', '😤', '😡', '🤬', '😈', '👿', '💀', '💩', '🤡', '👹', '👺', '👻', '👽', '👾', '🤖', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'],
+    animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🐢', '🐍', '🦎', '🦖', '🦕', '🐙', 'squid', 'shrimp', 'lobster', 'crab', '🐬', '🐳', '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', 'gorilla', 'orangutan', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🐐', '🦌', '🐕', '🐩', '🦮', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊️', '🐇', '🦝', 'skunk', 'badger'],
+    food: ['🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🍍', '🥭', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🌽', '🥕', '🧄', '🧅', '🥔', '🍠', '🥐', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🥞', '🧇', '🥓', '🥩', '🍗', '🍖', '🦴', 'hotdog', '🍔', '🍟', '🍕', '🥪', '🥙', '🧆', '🌮', '🌯', '🥗', '🥘', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🍛', 'rice', 'ball', '🍢', '🍡', '🍧', '🍨', '🍦', '🍰', '🎂', '🍮', '🍭', '🍬', '🍫', '🍩', '🍪', '🍯', '☕', '🍵', '🧃', '🥤', '🍶', '🍺', '🍻', '🍷', '🍸', '🍹', '🍾', '🥃', '🥄', '🍴', '🍽️'],
+    travel: ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎️', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜', '🛵', '🏍️', '🚲', '🛴', '🦽', '🦼', '🚨', '🚔', '🚍', '🚘', '🚖', '🚡', '🚠', '🚟', '🚃', '🚋', '🚝', '🚄', '🚅', '🚈', '🚂', '🚆', '🚇', '🚊', '🚉', '✈️', '🛫', '🛬', '🛩️', '🛰️', '🚀', '🛸', '🚁', '🛶', '⛵', 'speedboat', '🛥️', '🛳️', '⛴️', '🚢', '⚓', '⛽', 'construction', '🚦', '🚥', '🗺️', '🗿', '🗽', '🗼', '🏰', '🏯', '🏟️', '🎡', '🎢', '🎠', '⛲', '⛱️', '🏖️', '🏝️', '🏜️', '🌋', '⛰️', '🏔️', '🗻', '⛺', '🏠', '🏡', '🏢', '🏣', '🏤', '🏥', '🏦', '🏨', '🏪', '🏫', '🏬', '🏭', '🏯', '🏰'],
+    activities: ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', 'boxing', 'martialarts', '🥋', '🛼', '🛹', '🛷', '⛸️', '🥌', '🎿', '⛷️', '🏂', '🪂', '🏋️', '🤼', '🤸', '⛹️', '🤺', '🤾', '🏌️', '🏇', '🧘', '🏄', '🏊', '🤽', '🚣', '🧗', '🚵', '🚴', '🏆', '🥇', '🥈', '🥉', '🏅', '🎖️', '🏵️', '🎗️', '🎫', '🎟️', '🎪', '🤹', '🎭', '🩰', '🎨', '🎬', '🎤', '🎧', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🪕', '🎻', '🎲', '♟️', '🎯', '🎳', '🎮', '🎰', '🧩'],
+    objects: ['💻', '📱', '☎️', '📞', '📟', '📠', '🔋', '🔌', '🖨️', '⌨️', '🖱️', '🖲️', '💽', '💾', '💿', '📀', '🎥', '🎞️', '📽️', '📺', '📷', '📸', '📹', '📼', '🔍', '🔎', '🕯️', '💡', '🔦', '🏮', '📔', '📕', '📖', '📗', '📘', '📙', '📚', '📓', '📒', '📃', '📜', '📄', '📰', '🗞️', '📑', '🔖', '🏷️', '💰', '🪙', '💴', '💵', '💶', '💷', '💸', '💳', '✉️', '📧', '📨', '📩', '📤', '📥', '📦', '📫', '📪', '📬', '📭', '📮', '🗳️', '✏️', '✒️', '🖋️', '🖊️', '🖌️', '🖍️', '📝', '💼', '📁', '📂', '📅', '📆', '📇', '📈', '📉', '📊', '📋', '📌', '📍', '📎', '📏', '📐', '✂️', '🗃️', '🗄️', '🗑️', '🔒', '🔓', '🔏', '🔐', '🔑', '🗝️', '🔨', '斧', '⛏️', '⚒️', '🛠️', '🗡️', '⚔️', '🔫', '🪃', '🛡️', '🔧', '🔩', '⚙️', '🗜️', '⚖️', '🔗', '⛓️', '🧰', '🧲', '⚗️', '🧪', '🧫', '🧬', '🔬', '🔭', '📡', '💉', '🩸', '💊', '🩹', '🩺', '🚪', '🛏️', '🛋️', '🚽', '🪞', '🪟', '🧻', '🚿', '🛁', '🧼', '🧽', '🧴', '🛎️'],
+    symbols: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🖤', '🤍', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐', '⛎', '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓', '🆔', '⚛️', '🉑', '☢️', '☣️', '📴', '📳', '🈶', '🈚', '🈸', '🈺', '🈷️', '🔸', '🔹', '🔶', '🔷', '🔺', '🔻', '🎴', '🔀', '🔁', '🔂', '▶️', '⏩', '⏭️', '⏯️', '◀️', '⏪', '⏮️', '🔼', '🔽', ' стабилизация', '⏹️', '⏺️', '⏏️', '🎦', '🔅', '🔆', '📶', '📳', '📴', '💯', '💢', '💬', '👁️‍🗨️', '🗨️', '💬', '💭', '💤', '🏁', '🚩', '🎌', '🏴', '🏳️']
+  };
 
   useEffect(() => {
     const handlePopState = () => {
@@ -80,11 +92,13 @@ export default function IndiePulseChatSystem() {
     setMessageText('');
     setAttachedFile(null);
     setShowEmojiPicker(false);
+    setShowAttachmentMenu(false);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setAttachedFile(e.target.files[0].name);
+      setShowAttachmentMenu(false);
     }
   };
 
@@ -123,7 +137,7 @@ export default function IndiePulseChatSystem() {
           </div>
 
           {/* Messages Container */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a] pb-24">
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a] pb-32">
             <div className="text-center my-2">
               <span className="px-3 py-1 rounded-lg bg-[#182229] text-[10px] text-slate-400 shadow border border-slate-800">
                 🔒 Messages & file transfers are end-to-end encrypted.
@@ -152,19 +166,55 @@ export default function IndiePulseChatSystem() {
             </div>
           )}
 
-          {/* WhatsApp Style Emoji Picker Popup */}
+          {/* WhatsApp Style Attachment Popup Menu */}
+          {showAttachmentMenu && (
+            <div className="bg-[#1f2c34] p-4 border-t border-slate-800 grid grid-cols-4 gap-4 text-center shrink-0 shadow-2xl rounded-t-2xl z-50">
+              <label className="flex flex-col items-center gap-1 cursor-pointer">
+                <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center text-lg text-white shadow">🖼️</div>
+                <span className="text-[10px] text-slate-300 font-medium">Gallery</span>
+                <input type="file" accept="image/*,video/*" onChange={handleFileUpload} className="hidden" />
+              </label>
+              <label className="flex flex-col items-center gap-1 cursor-pointer">
+                <div className="w-12 h-12 rounded-full bg-pink-600 flex items-center justify-center text-lg text-white shadow">📷</div>
+                <span className="text-[10px] text-slate-300 font-medium">Camera</span>
+                <input type="file" accept="image/*" capture="environment" onChange={handleFileUpload} className="hidden" />
+              </label>
+              <label className="flex flex-col items-center gap-1 cursor-pointer">
+                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-lg text-white shadow">📄</div>
+                <span className="text-[10px] text-slate-300 font-medium">Document</span>
+                <input type="file" onChange={handleFileUpload} className="hidden" />
+              </label>
+              <div onClick={() => alert('Location sharing simulated!')} className="flex flex-col items-center gap-1 cursor-pointer">
+                <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center text-lg text-white shadow">📍</div>
+                <span className="text-[10px] text-slate-300 font-medium">Location</span>
+              </div>
+            </div>
+          )}
+
+          {/* WhatsApp Style Expanded Emoji Picker with All Categories */}
           {showEmojiPicker && (
-            <div className="bg-[#1f2c34] p-3 border-t border-slate-800 grid grid-cols-8 gap-2 shrink-0 shadow-lg">
-              {emojisList.map((emoji, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setMessageText(prev => prev + emoji)}
-                  className="text-xl p-1 hover:bg-slate-700/50 rounded transition-all text-center cursor-pointer"
-                >
-                  {emoji}
-                </button>
-              ))}
+            <div className="bg-[#1f2c34] border-t border-slate-800 shrink-0 shadow-2xl rounded-t-2xl z-50 flex flex-col h-60">
+              <div className="flex justify-around border-b border-slate-800 py-2 bg-[#111b21] overflow-x-auto text-xs shrink-0">
+                <button onClick={() => setEmojiCategory('smileys')} className={`px-2 ${emojiCategory === 'smileys' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>😀 Smileys</button>
+                <button onClick={() => setEmojiCategory('animals')} className={`px-2 ${emojiCategory === 'animals' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🐶 Animals</button>
+                <button onClick={() => setEmojiCategory('food')} className={`px-2 ${emojiCategory === 'food' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🍔 Food</button>
+                <button onClick={() => setEmojiCategory('travel')} className={`px-2 ${emojiCategory === 'travel' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🚗 Travel</button>
+                <button onClick={() => setEmojiCategory('activities')} className={`px-2 ${emojiCategory === 'activities' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>⚽ Activities</button>
+                <button onClick={() => setEmojiCategory('objects')} className={`px-2 ${emojiCategory === 'objects' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>💻 Objects</button>
+                <button onClick={() => setEmojiCategory('symbols')} className={`px-2 ${emojiCategory === 'symbols' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>❤️ Symbols</button>
+              </div>
+              <div className="p-3 grid grid-cols-8 gap-2 overflow-y-auto flex-1">
+                {emojiCategories[emojiCategory].map((emoji, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setMessageText(prev => prev + emoji)}
+                    className="text-xl p-1 hover:bg-slate-700/50 rounded transition-all text-center cursor-pointer"
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
@@ -175,14 +225,14 @@ export default function IndiePulseChatSystem() {
             </div>
           )}
 
-          {/* Bottom Input Bar - Perfectly aligned WhatsApp style without scrolling issues */}
-          <div className="bg-[#0b141a] px-2 py-2 shrink-0 w-full fixed bottom-0 left-0 right-0 z-50">
+          {/* Bottom Input Bar - WhatsApp Exact Layout */}
+          <div className="bg-[#0b141a] px-2 py-2 shrink-0 w-full fixed bottom-0 left-0 right-0 z-40">
             <form onSubmit={handleSendMessage} className="grid grid-cols-[1fr_auto] items-center gap-2 w-full max-w-full">
               
               {/* Input Box Container */}
               <div className="bg-[#1f2c34] rounded-full px-3.5 py-2 flex items-center gap-2 border border-slate-800 shadow-inner w-full">
                 <span 
-                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  onClick={() => { setShowEmojiPicker(!showEmojiPicker); setShowAttachmentMenu(false); }}
                   className="text-slate-400 text-base cursor-pointer shrink-0 hover:text-white transition-colors"
                 >
                   😊
@@ -194,10 +244,13 @@ export default function IndiePulseChatSystem() {
                   onChange={(e) => setMessageText(e.target.value)}
                   className="w-full bg-transparent text-white text-xs focus:outline-none placeholder-slate-400"
                 />
-                <label className="text-slate-400 hover:text-white cursor-pointer text-lg shrink-0" title="Upload from Gallery">
+                <span 
+                  onClick={() => { setShowAttachmentMenu(!showAttachmentMenu); setShowEmojiPicker(false); }}
+                  className="text-slate-400 hover:text-white cursor-pointer text-lg shrink-0" 
+                  title="Attach File"
+                >
                   📎
-                  <input type="file" accept="image/*,video/*" onChange={handleFileUpload} className="hidden" />
-                </label>
+                </span>
                 <label className="text-slate-400 hover:text-white cursor-pointer text-base shrink-0" title="Camera">
                   📷
                   <input type="file" accept="image/*" capture="environment" onChange={handleFileUpload} className="hidden" />
