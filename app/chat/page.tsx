@@ -118,7 +118,6 @@ export default function IndiePulseChatSystem() {
     <main className="min-h-screen w-full bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden">
       
       {currentView === 'conversation' && activeChat ? (
-        // Strict CSS Grid Layout locked to exact dynamic viewport height (h-[100dvh])
         <div className="h-[100dvh] w-full bg-[#0b141a] grid grid-rows-[auto_1fr_auto] overflow-hidden">
           
           {/* Top WhatsApp Style Header */}
@@ -162,7 +161,7 @@ export default function IndiePulseChatSystem() {
             ))}
           </div>
 
-          {/* Bottom Footer Section (Grid Row 3) containing Popups and Input Bar */}
+          {/* Bottom Footer Section */}
           <div className="w-full bg-[#0b141a] flex flex-col shrink-0 z-40 border-t border-slate-900 shadow-lg">
 
             {attachedFile && (
@@ -197,34 +196,12 @@ export default function IndiePulseChatSystem() {
               </div>
             )}
 
-            {/* WhatsApp Style Expanded Emoji Picker with Live Input Bar on Top inside Grid Footer */}
+            {/* WhatsApp Style Clean Emoji Picker (Without redundant top input bar) */}
             {showEmojiPicker && (
               <div className="bg-[#1f2c34] border-t border-slate-800 shadow-2xl rounded-t-2xl z-50 flex flex-col h-56 w-full shrink-0">
                 
-                {/* WhatsApp Live Input Bar inside Emoji Picker Header */}
-                <div className="bg-[#0b141a] px-3 py-2 flex items-center gap-2 border-b border-slate-800 shrink-0">
-                  <div className="bg-[#1f2c34] rounded-full px-3.5 py-2 flex items-center gap-2 border border-slate-800 shadow-inner w-full">
-                    <span className="text-slate-400 text-base cursor-pointer">😀</span>
-                    <input 
-                      type="text"
-                      placeholder="Message"
-                      value={messageText}
-                      onChange={(e) => setMessageText(e.target.value)}
-                      className="w-full bg-transparent text-white text-xs focus:outline-none placeholder-slate-400"
-                    />
-                    <span className="text-slate-400 text-lg">📎</span>
-                  </div>
-                  <button 
-                    type="button"
-                    onClick={handleSendMessage}
-                    className="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center text-sm shadow-lg shrink-0 cursor-pointer"
-                  >
-                    {messageText.trim() || attachedFile ? '➤' : '🎤'}
-                  </button>
-                </div>
-
                 {/* Emoji Categories Tabs */}
-                <div className="flex justify-around border-b border-slate-800 py-1.5 bg-[#111b21] overflow-x-auto text-xs shrink-0">
+                <div className="flex justify-around border-b border-slate-800 py-2 bg-[#111b21] overflow-x-auto text-xs shrink-0">
                   <button onClick={() => setEmojiCategory('recents')} className={`px-2 ${emojiCategory === 'recents' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🕒</button>
                   <button onClick={() => setEmojiCategory('smileys')} className={`px-2 ${emojiCategory === 'smileys' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>😀</button>
                   <button onClick={() => setEmojiCategory('animals')} className={`px-2 ${emojiCategory === 'animals' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🐶</button>
@@ -237,13 +214,13 @@ export default function IndiePulseChatSystem() {
                 </div>
 
                 {/* Emoji Grid */}
-                <div className="p-2 grid grid-cols-8 gap-1.5 overflow-y-auto flex-1 bg-[#0b141a]">
+                <div className="p-2.5 grid grid-cols-8 gap-1.5 overflow-y-auto flex-1 bg-[#0b141a]">
                   {emojiCategories[emojiCategory].map((emoji, i) => (
                     <button
                       key={i}
                       type="button"
                       onClick={() => setMessageText(prev => prev + emoji)}
-                      className="text-xl p-1 hover:bg-slate-700/50 rounded transition-all text-center cursor-pointer flex items-center justify-center"
+                      className="text-2xl p-1 hover:bg-slate-700/50 rounded transition-all text-center cursor-pointer flex items-center justify-center"
                     >
                       {emoji}
                     </button>
@@ -280,7 +257,7 @@ export default function IndiePulseChatSystem() {
                   />
                   <span 
                     onClick={() => { setShowAttachmentMenu(!showAttachmentMenu); setShowEmojiPicker(false); }}
-                    className="text-slate-400 hover:text-white cursor-pointer text-lg shrink-0"
+                    className="text-slate-400 hover:text-white cursor-pointer text-lg shrink-0" 
                     title="Attach File"
                   >
                     📎
