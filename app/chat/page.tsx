@@ -19,7 +19,7 @@ export default function IndiePulseChatSystem() {
   const [emojiCategory, setEmojiCategory] = useState<'recents' | 'smileys' | 'animals' | 'food' | 'travel' | 'activities' | 'objects' | 'symbols' | 'flags'>('smileys');
   const [isRecording, setIsRecording] = useState(false);
 
-  // WhatsApp Style Comprehensive Emoji Database (Clean & Real Emojis)
+  // WhatsApp Style Comprehensive Emoji Database
   const emojiCategories = {
     recents: ['😀', '😂', '❤️', '🔥', '👍', '🎉', '🚀', '⭐', '😎', '🙏'],
     smileys: ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😙', '😚', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐', '😕', '😟', '🙁', '😮', '😯', '😲', '😳', '🥺', '😦', '😧', '😨', '😰', '😥', '😢', '😭', '😱', '😖', '😣', '😞', '😩', '🥱', '😴', '😤', '😡', '🤬', '😈', '👿', '💀', '💩', '🤡', '👹', '👺', '👻', '👽', '👾', '🤖', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾', '🤲', '👐', '🙌', '👏', '🤝', '👍', '👎', '👊', '✊', '🤛', '🤜', '🤞', '✌️', '🤟', '🤘', '👌', '🤌', '🤏', '👈', '👉', '👆', '👇', '☝️', '✋', '🤚', '🖐️', '🖖', '👋', '🤙', '💪', '🦾', '🖕', '✍️', '🙏', '🦶', '🦵', '🦿', '💄', '💋', '👄', '🦷', '👂', '🦻', '👃', '👣', '👁️', '👀', '🧠', '🗣️', '👤', '👥'],
@@ -28,7 +28,7 @@ export default function IndiePulseChatSystem() {
     travel: ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎️', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜', '🛵', '🏍️', '🚲', '🛴', '🦽', '🦼', '🚨', '🚔', '🚍', '🚘', '🚖', '🚡', '🚠', '🚟', '🚃', '🚋', '🚝', '🚄', '🚅', '🚈', '🚂', '🚆', '🚇', '🚊', '🚉', '✈️', '🛫', '🛬', '🛩️', '🛰️', '🚀', '🛸', '🚁', '🛶', '⛵', '🚤', '🛥️', '🛳️', '⛴️', '🚢', '⚓', '⛽', '🚧', '🚦', '🚥', '🗺️', '🗿', '🗽', '🗼', '🏰', '🏯', '🏟️', '🎡', '🎢', '🎠', '⛲', '⛱️', '🏖️', '🏝️', '🏜️', '🌋', '⛰️', '🏔️', '🗻', '⛺', '🏠', '🏡', '🏢', '🏣', '🏤', '🏥', '🏦', '🏨', '🏪', '🏫', '🏬', '🏭'],
     activities: ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🛼', '🛹', '🛷', '⛸️', '🥌', '🎿', '⛷️', '🏂', '🪂', '🏋️', '🤼', '🤸', '⛹️', '🤺', '🤾', '🏌️', '🏇', '🧘', '🏄', '🏊', '🤽', '🚣', '🧗', '🚵', '🚴', '🏆', '🥇', '🥈', '🥉', '🏅', '🎖️', '🏵️', '🎗️', '🎫', '🎟️', '🎪', '🤹', '🎭', '🩰', '🎨', '🎬', '🎤', '🎧', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🪕', '🎻', '🎲', '♟️', '🎯', '🎳', '🎮', '🎰', '🧩'],
     objects: ['💻', '📱', '☎️', '📞', '📟', '📠', '🔋', '🔌', '🖨️', '⌨️', '🖱️', '🖲️', '💽', '💾', '💿', '📀', '🎥', '🎞️', '📽️', '📺', '📷', '📸', '📹', '📼', '🔍', '🔎', '🕯️', '💡', '🔦', '🏮', '📔', '📕', '📖', '📗', '📘', '📙', '📚', '📓', '📒', '📃', '📜', '📄', '📰', '🗞️', '📑', '🔖', '🏷️', '💰', '🪙', '💴', '💵', '💶', '💷', '💸', '💳', '✉️', '📧', '📨', '📩', '📤', '📥', '📦', '📫', '📪', '📬', '📭', '📮', '🗳️', '✏️', '✒️', '🖋️', '🖊️', '🖌️', '🖍️', '📝', '💼', '📁', '📂', '📅', '📆', '📇', '📈', '📉', '📊', '📋', '📌', '📍', '📎', '📏', '📐', '✂️', '🗃️', '🗄️', '🗑️', '🔒', '🔓', '🔏', '🔐', '🔑', '🗝️', '🔨', '⛏️', '⚒️', '🛠️', '🗡️', '⚔️', '🔫', '🪃', '🛡️', '🔧', '🔩', '⚙️', '🗜️', '⚖️', '🔗', '⛓️', '🧰', '🧲', '⚗️', '🧪', '🧫', '🧬', '🔬', '🔭', '📡', '💉', '🩸', '💊', '🩹', '🩺', '🚪', '🛏️', '🛋️', '🚽', '🪞', '🪟', '🧻', '🚿', '🛁', '🧼', '🧽', '🧴', '🛎️'],
-    symbols: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🖤', '🤍', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐', '⛎', '♈', '♉', '♊', '♋', '♌', '♍', '♏', '♐', '♑', '♒', '♓', '🆔', '⚛️', '🉑', '☢️', '☣️', '📴', '📳', '🈶', '🈚', '🈸', '🈺', '🈷️', '🔸', '🔹', '🔶', '🔷', '🔺', '🔻', '🎴', '🔀', '🔁', '🔂', '▶️', '⏩', '⏭️', '⏯️', '◀️', '⏪', '⏮️', '🔼', '🔽', '⏹️', '⏺️', '⏏️', '🎦', '🔅', '🔆', '📶', '💯', '💢', '💬', '🗨️', '💭', '💤', '🏁', '🚩', '🎌', '🏴', '🏳️'],
+    symbols: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🖤', '🤍', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐', '⛎', '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓', '🆔', '⚛️', '🉑', '☢️', '☣️', '📴', '📳', '🈶', '🈚', '🈸', '🈺', '🈷️', '🔸', '🔹', '🔶', '🔷', '🔺', '🔻', '🎴', '🔀', '🔁', '🔂', '▶️', '⏩', '⏭️', '⏯️', '◀️', '⏪', '⏮️', '🔼', '🔽', '⏹️', '⏺️', '⏏️', '🎦', '🔅', '🔆', '📶', '💯', '💢', '💬', '🗨️', '💭', '💤', '🏁', '🚩', '🎌', '🏴', '🏳️'],
     flags: ['🏳️‍🌈', '🏳️‍⚧️', '🏴‍☠️', '🏁', '🚩', '🎌', '🏴', '🏳️', '🇮🇳', '🇺🇸', '🇬🇧', '🇨🇦', '🇦🇺', '🇯🇵', '🇩🇪', '🇫🇷', '🇧🇷', '🇷🇺']
   };
 
@@ -118,10 +118,11 @@ export default function IndiePulseChatSystem() {
     <main className="min-h-screen w-full bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden">
       
       {currentView === 'conversation' && activeChat ? (
-        <div className="flex-1 flex flex-col h-screen bg-[#0b141a] justify-between relative overflow-hidden">
+        // CSS Grid Layout to lock screen bounds and prevent any scrolling/overflow issues
+        <div className="h-screen w-full bg-[#0b141a] grid grid-rows-[auto_1fr_auto] overflow-hidden">
           
           {/* Top WhatsApp Style Header */}
-          <div className="bg-[#1f2c34] px-3 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md shrink-0 z-20">
+          <div className="bg-[#1f2c34] px-3 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md w-full z-20">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-sm text-white shadow shrink-0">
                 {activeChat.avatar}
@@ -138,8 +139,8 @@ export default function IndiePulseChatSystem() {
             </div>
           </div>
 
-          {/* Messages Container */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a] pb-32">
+          {/* Messages Container (Scrollable Middle Section) */}
+          <div className="p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a] w-full">
             <div className="text-center my-2">
               <span className="px-3 py-1 rounded-lg bg-[#182229] text-[10px] text-slate-400 shadow border border-slate-800">
                 🔒 Messages & file transfers are end-to-end encrypted.
@@ -161,142 +162,147 @@ export default function IndiePulseChatSystem() {
             ))}
           </div>
 
-          {attachedFile && (
-            <div className="bg-[#1f2c34] px-4 py-2 border-t border-slate-800 flex items-center justify-between text-xs text-blue-400 shrink-0 z-20">
-              <span>Attached: {attachedFile}</span>
-              <button onClick={() => setAttachedFile(null)} className="text-pink-400 font-bold">✕ Remove</button>
-            </div>
-          )}
+          {/* Bottom Footer Section (Grid Row 3) containing Attachments, Emoji Picker, and Input Bar */}
+          <div className="w-full bg-[#0b141a] flex flex-col z-40 border-t border-slate-900 shadow-lg">
 
-          {/* WhatsApp Style Attachment Popup Menu */}
-          {showAttachmentMenu && (
-            <div className="bg-[#1f2c34] p-4 border-t border-slate-800 grid grid-cols-4 gap-4 text-center shrink-0 shadow-2xl rounded-t-2xl z-50">
-              <label className="flex flex-col items-center gap-1 cursor-pointer">
-                <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center text-lg text-white shadow">🖼️</div>
-                <span className="text-[10px] text-slate-300 font-medium">Gallery</span>
-                <input type="file" accept="image/*,video/*" onChange={handleFileUpload} className="hidden" />
-              </label>
-              <label className="flex flex-col items-center gap-1 cursor-pointer">
-                <div className="w-12 h-12 rounded-full bg-pink-600 flex items-center justify-center text-lg text-white shadow">📷</div>
-                <span className="text-[10px] text-slate-300 font-medium">Camera</span>
-                <input type="file" accept="image/*" capture="environment" onChange={handleFileUpload} className="hidden" />
-              </label>
-              <label className="flex flex-col items-center gap-1 cursor-pointer">
-                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-lg text-white shadow">📄</div>
-                <span className="text-[10px] text-slate-300 font-medium">Document</span>
-                <input type="file" onChange={handleFileUpload} className="hidden" />
-              </label>
-              <div onClick={() => alert('Location sharing simulated!')} className="flex flex-col items-center gap-1 cursor-pointer">
-                <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center text-lg text-white shadow">📍</div>
-                <span className="text-[10px] text-slate-300 font-medium">Location</span>
+            {attachedFile && (
+              <div className="bg-[#1f2c34] px-4 py-2 border-t border-slate-800 flex items-center justify-between text-xs text-blue-400">
+                <span>Attached: {attachedFile}</span>
+                <button onClick={() => setAttachedFile(null)} className="text-pink-400 font-bold">✕ Remove</button>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* WhatsApp Style Expanded Emoji Picker with Live Input Bar on Top */}
-          {showEmojiPicker && (
-            <div className="bg-[#1f2c34] border-t border-slate-800 shrink-0 shadow-2xl rounded-t-2xl z-50 flex flex-col h-72 w-full">
-              
-              {/* WhatsApp Live Input Bar inside Emoji Picker Header */}
-              <div className="bg-[#0b141a] px-3 py-2 flex items-center gap-2 border-b border-slate-800 shrink-0">
-                <div className="bg-[#1f2c34] rounded-full px-3.5 py-2 flex items-center gap-2 border border-slate-800 shadow-inner w-full">
-                  <span className="text-slate-400 text-base cursor-pointer">😀</span>
+            {/* WhatsApp Style Attachment Popup Menu */}
+            {showAttachmentMenu && (
+              <div className="bg-[#1f2c34] p-4 border-t border-slate-800 grid grid-cols-4 gap-4 text-center shadow-2xl rounded-t-2xl z-50">
+                <label className="flex flex-col items-center gap-1 cursor-pointer">
+                  <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center text-lg text-white shadow">🖼️</div>
+                  <span className="text-[10px] text-slate-300 font-medium">Gallery</span>
+                  <input type="file" accept="image/*,video/*" onChange={handleFileUpload} className="hidden" />
+                </label>
+                <label className="flex flex-col items-center gap-1 cursor-pointer">
+                  <div className="w-12 h-12 rounded-full bg-pink-600 flex items-center justify-center text-lg text-white shadow">📷</div>
+                  <span className="text-[10px] text-slate-300 font-medium">Camera</span>
+                  <input type="file" accept="image/*" capture="environment" onChange={handleFileUpload} className="hidden" />
+                </label>
+                <label className="flex flex-col items-center gap-1 cursor-pointer">
+                  <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-lg text-white shadow">📄</div>
+                  <span className="text-[10px] text-slate-300 font-medium">Document</span>
+                  <input type="file" onChange={handleFileUpload} className="hidden" />
+                </label>
+                <div onClick={() => alert('Location sharing simulated!')} className="flex flex-col items-center gap-1 cursor-pointer">
+                  <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center text-lg text-white shadow">📍</div>
+                  <span className="text-[10px] text-slate-300 font-medium">Location</span>
+                </div>
+              </div>
+            )}
+
+            {/* WhatsApp Style Expanded Emoji Picker with Live Input Bar on Top */}
+            {showEmojiPicker && (
+              <div className="bg-[#1f2c34] border-t border-slate-800 shadow-2xl rounded-t-2xl z-50 flex flex-col h-64 w-full">
+                
+                {/* WhatsApp Live Input Bar inside Emoji Picker Header */}
+                <div className="bg-[#0b141a] px-3 py-2 flex items-center gap-2 border-b border-slate-800 shrink-0">
+                  <div className="bg-[#1f2c34] rounded-full px-3.5 py-2 flex items-center gap-2 border border-slate-800 shadow-inner w-full">
+                    <span className="text-slate-400 text-base cursor-pointer">😀</span>
+                    <input 
+                      type="text"
+                      placeholder="Message"
+                      value={messageText}
+                      onChange={(e) => setMessageText(e.target.value)}
+                      className="w-full bg-transparent text-white text-xs focus:outline-none placeholder-slate-400"
+                    />
+                    <span className="text-slate-400 text-lg">📎</span>
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={handleSendMessage}
+                    className="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center text-sm shadow-lg shrink-0 cursor-pointer"
+                  >
+                    {messageText.trim() || attachedFile ? '➤' : '🎤'}
+                  </button>
+                </div>
+
+                {/* Emoji Categories Tabs */}
+                <div className="flex justify-around border-b border-slate-800 py-2 bg-[#111b21] overflow-x-auto text-xs shrink-0">
+                  <button onClick={() => setEmojiCategory('recents')} className={`px-2 ${emojiCategory === 'recents' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🕒</button>
+                  <button onClick={() => setEmojiCategory('smileys')} className={`px-2 ${emojiCategory === 'smileys' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>😀</button>
+                  <button onClick={() => setEmojiCategory('animals')} className={`px-2 ${emojiCategory === 'animals' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🐶</button>
+                  <button onClick={() => setEmojiCategory('food')} className={`px-2 ${emojiCategory === 'food' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🍔</button>
+                  <button onClick={() => setEmojiCategory('travel')} className={`px-2 ${emojiCategory === 'travel' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🚗</button>
+                  <button onClick={() => setEmojiCategory('activities')} className={`px-2 ${emojiCategory === 'activities' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>⚽</button>
+                  <button onClick={() => setEmojiCategory('objects')} className={`px-2 ${emojiCategory === 'objects' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>💡</button>
+                  <button onClick={() => setEmojiCategory('symbols')} className={`px-2 ${emojiCategory === 'symbols' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>❤️</button>
+                  <button onClick={() => setEmojiCategory('flags')} className={`px-2 ${emojiCategory === 'flags' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🏳️</button>
+                </div>
+
+                {/* Emoji Grid */}
+                <div className="p-3 grid grid-cols-8 gap-2 overflow-y-auto flex-1 bg-[#0b141a]">
+                  {emojiCategories[emojiCategory].map((emoji, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setMessageText(prev => prev + emoji)}
+                      className="text-2xl p-1.5 hover:bg-slate-700/50 rounded transition-all text-center cursor-pointer flex items-center justify-center"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Recording Status Overlay */}
+            {isRecording && (
+              <div className="bg-red-600/90 text-white text-center py-2 text-xs font-bold animate-pulse">
+                🎙️ Recording audio... (Release to send)
+              </div>
+            )}
+
+            {/* Main Bottom Input Bar */}
+            <div className="bg-[#0b141a] px-2 py-2 w-full">
+              <form onSubmit={handleSendMessage} className="grid grid-cols-[1fr_auto] items-center gap-2 w-full">
+                
+                {/* Input Box Container */}
+                <div className="bg-[#1f2c34] rounded-full px-3.5 py-2 flex items-center gap-2 border border-slate-800 shadow-inner w-full min-w-0">
+                  <span 
+                    onClick={() => { setShowEmojiPicker(!showEmojiPicker); setShowAttachmentMenu(false); }}
+                    className="text-slate-400 text-base cursor-pointer shrink-0 hover:text-white transition-colors"
+                  >
+                    😊
+                  </span>
                   <input 
                     type="text"
                     placeholder="Message"
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
-                    className="w-full bg-transparent text-white text-xs focus:outline-none placeholder-slate-400"
+                    className="w-full bg-transparent text-white text-xs focus:outline-none placeholder-slate-400 min-w-0"
                   />
-                  <span className="text-slate-400 text-lg">📎</span>
+                  <span 
+                    onClick={() => { setShowAttachmentMenu(!showAttachmentMenu); setShowEmojiPicker(false); }}
+                    className="text-slate-400 hover:text-white cursor-pointer text-lg shrink-0" 
+                    title="Attach File"
+                  >
+                    📎
+                  </span>
+                  <label className="text-slate-400 hover:text-white cursor-pointer text-base shrink-0" title="Camera">
+                    📷
+                    <input type="file" accept="image/*" capture="environment" onChange={handleFileUpload} className="hidden" />
+                  </label>
                 </div>
+
+                {/* Fixed Send / Mic Button */}
                 <button 
-                  type="button"
-                  onClick={handleSendMessage}
-                  className="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center text-sm shadow-lg shrink-0 cursor-pointer"
+                  type="submit"
+                  onClick={handleMicClick}
+                  className="w-11 h-11 rounded-full bg-green-600 hover:bg-green-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all select-none"
                 >
                   {messageText.trim() || attachedFile ? '➤' : '🎤'}
                 </button>
-              </div>
 
-              {/* Emoji Categories Tabs */}
-              <div className="flex justify-around border-b border-slate-800 py-2 bg-[#111b21] overflow-x-auto text-xs shrink-0">
-                <button onClick={() => setEmojiCategory('recents')} className={`px-2 ${emojiCategory === 'recents' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🕒</button>
-                <button onClick={() => setEmojiCategory('smileys')} className={`px-2 ${emojiCategory === 'smileys' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>😀</button>
-                <button onClick={() => setEmojiCategory('animals')} className={`px-2 ${emojiCategory === 'animals' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🐶</button>
-                <button onClick={() => setEmojiCategory('food')} className={`px-2 ${emojiCategory === 'food' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🍔</button>
-                <button onClick={() => setEmojiCategory('travel')} className={`px-2 ${emojiCategory === 'travel' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🚗</button>
-                <button onClick={() => setEmojiCategory('activities')} className={`px-2 ${emojiCategory === 'activities' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>⚽</button>
-                <button onClick={() => setEmojiCategory('objects')} className={`px-2 ${emojiCategory === 'objects' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>💡</button>
-                <button onClick={() => setEmojiCategory('symbols')} className={`px-2 ${emojiCategory === 'symbols' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>❤️</button>
-                <button onClick={() => setEmojiCategory('flags')} className={`px-2 ${emojiCategory === 'flags' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🏳️</button>
-              </div>
-
-              {/* Emoji Grid with direct click insertion */}
-              <div className="p-3 grid grid-cols-8 gap-2 overflow-y-auto flex-1 bg-[#0b141a]">
-                {emojiCategories[emojiCategory].map((emoji, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => setMessageText(prev => prev + emoji)}
-                    className="text-2xl p-1.5 hover:bg-slate-700/50 rounded transition-all text-center cursor-pointer flex items-center justify-center"
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
+              </form>
             </div>
-          )}
 
-          {/* Recording Status Overlay */}
-          {isRecording && (
-            <div className="bg-red-600/90 text-white text-center py-2 text-xs font-bold animate-pulse shrink-0 z-30">
-              🎙️ Recording audio... (Release to send)
-            </div>
-          )}
-
-          {/* Bottom Input Bar - Fixed Footer using CSS Grid layout to prevent overflow */}
-          <div className="bg-[#0b141a] px-2 py-2 w-full absolute bottom-0 left-0 right-0 z-40 border-t border-slate-900 shadow-lg">
-            <form onSubmit={handleSendMessage} className="grid grid-cols-[1fr_auto] items-center gap-2 w-full max-w-full">
-              
-              {/* Input Box Container */}
-              <div className="bg-[#1f2c34] rounded-full px-3.5 py-2 flex items-center gap-2 border border-slate-800 shadow-inner w-full min-w-0">
-                <span 
-                  onClick={() => { setShowEmojiPicker(!showEmojiPicker); setShowAttachmentMenu(false); }}
-                  className="text-slate-400 text-base cursor-pointer shrink-0 hover:text-white transition-colors"
-                >
-                  😊
-                </span>
-                <input 
-                  type="text"
-                  placeholder="Message"
-                  value={messageText}
-                  onChange={(e) => setMessageText(e.target.value)}
-                  className="w-full bg-transparent text-white text-xs focus:outline-none placeholder-slate-400 min-w-0"
-                />
-                <span 
-                  onClick={() => { setShowAttachmentMenu(!showAttachmentMenu); setShowEmojiPicker(false); }}
-                  className="text-slate-400 hover:text-white cursor-pointer text-lg shrink-0" 
-                  title="Attach File"
-                >
-                  📎
-                </span>
-                <label className="text-slate-400 hover:text-white cursor-pointer text-base shrink-0" title="Camera">
-                  📷
-                  <input type="file" accept="image/*" capture="environment" onChange={handleFileUpload} className="hidden" />
-                </label>
-              </div>
-
-              {/* Fixed Send / Mic Button */}
-              <button 
-                type="submit"
-                onClick={handleMicClick}
-                className="w-11 h-11 rounded-full bg-green-600 hover:bg-green-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all select-none"
-              >
-                {messageText.trim() || attachedFile ? '➤' : '🎤'}
-              </button>
-
-            </form>
           </div>
 
         </div>
