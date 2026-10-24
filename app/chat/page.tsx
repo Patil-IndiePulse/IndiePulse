@@ -41,7 +41,7 @@ export default function IndiePulseChatSystem() {
       osc.start();
       osc.stop(audioCtx.currentTime + 0.1);
     } catch (e) {
-      // AudioContext fallback if blocked by browser autoplay policy
+      // AudioContext fallback
     }
   };
 
@@ -258,13 +258,13 @@ export default function IndiePulseChatSystem() {
           <div className="p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a] w-full">
             <div className="text-center my-2">
               <span className="px-3 py-1 rounded-lg bg-[#182229] text-[10px] text-slate-400 shadow border border-slate-800">
-                🔒 Messages & file transfers are end-to-end encrypted[span_0](start_span)[span_0](end_span).
+                🔒 Messages & file transfers are end-to-end encrypted[span_3](start_span)[span_3](end_span).
               </span>
             </div>
 
             {(messages[activeChat.id] || []).map((msg, idx) => (
               <div key={idx} className={`flex flex-col max-w-[85%] ${msg.isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
-                {/* Single Gradient Mixing Color Bubble (Pink + Blue Mixing) */}
+                {/* Clean Full Gradient Mixing Color Bubble without white inner box */}
                 <div className={`p-3 rounded-2xl text-xs shadow-md ${msg.isMe ? 'bg-gradient-to-r from-pink-600 to-blue-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'bg-[#202c33] text-slate-100 rounded-tl-none'}`}>
                   {msg.file && (
                     <div className="mb-2 p-2 bg-black/40 rounded-lg flex items-center gap-2 border border-white/10 text-[11px] text-blue-300">
@@ -272,22 +272,19 @@ export default function IndiePulseChatSystem() {
                     </div>
                   )}
                   {msg.audioUrl ? (
-                    <div className="flex flex-col gap-1.5 min-w-[220px]">
-                      {/* WhatsApp Exact Audio Format with DP and waveform */}
-                      <div className="flex items-center gap-3">
-                        <div className="relative shrink-0">
-                          <div className="w-10 h-10 rounded-full bg-slate-600 flex items-center justify-center font-bold text-xs text-white overflow-hidden border border-white/20">
-                            {activeChat.avatar}
-                          </div>
-                          <span className="absolute -bottom-1 -right-1 text-[10px] bg-pink-600 rounded-full p-0.5 shadow">🎤</span>
+                    <div className="flex items-center gap-3 min-w-[220px]">
+                      <div className="relative shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-slate-600 flex items-center justify-center font-bold text-xs text-white overflow-hidden border border-white/20">
+                          {activeChat.avatar}
                         </div>
-                        <div className="flex-1 flex flex-col gap-1">
-                          <audio controls src={msg.audioUrl} className="h-8 w-full accent-pink-400" />
-                        </div>
+                        <span className="absolute -bottom-1 -right-1 text-[10px] bg-pink-600 rounded-full p-0.5 shadow">🎤</span>
                       </div>
-                      <div className="flex justify-between items-center text-[9px] text-slate-200 px-1 font-mono">
-                        <span>{msg.duration || '0:03'}</span>
-                        <span>{msg.time} ✓✓</span>
+                      <div className="flex-1 flex flex-col gap-1">
+                        <audio controls src={msg.audioUrl} className="h-8 w-full accent-pink-300 filter invert contrast-200" />
+                        <div className="flex justify-between items-center text-[9px] text-slate-100 font-mono px-0.5">
+                          <span>{msg.duration || '0:03'}</span>
+                          <span>{msg.time} ✓✓</span>
+                        </div>
                       </div>
                     </div>
                   ) : (
@@ -314,7 +311,10 @@ export default function IndiePulseChatSystem() {
               {isRecording ? (
                 <div className="bg-[#1f2c34] rounded-full px-4 py-2.5 flex items-center justify-between border border-slate-800 shadow-inner w-full">
                   <div className="flex items-center gap-3">
-                    <button onClick={cancelRecording} className="text-red-400 text-base cursor-pointer hover:scale-110 transition-transform">🗑️</button>
+                    {/* WhatsApp Style Delete Icon Button during recording */}
+                    <button onClick={cancelRecording} className="w-9 h-9 rounded-full bg-red-600/20 text-red-400 flex items-center justify-center text-sm cursor-pointer hover:bg-red-600/40 transition-colors" title="Delete Recording">
+                      🗑️
+                    </button>
                     <span className="text-xs font-mono text-red-400 font-bold">{formatTime(recordingSeconds)}</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-[11px] text-slate-300">
@@ -323,7 +323,7 @@ export default function IndiePulseChatSystem() {
                   </div>
                   <div className="flex items-center gap-3">
                     <button onClick={pauseOrResumeRecording} className="text-slate-300 text-xs cursor-pointer px-2 py-1 rounded bg-black/30 font-bold">
-                    {isPaused ? '▶' : '⏸'}
+                      {isPaused ? '▶' : '⏸'}
                     </button>
                     <button onClick={stopRecordingAndSend} className="w-9 h-9 rounded-full bg-green-600 text-white flex items-center justify-center text-sm shadow cursor-pointer hover:bg-green-500 transition-colors">
                       ➤
