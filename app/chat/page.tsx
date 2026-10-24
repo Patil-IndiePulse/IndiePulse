@@ -12,6 +12,11 @@ export default function IndiePulseChatSystem() {
   const [activeChat, setActiveChat] = useState<any>(null);
   const [messageText, setMessageText] = useState('');
   const [attachedFile, setAttachedFile] = useState<string | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+
+  // Common WhatsApp style emojis list
+  const emojisList = ['😀', '😂', '😍', '🔥', '👍', '🎉', '💻', '🚀', '⭐', '❤️', '😎', '🙌', '💡', '⚡', '🎯', '✨'];
 
   useEffect(() => {
     const handlePopState = () => {
@@ -74,11 +79,22 @@ export default function IndiePulseChatSystem() {
     }));
     setMessageText('');
     setAttachedFile(null);
+    setShowEmojiPicker(false);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setAttachedFile(e.target.files[0].name);
+    }
+  };
+
+  const handleMicClick = () => {
+    if (!messageText.trim() && !attachedFile) {
+      setIsRecording(true);
+      setTimeout(() => {
+        setIsRecording(false);
+        alert('Voice note simulated successfully!');
+      }, 2000);
     }
   };
 
@@ -88,7 +104,7 @@ export default function IndiePulseChatSystem() {
       {currentView === 'conversation' && activeChat ? (
         <div className="flex-1 flex flex-col h-screen bg-[#0b141a] justify-between">
           
-          {/* Top Header */}
+          {/* Top WhatsApp Style Header */}
           <div className="bg-[#1f2c34] px-3 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md shrink-0">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-sm text-white shadow shrink-0">
@@ -107,7 +123,7 @@ export default function IndiePulseChatSystem() {
           </div>
 
           {/* Messages Container */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a]">
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a] pb-24">
             <div className="text-center my-2">
               <span className="px-3 py-1 rounded-lg bg-[#182229] text-[10px] text-slate-400 shadow border border-slate-800">
                 🔒 Messages & file transfers are end-to-end encrypted.
@@ -136,13 +152,41 @@ export default function IndiePulseChatSystem() {
             </div>
           )}
 
-          {/* Bottom Input Bar - WhatsApp Exact Layout using CSS Grid to prevent overflow/disappearing */}
-          <div className="bg-[#0b141a] px-2 py-2 shrink-0 w-full">
+          {/* WhatsApp Style Emoji Picker Popup */}
+          {showEmojiPicker && (
+            <div className="bg-[#1f2c34] p-3 border-t border-slate-800 grid grid-cols-8 gap-2 shrink-0 shadow-lg">
+              {emojisList.map((emoji, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setMessageText(prev => prev + emoji)}
+                  className="text-xl p-1 hover:bg-slate-700/50 rounded transition-all text-center cursor-pointer"
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Recording Status Overlay */}
+          {isRecording && (
+            <div className="bg-red-600/90 text-white text-center py-2 text-xs font-bold animate-pulse shrink-0">
+              🎙️ Recording audio... (Release to send)
+            </div>
+          )}
+
+          {/* Bottom Input Bar - Perfectly aligned WhatsApp style without scrolling issues */}
+          <div className="bg-[#0b141a] px-2 py-2 shrink-0 w-full fixed bottom-0 left-0 right-0 z-50">
             <form onSubmit={handleSendMessage} className="grid grid-cols-[1fr_auto] items-center gap-2 w-full max-w-full">
               
               {/* Input Box Container */}
               <div className="bg-[#1f2c34] rounded-full px-3.5 py-2 flex items-center gap-2 border border-slate-800 shadow-inner w-full">
-                <span className="text-slate-400 text-base cursor-pointer shrink-0">😊</span>
+                <span 
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="text-slate-400 text-base cursor-pointer shrink-0 hover:text-white transition-colors"
+                >
+                  😊
+                </span>
                 <input 
                   type="text"
                   placeholder="Message"
@@ -150,16 +194,20 @@ export default function IndiePulseChatSystem() {
                   onChange={(e) => setMessageText(e.target.value)}
                   className="w-full bg-transparent text-white text-xs focus:outline-none placeholder-slate-400"
                 />
-                <label className="text-slate-400 hover:text-white cursor-pointer text-lg shrink-0">
+                <label className="text-slate-400 hover:text-white cursor-pointer text-lg shrink-0" title="Upload from Gallery">
                   📎
-                  <input type="file" onChange={handleFileUpload} className="hidden" />
+                  <input type="file" accept="image/*,video/*" onChange={handleFileUpload} className="hidden" />
                 </label>
-                <span className="text-slate-400 text-base cursor-pointer shrink-0">📷</span>
+                <label className="text-slate-400 hover:text-white cursor-pointer text-base shrink-0" title="Camera">
+                  📷
+                  <input type="file" accept="image/*" capture="environment" onChange={handleFileUpload} className="hidden" />
+                </label>
               </div>
 
               {/* Fixed Send / Mic Button */}
               <button 
                 type="submit"
+                onClick={handleMicClick}
                 className="w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-sm shadow-lg cursor-pointer shrink-0 transition-all select-none"
               >
                 {messageText.trim() || attachedFile ? '➤' : '🎤'}
