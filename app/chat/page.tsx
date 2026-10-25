@@ -11,7 +11,11 @@ export default function IndiePulseChatSystem() {
   const [globalSearchQuery, setGlobalSearchQuery] = useState('');
   const [activeChat, setActiveChat] = useState<any>(null);
   const [messageText, setMessageText] = useState('');
+  
+  // Real Media Attachment States (WhatsApp Style)
   const [attachedFile, setAttachedFile] = useState<string | null>(null);
+  const [attachedFileUrl, setAttachedFileUrl] = useState<string | null>(null);
+  const [attachedFileType, setAttachedFileType] = useState<'image' | 'video' | 'document' | null>(null);
   
   // WhatsApp Style Popup States
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -89,7 +93,7 @@ export default function IndiePulseChatSystem() {
     { id: '3', name: '+91 80507 64670', lastMsg: 'Direct chat started', time: 'Just now', unread: 0, avatar: '8' }
   ]);
 
-  const [messages, setMessages] = useState<Record<string, { sender: string; text: string; file?: string; audioUrl?: string; duration?: string; time: string; isMe: boolean }[]>>({
+  const [messages, setMessages] = useState<Record<string, { sender: string; text: string; file?: string; fileUrl?: string; fileType?: 'image' | 'video' | 'document'; audioUrl?: string; duration?: string; time: string; isMe: boolean }[]>>({
     '1': [],
     '2': [],
     '3': []
@@ -118,6 +122,8 @@ export default function IndiePulseChatSystem() {
       sender: 'You',
       text: messageText,
       file: attachedFile || undefined,
+      fileUrl: attachedFileUrl || undefined,
+      fileType: attachedFileType || undefined,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       isMe: true
     };
@@ -128,13 +134,27 @@ export default function IndiePulseChatSystem() {
     }));
     setMessageText('');
     setAttachedFile(null);
+    setAttachedFileUrl(null);
+    setAttachedFileType(null);
     setShowEmojiPicker(false);
     setShowAttachmentMenu(false);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setAttachedFile(e.target.files[0].name);
+      const file = e.target.files[0];
+      const url = URL.createObjectURL(file);
+      setAttachedFile(file.name);
+      setAttachedFileUrl(url);
+      
+      if (file.type.startsWith('image/')) {
+        setAttachedFileType('image');
+      } else if (file.type.startsWith('video/')) {
+        setAttachedFileType('video');
+      } else {
+        setAttachedFileType('document');
+      }
+      
       setShowAttachmentMenu(false);
     }
   };
@@ -222,7 +242,6 @@ export default function IndiePulseChatSystem() {
     clearInterval(timerRef.current);
     if (mediaRecorderRef.current && isRecording) {
       const recorder = mediaRecorderRef.current;
-      // Clear onstop so it won't send anything when stopped
       recorder.onstop = null;
       recorder.stop();
       recorder.stream.getTracks().forEach(track => track.stop());
@@ -272,15 +291,26 @@ export default function IndiePulseChatSystem() {
 
             {(messages[activeChat.id] || []).map((msg, idx) => (
               <div key={idx} className={`flex flex-col max-w-[85%] ${msg.isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
-                {/* Clean Full Gradient Mixing Color Bubble without any inner box */}
-                <div className={`p-3 rounded-2xl text-xs shadow-md ${msg.isMe ? 'bg-gradient-to-r from-pink-600 to-blue-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'bg-[#202c33] text-slate-100 rounded-tl-none'}`}>
-                  {msg.file && (
-                    <div className="mb-2 p-2 bg-black/40 rounded-lg flex items-center gap-2 border border-white/10 text-[11px] text-blue-300">
-                      <span>📎 {msg.file}</span>
+                {/* Clean Full Gradient Mixing Color Bubble */}
+                <div className={`p-2 rounded-2xl text-xs shadow-md ${msg.isMe ? 'bg-gradient-to-r from-pink-600 to-blue-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'bg-[#202c33] text-slate-100 rounded-tl-none'}`}>
+                  
+                  {/* Real Photo / Video / Document Rendering */}
+                  {msg.fileUrl && (
+                    <div className="mb-1 rounded-xl overflow-hidden max-w-[240px] border border-white/20">
+                      {msg.fileType === 'image' ? (
+                        <img src={msg.fileUrl} alt={msg.file || 'Photo'} className="w-full h-auto object-cover max-h-[220px]" />
+                      ) : msg.fileType === 'video' ? (
+                        <video controls src={msg.fileUrl} className="w-full h-auto max-h-[220px]" />
+                      ) : (
+                        <div className="p-3 bg-black/40 flex items-center gap-2 text-[11px] text-blue-300">
+                          <span>📄 {msg.file}</span>
+                        </div>
+                      )}
                     </div>
                   )}
+
                   {msg.audioUrl ? (
-                    <div className="flex items-center gap-3 min-w-[220px]">
+                    <div className="flex items-center gap-3 min-w-[220px] p-1">
                       <div className="relative shrink-0">
                         <div className="w-10 h-10 rounded-full bg-slate-600 flex items-center justify-center font-bold text-xs text-white overflow-hidden border border-white/20">
                           {activeChat.avatar}
@@ -296,9 +326,9 @@ export default function IndiePulseChatSystem() {
                       </div>
                     </div>
                   ) : (
-                    msg.text && <p className="leading-relaxed">{msg.text}</p>
+                    msg.text && <p className="leading-relaxed px-1 py-0.5">{msg.text}</p>
                   )}
-                  {!msg.audioUrl && <span className="block text-[8px] text-slate-200 text-right mt-1 font-mono">{msg.time} ✓✓</span>}
+                  {!msg.audioUrl && <span className="block text-[8px] text-slate-200 text-right mt-1 font-mono px-1">{msg.time} ✓✓</span>}
                 </div>
               </div>
             ))}
@@ -307,10 +337,22 @@ export default function IndiePulseChatSystem() {
           {/* Bottom Footer Section with Fixed WhatsApp Ordering */}
           <div className="w-full bg-[#0b141a] flex flex-col shrink-0 z-40 border-t border-slate-900 shadow-lg">
 
+            {/* Real Media Preview Bar before sending */}
             {attachedFile && (
-              <div className="bg-[#1f2c34] px-4 py-2 border-t border-slate-800 flex items-center justify-between text-xs text-blue-400 shrink-0">
-                <span>Attached: {attachedFile}</span>
-                <button onClick={() => setAttachedFile(null)} className="text-pink-400 font-bold">✕ Remove</button>
+              <div className="bg-[#1f2c34] px-4 py-3 border-t border-slate-800 flex items-center justify-between text-xs text-blue-400 shrink-0">
+                <div className="flex items-center gap-3">
+                  {attachedFileUrl && attachedFileType === 'image' && (
+                    <img src={attachedFileUrl} alt="Preview" className="w-12 h-12 object-cover rounded-lg border border-white/20" />
+                  )}
+                  {attachedFileUrl && attachedFileType === 'video' && (
+                    <video src={attachedFileUrl} className="w-12 h-12 object-cover rounded-lg border border-white/20" />
+                  )}
+                  <div className="flex flex-col">
+                    <span className="font-bold text-white truncate max-w-[180px]">{attachedFile}</span>
+                    <span className="text-[10px] text-emerald-400">Ready to send media</span>
+                  </div>
+                </div>
+                <button onClick={() => { setAttachedFile(null); setAttachedFileUrl(null); setAttachedFileType(null); }} className="text-pink-400 font-bold px-2 py-1 bg-black/30 rounded cursor-pointer">✕ Remove</button>
               </div>
             )}
 
@@ -319,7 +361,6 @@ export default function IndiePulseChatSystem() {
               {isRecording ? (
                 <div className="bg-[#1f2c34] rounded-full px-4 py-2.5 flex items-center justify-between border border-slate-800 shadow-inner w-full">
                   <div className="flex items-center gap-3">
-                    {/* Working WhatsApp Style Delete Trash Icon Button */}
                     <button type="button" onClick={cancelRecording} className="w-9 h-9 rounded-full bg-red-600/20 text-red-400 flex items-center justify-center text-sm cursor-pointer hover:bg-red-600/40 transition-colors" title="Delete Recording">
                       🗑️
                     </button>
@@ -366,7 +407,7 @@ export default function IndiePulseChatSystem() {
                     {/* Direct Live Camera Capture Option + Gallery Upload */}
                     <label className="text-slate-400 hover:text-white cursor-pointer text-base shrink-0" title="Camera">
                       📷
-                      <input type="file" accept="image/*" capture="environment" onChange={handleFileUpload} className="hidden" />
+                      <input type="file" accept="image/*,video/*" capture="environment" onChange={handleFileUpload} className="hidden" />
                     </label>
                   </div>
 
@@ -401,7 +442,7 @@ export default function IndiePulseChatSystem() {
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-12 h-12 rounded-full bg-pink-600 flex items-center justify-center text-lg text-white shadow">📷</div>
                   <span className="text-[10px] text-slate-300 font-medium">Camera</span>
-                  <input type="file" accept="image/*" capture="environment" onChange={handleFileUpload} className="hidden" />
+                  <input type="file" accept="image/*,video/*" capture="environment" onChange={handleFileUpload} className="hidden" />
                 </label>
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-lg text-white shadow">📄</div>
