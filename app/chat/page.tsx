@@ -12,8 +12,9 @@ export default function IndiePulseChatSystem() {
   const [activeChat, setActiveChat] = useState<any>(null);
   const [messageText, setMessageText] = useState('');
   
-  // Multiple WhatsApp Style Media Attachment States with HD option
-  const [attachedFiles, setAttachedFiles] = useState<{ url: string; name: string; type: 'image' | 'video' | 'document'; isHD: boolean }[]>([]);
+  // Multiple WhatsApp Style Media Attachment States
+  const [attachedFiles, setAttachedFiles] = useState<{ url: string; name: string; type: 'image' | 'video' | 'document'; isHD: boolean }[]>();
+  const [showHDPopup, setShowHDPopup] = useState(false);
   
   // Fullscreen Media Viewer State (WhatsApp Style without X button)
   const [fullscreenMedia, setFullscreenMedia] = useState<{ url: string; type: 'image' | 'video' } | null>(null);
@@ -88,12 +89,13 @@ export default function IndiePulseChatSystem() {
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!messageText.trim() && attachedFiles.length === 0) || !activeChat) return;
+    const filesArray = attachedFiles || [];
+    if ((!messageText.trim() && filesArray.length === 0) || !activeChat) return;
 
     const newMsg = {
       sender: 'You',
       text: messageText,
-      files: attachedFiles.length > 0 ? [...attachedFiles] : undefined,
+      files: filesArray.length > 0 ? [...filesArray] : undefined,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       isMe: true
     };
@@ -108,7 +110,7 @@ export default function IndiePulseChatSystem() {
     setShowAttachmentMenu(false);
   };
 
-  // Multiple File Upload with WhatsApp Style HD Toggle Support
+  // Multiple File Upload Handler
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newFilesArray = Array.from(e.target.files).map(file => {
@@ -119,17 +121,30 @@ export default function IndiePulseChatSystem() {
         return { url, name: file.name, type, isHD: false };
       });
 
-      setAttachedFiles(prev => [...prev, ...newFilesArray]);
+      setAttachedFiles(prev => [...(prev || []), ...newFilesArray]);
       setShowAttachmentMenu(false);
     }
   };
 
-  const toggleHD = (index: number) => {
-    setAttachedFiles(prev => prev.map((file, i) => i === index ? { ...file, isHD: !file.isHD } : file));
+  // Direct Live Camera Capture Handler
+  const handleCameraCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const url = URL.createObjectURL(file);
+      let type: 'image' | 'video' = file.type.startsWith('video/') ? 'video' : 'image';
+      
+      setAttachedFiles(prev => [...(prev || []), { url, name: file.name, type, isHD: false }]);
+      setShowAttachmentMenu(false);
+    }
+  };
+
+  const toggleHDForAll = (status: boolean) => {
+    setAttachedFiles(prev => (prev || []).map(file => ({ ...file, isHD: status })));
+    setShowHDPopup(false);
   };
 
   const removeAttachedFile = (index: number) => {
-    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+    setAttachedFiles(prev => (prev || []).filter((_, i) => i !== index));
   };
 
   // Audio Bip Sound Function for WhatsApp Mic Click
@@ -153,7 +168,8 @@ export default function IndiePulseChatSystem() {
 
   // Real Live WhatsApp Style Voice Note Recording using MediaRecorder API
   const startRecording = async () => {
-    if (!messageText.trim() && attachedFiles.length === 0) {
+    const filesArray = attachedFiles || [];
+    if (!messageText.trim() && filesArray.length === 0) {
       playMicClickSound();
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -269,10 +285,11 @@ export default function IndiePulseChatSystem() {
     ]
   };
 
+  const filesCount = attachedFiles ? attachedFiles.length : 0;
+
   return (
     <main className="min-h-screen w-full bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden">
       
-      {/* WhatsApp Style Fullscreen Media Viewer (Without X Button, closes on Back or Click) */}
       {fullscreenMedia && (
         <div 
           onClick={closeFullscreen}
@@ -286,10 +303,28 @@ export default function IndiePulseChatSystem() {
         </div>
       )}
 
+      {showHDPopup && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+          <div className="bg-[#1f2c34] rounded-2xl p-5 w-80 max-w-full shadow-2xl border border-slate-700 flex flex-col gap-4">
+            <h3 className="text-sm font-bold text-white">Photo quality</h3>
+            <div className="flex flex-col gap-3 text-xs text-slate-300">
+              <label onClick={() => toggleHDForAll(false)} className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-800 cursor-pointer">
+                <span>Standard quality</span>
+                <span className="text-[10px] text-slate-400">Faster sending</span>
+              </label>
+              <label onClick={() => toggleHDForAll(true)} className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-800 cursor-pointer text-blue-400 font-bold">
+                <span>HD quality</span>
+                <span className="text-[10px] bg-blue-500/20 px-2 py-0.5 rounded">Recommended</span>
+              </label>
+            </div>
+            <button onClick={() => setShowHDPopup(false)} className="mt-2 text-right text-xs font-bold text-blue-400">CANCEL</button>
+          </div>
+        </div>
+      )}
+
       {currentView === 'conversation' && activeChat ? (
         <div className="h-[100dvh] w-full bg-[#0b141a] grid grid-rows-[auto_1fr_auto] overflow-hidden">
           
-          {/* Top WhatsApp Style Header */}
           <div className="bg-[#1f2c34] px-3 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md w-full z-20 shrink-0">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-sm text-white shadow shrink-0">
@@ -307,7 +342,6 @@ export default function IndiePulseChatSystem() {
             </div>
           </div>
 
-          {/* Messages Container (Scrollable Middle Section) */}
           <div className="p-4 overflow-y-auto space-y-3 flex flex-col bg-[#0b141a] w-full">
             <div className="text-center my-2">
               <span className="px-3 py-1 rounded-lg bg-[#182229] text-[10px] text-slate-400 shadow border border-slate-800">
@@ -317,10 +351,8 @@ export default function IndiePulseChatSystem() {
 
             {(messages[activeChat.id] || []).map((msg, idx) => (
               <div key={idx} className={`flex flex-col max-w-[85%] ${msg.isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
-                {/* Clean Full Gradient Mixing Color Bubble */}
                 <div className={`p-2 rounded-2xl text-xs shadow-md ${msg.isMe ? 'bg-gradient-to-r from-pink-600 to-blue-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'bg-[#202c33] text-slate-100 rounded-tl-none'}`}>
                   
-                  {/* Multiple WhatsApp Style Clickable Media Rendering */}
                   {msg.files && msg.files.map((fileObj, fIdx) => (
                     <div key={fIdx} className="mb-1 rounded-xl overflow-hidden max-w-[240px] border border-white/20 cursor-pointer relative" onClick={() => openFullscreen(fileObj.url, fileObj.type === 'video' ? 'video' : 'image')}>
                       {fileObj.type === 'image' ? (
@@ -363,18 +395,23 @@ export default function IndiePulseChatSystem() {
             ))}
           </div>
 
-          {/* Bottom Footer Section with Fixed WhatsApp Ordering */}
           <div className="w-full bg-[#0b141a] flex flex-col shrink-0 z-40 border-t border-slate-900 shadow-lg">
 
-            {/* Multiple Clean Media Preview Bar before sending with HD toggles */}
-            {attachedFiles.length > 0 && (
-              <div className="bg-[#1f2c34] px-4 py-3 border-t border-slate-800 flex flex-col gap-2 shrink-0 max-h-40 overflow-y-auto">
-                <div className="flex justify-between items-center text-xs text-emerald-400 font-bold">
-                  <span>{attachedFiles.length} media file(s) selected</span>
-                  <button onClick={() => setAttachedFiles([])} className="text-pink-400 font-bold px-2 py-0.5 bg-black/30 rounded cursor-pointer text-[10px]">✕ Clear All</button>
+            {filesCount > 0 && (
+              <div className="bg-[#1f2c34] px-4 py-3 border-t border-slate-800 flex flex-col gap-2 shrink-0 max-h-44 overflow-y-auto">
+                <div className="flex justify-between items-center text-xs text-white font-bold">
+                  <div className="flex items-center gap-2">
+                    <span className="text-emerald-400 font-bold">{filesCount} media file(s) selected</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => setShowHDPopup(true)} className="bg-black/40 border border-white/30 text-white font-bold text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1 cursor-pointer">
+                      HD {attachedFiles?.some(f => f.isHD) ? '✓' : ''}
+                    </button>
+                    <button onClick={() => setAttachedFiles([])} className="text-pink-400 font-bold px-2 py-0.5 bg-black/30 rounded cursor-pointer text-[10px]">✕ Clear All</button>
+                  </div>
                 </div>
                 <div className="flex gap-2 overflow-x-auto pb-1">
-                  {attachedFiles.map((file, idx) => (
+                  {attachedFiles?.map((file, idx) => (
                     <div key={idx} className="relative shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-white/20 bg-black">
                       {file.type === 'image' ? (
                         <img src={file.url} alt="Preview" className="w-full h-full object-cover" />
@@ -384,16 +421,15 @@ export default function IndiePulseChatSystem() {
                         <div className="flex items-center justify-center h-full text-xs">📄</div>
                       )}
                       <button onClick={() => removeAttachedFile(idx)} className="absolute top-0 right-0 bg-red-600 text-white text-[9px] w-4 h-4 rounded-bl flex items-center justify-center font-bold">✕</button>
-                      <button onClick={() => toggleHD(idx)} className={`absolute bottom-0 inset-x-0 text-[8px] font-bold py-0.5 text-center ${file.isHD ? 'bg-blue-600 text-white' : 'bg-black/70 text-slate-300'}`}>
+                      <span className={`absolute bottom-0 inset-x-0 text-[8px] font-bold py-0.5 text-center ${file.isHD ? 'bg-blue-600 text-white' : 'bg-black/70 text-slate-300'}`}>
                         {file.isHD ? 'HD ✓' : 'HD'}
-                      </button>
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Main Bottom Input Bar or Clean WhatsApp Style Live Voice Recording Bar */}
             <div className="bg-[#0b141a] px-2 py-2 w-full shrink-0">
               {isRecording ? (
                 <div className="bg-[#1f2c34] rounded-full px-4 py-2.5 flex items-center justify-between border border-slate-800 shadow-inner w-full">
@@ -419,7 +455,6 @@ export default function IndiePulseChatSystem() {
               ) : (
                 <form onSubmit={handleSendMessage} className="grid grid-cols-[1fr_auto] items-center gap-2 w-full">
                   
-                  {/* Input Box Container */}
                   <div className="bg-[#1f2c34] rounded-full px-3.5 py-2 flex items-center gap-2 border border-slate-800 shadow-inner w-full min-w-0">
                     <span 
                       onClick={() => { setShowEmojiPicker(!showEmojiPicker); setShowAttachmentMenu(false); }}
@@ -441,22 +476,34 @@ export default function IndiePulseChatSystem() {
                     >
                       📎
                     </span>
-                    {/* Live Camera Capture Option (Directly opens camera to shoot photo/video) */}
-                    <label className="text-slate-400 hover:text-white cursor-pointer text-base shrink-0" title="Live Camera">
+                    
+                    <label className="text-slate-400 hover:text-white cursor-pointer text-base shrink-0 relative" title="Camera">
                       📷
-                      <input type="file" accept="image/*,video/*" capture="environment" onChange={handleFileUpload} className="hidden" />
+                      <input 
+                        type="file" 
+                        accept="image/*,video/*" 
+                        capture="environment" 
+                        onChange={handleCameraCapture} 
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" 
+                      />
                     </label>
                   </div>
 
-                  {/* Fixed Send / Exact WhatsApp Style SVG Mic Button with Click Bip Sound */}
                   <button 
-                    type={messageText.trim() || attachedFiles.length > 0 ? 'submit' : 'button'}
-                    onClick={messageText.trim() || attachedFiles.length > 0 ? undefined : startRecording}
-                    className="w-11 h-11 rounded-full bg-green-600 hover:bg-green-500 text-white flex items-center justify-center shadow-lg cursor-pointer shrink-0 transition-all select-none"
-                    title="Hold or click to record voice note"
+                    type={messageText.trim() || filesCount > 0 ? 'submit' : 'button'}
+                    onClick={messageText.trim() || filesCount > 0 ? undefined : startRecording}
+                    className="w-11 h-11 rounded-full bg-green-600 hover:bg-green-500 text-white flex items-center justify-center shadow-lg cursor-pointer shrink-0 transition-all select-none relative"
+                    title="Send or record voice note"
                   >
-                    {messageText.trim() || attachedFiles.length > 0 ? (
-                      <span className="text-sm font-bold">➤</span>
+                    {messageText.trim() || filesCount > 0 ? (
+                      <>
+                        <span className="text-sm font-bold">➤</span>
+                        {filesCount > 0 && (
+                          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-white text-emerald-700 text-[10px] font-black flex items-center justify-center shadow-md border-2 border-green-600">
+                            {filesCount}
+                          </span>
+                        )}
+                      </>
                     ) : (
                       <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                         <path d="M11.999 14.942c2.001 0 3.631-1.63 3.631-3.631V5.685c0-2.001-1.63-3.631-3.631-3.631-2.001 0-3.631 1.63-3.631 3.631v5.626c0 2.001 1.63 3.631 3.631 3.631zM18.106 11.31c0 3.38-2.748 6.128-6.128 6.128S5.85 14.69 5.85 11.31H4.35c0 3.82 2.943 6.96 6.721 7.437v3.003h1.857v-3.003c3.778-.477 6.721-3.617 6.721-7.437h-1.503z"/>
@@ -468,7 +515,6 @@ export default function IndiePulseChatSystem() {
               )}
             </div>
 
-            {/* WhatsApp Style Attachment Popup Menu */}
             {showAttachmentMenu && (
               <div className="bg-[#1f2c34] p-4 border-t border-slate-800 grid grid-cols-4 gap-4 text-center shadow-2xl rounded-t-2xl z-50 shrink-0">
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
@@ -479,7 +525,7 @@ export default function IndiePulseChatSystem() {
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-12 h-12 rounded-full bg-pink-600 flex items-center justify-center text-lg text-white shadow">📷</div>
                   <span className="text-[10px] text-slate-300 font-medium">Camera</span>
-                  <input type="file" accept="image/*,video/*" capture="environment" onChange={handleFileUpload} className="hidden" />
+                  <input type="file" accept="image/*,video/*" capture="environment" onChange={handleCameraCapture} className="hidden" />
                 </label>
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-lg text-white shadow">📄</div>
@@ -493,11 +539,9 @@ export default function IndiePulseChatSystem() {
               </div>
             )}
 
-            {/* Clean Emoji Picker */}
             {showEmojiPicker && (
               <div className="bg-[#1f2c34] border-t border-slate-800 shadow-2xl rounded-t-2xl z-50 flex flex-col h-56 w-full shrink-0">
                 
-                {/* Emoji Categories Tabs */}
                 <div className="flex justify-around border-b border-slate-800 py-2 bg-[#111b21] overflow-x-auto text-xs shrink-0">
                   <button onClick={() => setEmojiCategory('recents')} className={`px-2 ${emojiCategory === 'recents' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🕒</button>
                   <button onClick={() => setEmojiCategory('smileys')} className={`px-2 ${emojiCategory === 'smileys' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>😀</button>
@@ -510,7 +554,6 @@ export default function IndiePulseChatSystem() {
                   <button onClick={() => setEmojiCategory('flags')} className={`px-2 ${emojiCategory === 'flags' ? 'text-blue-400 font-bold border-b-2 border-blue-400' : 'text-slate-400'}`}>🏳️</button>
                 </div>
 
-                {/* Emoji Grid */}
                 <div className="p-2.5 grid grid-cols-8 gap-1.5 overflow-y-auto flex-1 bg-[#0b141a]">
                   {emojiCategories[emojiCategory].map((emoji, i) => (
                     <button
