@@ -143,10 +143,6 @@ export default function IndiePulseChatSystem() {
     setShowHDPopup(false);
   };
 
-  const removeAttachedFile = (index: number) => {
-    setAttachedFiles(prev => (prev || []).filter((_, i) => i !== index));
-  };
-
   // Audio Bip Sound Function for WhatsApp Mic Click
   const playMicClickSound = () => {
     try {
@@ -397,38 +393,7 @@ export default function IndiePulseChatSystem() {
 
           <div className="w-full bg-[#0b141a] flex flex-col shrink-0 z-40 border-t border-slate-900 shadow-lg">
 
-            {filesCount > 0 && (
-              <div className="bg-[#1f2c34] px-4 py-3 border-t border-slate-800 flex flex-col gap-2 shrink-0 max-h-44 overflow-y-auto">
-                <div className="flex justify-between items-center text-xs text-white font-bold">
-                  <div className="flex items-center gap-2">
-                    <span className="text-emerald-400 font-bold">{filesCount} media file(s) selected</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <button onClick={() => setShowHDPopup(true)} className="bg-black/40 border border-white/30 text-white font-bold text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1 cursor-pointer">
-                      HD {attachedFiles?.some(f => f.isHD) ? '✓' : ''}
-                    </button>
-                    <button onClick={() => setAttachedFiles([])} className="text-pink-400 font-bold px-2 py-0.5 bg-black/30 rounded cursor-pointer text-[10px]">✕ Clear All</button>
-                  </div>
-                </div>
-                <div className="flex gap-2 overflow-x-auto pb-1">
-                  {attachedFiles?.map((file, idx) => (
-                    <div key={idx} className="relative shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-white/20 bg-black">
-                      {file.type === 'image' ? (
-                        <img src={file.url} alt="Preview" className="w-full h-full object-cover" />
-                      ) : file.type === 'video' ? (
-                        <video src={file.url} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="flex items-center justify-center h-full text-xs">📄</div>
-                      )}
-                      <button onClick={() => removeAttachedFile(idx)} className="absolute top-0 right-0 bg-red-600 text-white text-[9px] w-4 h-4 rounded-bl flex items-center justify-center font-bold">✕</button>
-                      <span className={`absolute bottom-0 inset-x-0 text-[8px] font-bold py-0.5 text-center ${file.isHD ? 'bg-blue-600 text-white' : 'bg-black/70 text-slate-300'}`}>
-                        {file.isHD ? 'HD ✓' : 'HD'}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Note: Attached media preview removed from text bar area to match WhatsApp exact style */}
 
             <div className="bg-[#0b141a] px-2 py-2 w-full shrink-0">
               {isRecording ? (
@@ -464,7 +429,7 @@ export default function IndiePulseChatSystem() {
                     </span>
                     <input 
                       type="text"
-                      placeholder="Message"
+                      placeholder={filesCount > 0 ? "Add a caption..." : "Message"}
                       value={messageText}
                       onChange={(e) => setMessageText(e.target.value)}
                       className="w-full bg-transparent text-white text-xs focus:outline-none placeholder-slate-400 min-w-0"
