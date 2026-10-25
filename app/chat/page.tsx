@@ -110,7 +110,7 @@ export default function IndiePulseChatSystem() {
     setShowAttachmentMenu(false);
   };
 
-  // Multiple File Upload Handler
+  // Multiple File Upload Handler for Gallery/Documents
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newFilesArray = Array.from(e.target.files).map(file => {
@@ -126,7 +126,7 @@ export default function IndiePulseChatSystem() {
     }
   };
 
-  // Direct Live Camera Capture Handler
+  // Fixed Direct Live Camera Capture Handler (Strictly opens phone camera)
   const handleCameraCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -442,7 +442,8 @@ export default function IndiePulseChatSystem() {
                       📎
                     </span>
                     
-                    <label className="text-slate-400 hover:text-white cursor-pointer text-base shrink-0 relative" title="Camera">
+                    {/* Fixed Camera Input Triggering Direct Live Capture */}
+                    <label className="text-slate-400 hover:text-white cursor-pointer text-base shrink-0 relative" title="Live Camera">
                       📷
                       <input 
                         type="file" 
