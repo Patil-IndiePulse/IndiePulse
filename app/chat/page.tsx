@@ -19,7 +19,7 @@ export default function IndiePulseChatSystem() {
   // WhatsApp Style Document Sub-Menu Popup State (Exact 5 Options)
   const [showDocMenu, setShowDocMenu] = useState(false);
   
-  // In-App Chat Media Viewer State (Independent of phone gallery)
+  // Full-Size Immersive In-App Chat Media Viewer State
   const [fullscreenMedia, setFullscreenMedia] = useState<{ url: string; name: string; type: 'image' | 'video' | 'document' } | null>(null);
 
   // WhatsApp Style Popup States
@@ -118,7 +118,6 @@ export default function IndiePulseChatSystem() {
     if (e.target.files && e.target.files.length > 0) {
       const newFilesArray = Array.from(e.target.files).map(file => {
         const url = URL.createObjectURL(file);
-        // Force document style card if explicitly uploaded through document menu
         const sizeInMB = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
         return { url, name: file.name, size: sizeInMB, type: 'document' as const, isHD: false };
       });
@@ -129,7 +128,7 @@ export default function IndiePulseChatSystem() {
     }
   };
 
-  // True Files & Drive Direct System Picker Handler
+  // Direct Mobile Files & Drive System Picker Handler (Opens Google Files / File Manager)
   const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newDocsArray = Array.from(e.target.files).map(file => {
@@ -300,31 +299,33 @@ export default function IndiePulseChatSystem() {
   return (
     <main className="min-h-screen w-full bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden">
       
+      {/* Full-Size Immersive In-App Chat Media Viewer */}
       {fullscreenMedia && (
         <div 
           onClick={closeFullscreen}
-          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-2 cursor-pointer"
+          className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center p-3 cursor-pointer"
         >
-          {fullscreenMedia.type === 'image' ? (
-            <img src={fullscreenMedia.url} alt="Fullscreen View" className="max-w-full max-h-full object-contain" />
-          ) : fullscreenMedia.type === 'video' ? (
-            <video controls autoPlay src={fullscreenMedia.url} className="max-w-full max-h-full object-contain" onClick={(e) => e.stopPropagation()} />
-          ) : (
-            <div className="bg-[#1f2c34] p-6 rounded-2xl max-w-sm w-full flex flex-col items-center gap-4 text-center border border-slate-700 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-              <div className="w-16 h-16 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center text-3xl">📄</div>
-              <h3 className="text-sm font-bold text-white break-all">{fullscreenMedia.name || 'Document'}</h3>
-              <div className="w-full max-h-[60vh] overflow-y-auto bg-black/50 p-3 rounded-xl border border-slate-700">
-                {fullscreenMedia.url.includes('blob:') ? (
-                  <iframe src={fullscreenMedia.url} className="w-full h-48 rounded bg-white" title="Document Viewer" />
-                ) : (
-                  <p className="text-xs text-slate-300">File loaded successfully inside chat viewer.</p>
-                )}
-              </div>
-              <button onClick={closeFullscreen} className="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold shadow hover:bg-blue-500">
-                Close Viewer
-              </button>
+          <div className="bg-[#1f2c34] p-4 rounded-3xl max-w-lg w-full h-[85vh] flex flex-col items-center justify-between border border-slate-700 shadow-2xl relative" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-3 w-full border-b border-slate-800 pb-3">
+              <div className="w-10 h-10 rounded-full bg-blue-600/30 text-blue-400 flex items-center justify-center text-xl shrink-0">📄</div>
+              <h3 className="text-xs font-bold text-white truncate flex-1">{fullscreenMedia.name || 'Document'}</h3>
+              <button onClick={closeFullscreen} className="text-slate-400 hover:text-white text-lg px-2 font-bold">✕</button>
             </div>
-          )}
+
+            <div className="w-full flex-1 flex items-center justify-center overflow-hidden my-3 bg-black/60 rounded-2xl p-2 border border-slate-800">
+              {fullscreenMedia.url.match(/\.(mp4|webm|mov|m4v)$/i) || fullscreenMedia.type === 'video' ? (
+                <video controls autoPlay src={fullscreenMedia.url} className="max-w-full max-h-full object-contain rounded-xl" />
+              ) : fullscreenMedia.url.match(/\.(jpeg|jpg|png|gif|webp)$/i) || fullscreenMedia.type === 'image' ? (
+                <img src={fullscreenMedia.url} alt="Fullscreen View" className="max-w-full max-h-full object-contain rounded-xl" />
+              ) : (
+                <iframe src={fullscreenMedia.url} className="w-full h-full rounded-xl bg-white" title="Document Viewer" />
+              )}
+            </div>
+
+            <button onClick={closeFullscreen} className="w-full py-3.5 bg-blue-600 text-white rounded-2xl text-xs font-bold shadow-lg hover:bg-blue-500 transition-all">
+              Close Viewer
+            </button>
+          </div>
         </div>
       )}
 
@@ -381,15 +382,15 @@ export default function IndiePulseChatSystem() {
                   {msg.files && msg.files.map((fileObj, fIdx) => (
                     <div 
                       key={fIdx} 
-                      className="mb-1 rounded-xl overflow-hidden max-w-[240px] border border-white/20 flex items-center gap-3 bg-black/40 p-2.5 cursor-pointer block hover:bg-black/60 transition-colors"
+                      className="mb-1 rounded-xl overflow-hidden max-w-[260px] border border-white/20 flex items-center gap-3 bg-black/50 p-3 cursor-pointer block hover:bg-black/70 transition-colors shadow-lg"
                       onClick={() => openFullscreen(fileObj.url, fileObj.name, 'document')}
                     >
-                      <div className="w-10 h-10 rounded-lg bg-red-600/30 border border-red-400/40 flex items-center justify-center text-xs font-bold text-red-300 shrink-0">
+                      <div className="w-11 h-11 rounded-xl bg-red-600/30 border border-red-400/40 flex items-center justify-center text-sm font-bold text-red-300 shrink-0">
                         📄
                       </div>
                       <div className="flex flex-col min-w-0">
-                        <span className="text-xs font-bold text-white truncate max-w-[150px]">{fileObj.name}</span>
-                        <span className="text-[9px] text-slate-300 uppercase">{fileObj.size} • {fileObj.name.split('.').pop() || 'PDF'} (TAP TO DOWNLOAD)</span>
+                        <span className="text-xs font-bold text-white truncate max-w-[160px]">{fileObj.name}</span>
+                        <span className="text-[9px] text-slate-300 uppercase">{fileObj.size} • {fileObj.name.split('.').pop() || 'FILE'} (TAP TO FULLSCREEN)</span>
                       </div>
                     </div>
                   ))}
@@ -506,7 +507,7 @@ export default function IndiePulseChatSystem() {
               )}
             </div>
 
-            {/* WhatsApp Style Document 5-Option Sub-Menu Popup with Direct Native File Manager & Drive Routing */}
+            {/* WhatsApp Style Document 5-Option Sub-Menu Popup with Direct Files App Integration */}
             {showDocMenu && (
               <div className="bg-[#1f2c34] p-4 border-t border-slate-800 grid grid-cols-5 gap-2 text-center shadow-2xl rounded-t-2xl z-50 shrink-0">
                 
@@ -531,14 +532,14 @@ export default function IndiePulseChatSystem() {
                   <input type="file" accept="image/*,video/*" multiple onChange={handleFileUpload} className="hidden" />
                 </label>
 
-                {/* 4. Drive (Cloud Selector) */}
+                {/* 4. Drive */}
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-11 h-11 rounded-full bg-yellow-600 flex items-center justify-center text-base text-white shadow">☁️</div>
                   <span className="text-[9px] text-slate-300 font-medium">Drive</span>
-                  <input type="file" accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain,*/*" multiple onChange={handleDocumentUpload} className="hidden" />
+                  <input type="file" accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,*/*" multiple onChange={handleDocumentUpload} className="hidden" />
                 </label>
 
-                {/* 5. Files (Direct Mobile File Manager App Picker) */}
+                {/* 5. Files (Direct Mobile File Manager / Google Files App Picker) */}
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-11 h-11 rounded-full bg-emerald-600 flex items-center justify-center text-base text-white shadow">📁</div>
                   <span className="text-[9px] text-slate-300 font-medium">Files</span>
