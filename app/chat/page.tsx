@@ -19,8 +19,8 @@ export default function IndiePulseChatSystem() {
   // WhatsApp Style Document Sub-Menu Popup State
   const [showDocMenu, setShowDocMenu] = useState(false);
   
-  // Fullscreen Media Viewer State
-  const [fullscreenMedia, setFullscreenMedia] = useState<{ url: string; type: 'image' | 'video' | 'document' } | null>(null);
+  // In-App Chat Media Viewer State (Completely independent of phone gallery)
+  const [fullscreenMedia, setFullscreenMedia] = useState<{ url: string; name: string; type: 'image' | 'video' | 'document' } | null>(null);
 
   // WhatsApp Style Popup States
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -48,8 +48,8 @@ export default function IndiePulseChatSystem() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [currentView, fullscreenMedia]);
 
-  const openFullscreen = (url: string, type: 'image' | 'video' | 'document') => {
-    setFullscreenMedia({ url, type });
+  const openFullscreen = (url: string, name: string, type: 'image' | 'video' | 'document') => {
+    setFullscreenMedia({ url, name, type });
     window.history.pushState({ fullscreen: true }, '');
   };
 
@@ -132,13 +132,17 @@ export default function IndiePulseChatSystem() {
     }
   };
 
-  // Document Specific Multiple File Upload Handler
+  // True Files & Drive Direct System Picker Handler
   const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newDocsArray = Array.from(e.target.files).map(file => {
         const url = URL.createObjectURL(file);
         const sizeInMB = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
-        return { url, name: file.name, size: sizeInMB, type: 'document' as const, isHD: false };
+        let type: 'image' | 'video' | 'document' = 'document';
+        if (file.type.startsWith('image/')) type = 'image';
+        else if (file.type.startsWith('video/')) type = 'video';
+
+        return { url, name: file.name, size: sizeInMB, type, isHD: false };
       });
 
       setAttachedFiles(prev => [...(prev || []), ...newDocsArray]);
@@ -315,12 +319,18 @@ export default function IndiePulseChatSystem() {
             <video controls autoPlay src={fullscreenMedia.url} className="max-w-full max-h-full object-contain" onClick={(e) => e.stopPropagation()} />
           ) : (
             <div className="bg-[#1f2c34] p-6 rounded-2xl max-w-sm w-full flex flex-col items-center gap-4 text-center border border-slate-700 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-              <div className="w-16 h-16 rounded-full bg-red-600/20 text-red-400 flex items-center justify-center text-3xl">📄</div>
-              <h3 className="text-sm font-bold text-white break-all">Open Document</h3>
-              <a href={fullscreenMedia.url} download target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-green-600 text-white rounded-xl text-xs font-bold shadow hover:bg-green-500">
-                Download & Open File
-              </a>
-              <button onClick={closeFullscreen} className="text-xs text-slate-400 font-bold mt-1">Cancel</button>
+              <div className="w-16 h-16 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center text-3xl">📄</div>
+              <h3 className="text-sm font-bold text-white break-all">{fullscreenMedia.name || 'Document'}</h3>
+              <div className="w-full max-h-[60vh] overflow-y-auto bg-black/50 p-3 rounded-xl border border-slate-700">
+                {fullscreenMedia.url.includes('blob:') ? (
+                  <iframe src={fullscreenMedia.url} className="w-full h-48 rounded bg-white" title="Document Viewer" />
+                ) : (
+                  <p className="text-xs text-slate-300">File loaded successfully inside chat viewer.</p>
+                )}
+              </div>
+              <button onClick={closeFullscreen} className="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold shadow hover:bg-blue-500">
+                Close Viewer
+              </button>
             </div>
           )}
         </div>
@@ -337,7 +347,7 @@ export default function IndiePulseChatSystem() {
               </label>
               <label onClick={() => toggleHDForAll(true)} className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-800 cursor-pointer text-blue-400 font-bold">
                 <span>HD quality</span>
-                <span className="text-[10px] bg-blue-500/20 px-2 py-0.5 rounded">Recommended</span>
+               <span className="text-[10px] bg-blue-500/20 px-2 py-0.5 rounded">Recommended</span>
               </label>
             </div>
             <button onClick={() => setShowHDPopup(false)} className="mt-2 text-right text-xs font-bold text-blue-400">CANCEL</button>
@@ -381,21 +391,21 @@ export default function IndiePulseChatSystem() {
                       <div 
                         key={fIdx} 
                         className="mb-1 rounded-xl overflow-hidden max-w-[240px] border border-white/20 flex items-center gap-3 bg-black/40 p-2.5 cursor-pointer block hover:bg-black/60 transition-colors"
-                        onClick={() => openFullscreen(fileObj.url, 'document')}
+                        onClick={() => openFullscreen(fileObj.url, fileObj.name, 'document')}
                       >
                         <div className="w-10 h-10 rounded-lg bg-red-600/30 border border-red-400/40 flex items-center justify-center text-xs font-bold text-red-300 shrink-0">
                           📄
                         </div>
                         <div className="flex flex-col min-w-0">
                           <span className="text-xs font-bold text-white truncate max-w-[150px]">{fileObj.name}</span>
-                          <span className="text-[9px] text-slate-300 uppercase">{fileObj.size} • {fileObj.name.split('.').pop() || 'PDF'} (TAP TO DOWNLOAD)</span>
+                          <span className="text-[9px] text-slate-300 uppercase">{fileObj.size} • {fileObj.name.split('.').pop() || 'PDF'} (TAP TO OPEN)</span>
                         </div>
                       </div>
                     ) : (
                       <div 
                         key={fIdx} 
                         className="mb-1 rounded-xl overflow-hidden max-w-[240px] border border-white/20 cursor-pointer relative" 
-                        onClick={() => openFullscreen(fileObj.url, fileObj.type === 'video' ? 'video' : 'image')}
+                        onClick={() => openFullscreen(fileObj.url, fileObj.name, fileObj.type === 'video' ? 'video' : 'image')}
                       >
                         {fileObj.type === 'image' ? (
                           <img src={fileObj.url} alt="Media" className="w-full h-auto object-cover max-h-[220px]" />
@@ -521,34 +531,45 @@ export default function IndiePulseChatSystem() {
               )}
             </div>
 
-            {/* WhatsApp Style Document 5-Option Sub-Menu Popup */}
+            {/* WhatsApp Style Document 5-Option Sub-Menu Popup with True System Routing */}
             {showDocMenu && (
               <div className="bg-[#1f2c34] p-4 border-t border-slate-800 grid grid-cols-5 gap-2 text-center shadow-2xl rounded-t-2xl z-50 shrink-0">
+                
+                {/* 1. Camera */}
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-11 h-11 rounded-full bg-pink-600 flex items-center justify-center text-base text-white shadow">📷</div>
                   <span className="text-[9px] text-slate-300 font-medium">Camera</span>
                   <input type="file" accept="image/*" capture="environment" onChange={handleCameraCapture} className="hidden" />
                 </label>
+
+                {/* 2. Camera Camcorder */}
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-11 h-11 rounded-full bg-purple-600 flex items-center justify-center text-base text-white shadow">📹</div>
                   <span className="text-[9px] text-slate-300 font-medium">Camcorder</span>
                   <input type="file" accept="video/*" capture="environment" onChange={handleCameraCapture} className="hidden" />
                 </label>
+
+                {/* 3. Photos & Videos */}
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-11 h-11 rounded-full bg-blue-600 flex items-center justify-center text-base text-white shadow">🖼️</div>
                   <span className="text-[9px] text-slate-300 font-medium">Photos & videos</span>
                   <input type="file" accept="image/*,video/*" multiple onChange={handleFileUpload} className="hidden" />
                 </label>
+
+                {/* 4. Drive (Cloud File Selector) */}
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-11 h-11 rounded-full bg-yellow-600 flex items-center justify-center text-base text-white shadow">☁️</div>
                   <span className="text-[9px] text-slate-300 font-medium">Drive</span>
-                  <input type="file" accept="*/*" multiple onChange={handleDocumentUpload} className="hidden" />
+                  <input type="file" accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain,*/*" multiple onChange={handleDocumentUpload} className="hidden" />
                 </label>
+
+                {/* 5. Files (Direct System File Manager App Picker) */}
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-11 h-11 rounded-full bg-emerald-600 flex items-center justify-center text-base text-white shadow">📁</div>
                   <span className="text-[9px] text-slate-300 font-medium">Files</span>
                   <input type="file" accept="*/*" multiple onChange={handleDocumentUpload} className="hidden" />
                 </label>
+
               </div>
             )}
 
@@ -624,7 +645,7 @@ export default function IndiePulseChatSystem() {
               placeholder="Search global developer number or name..."
               value={globalSearchQuery}
               onChange={(e) => setGlobalSearchQuery(e.target.value)}
-              autoFocus
+             autoFocus
               className="w-full py-3.5 pl-11 pr-4 bg-[#111b21] text-white text-xs rounded-xl border border-slate-700 focus:outline-none focus:border-blue-500 shadow-inner"
             />
           </div>
@@ -753,4 +774,4 @@ export default function IndiePulseChatSystem() {
 
     </main>
   );
-}
+}  
