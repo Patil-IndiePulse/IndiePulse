@@ -16,8 +16,11 @@ export default function IndiePulseChatSystem() {
   const [attachedFiles, setAttachedFiles] = useState<{ url: string; name: string; size: string; type: 'image' | 'video' | 'document'; isHD: boolean }[]>();
   const [showHDPopup, setShowHDPopup] = useState(false);
   
+  // WhatsApp Style Document Sub-Menu Popup State
+  const [showDocMenu, setShowDocMenu] = useState(false);
+  
   // Fullscreen Media Viewer State
-  const [fullscreenMedia, setFullscreenMedia] = useState<{ url: string; type: 'image' | 'video' } | null>(null);
+  const [fullscreenMedia, setFullscreenMedia] = useState<{ url: string; type: 'image' | 'video' | 'document' } | null>(null);
 
   // WhatsApp Style Popup States
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -45,7 +48,7 @@ export default function IndiePulseChatSystem() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [currentView, fullscreenMedia]);
 
-  const openFullscreen = (url: string, type: 'image' | 'video') => {
+  const openFullscreen = (url: string, type: 'image' | 'video' | 'document') => {
     setFullscreenMedia({ url, type });
     window.history.pushState({ fullscreen: true }, '');
   };
@@ -107,6 +110,7 @@ export default function IndiePulseChatSystem() {
     setAttachedFiles([]);
     setShowEmojiPicker(false);
     setShowAttachmentMenu(false);
+    setShowDocMenu(false);
   };
 
   // Gallery File Upload Handler
@@ -124,10 +128,11 @@ export default function IndiePulseChatSystem() {
 
       setAttachedFiles(prev => [...(prev || []), ...newFilesArray]);
       setShowAttachmentMenu(false);
+      setShowDocMenu(false);
     }
   };
 
-  // Document Specific Multiple File Upload Handler (WhatsApp Style Files Picker)
+  // Document Specific Multiple File Upload Handler
   const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newDocsArray = Array.from(e.target.files).map(file => {
@@ -138,6 +143,7 @@ export default function IndiePulseChatSystem() {
 
       setAttachedFiles(prev => [...(prev || []), ...newDocsArray]);
       setShowAttachmentMenu(false);
+      setShowDocMenu(false);
     }
   };
 
@@ -151,6 +157,7 @@ export default function IndiePulseChatSystem() {
       
       setAttachedFiles(prev => [...(prev || []), { url, name: file.name, size: sizeInMB, type, isHD: false }]);
       setShowAttachmentMenu(false);
+      setShowDocMenu(false);
     }
   };
 
@@ -304,8 +311,17 @@ export default function IndiePulseChatSystem() {
         >
           {fullscreenMedia.type === 'image' ? (
             <img src={fullscreenMedia.url} alt="Fullscreen View" className="max-w-full max-h-full object-contain" />
-          ) : (
+          ) : fullscreenMedia.type === 'video' ? (
             <video controls autoPlay src={fullscreenMedia.url} className="max-w-full max-h-full object-contain" onClick={(e) => e.stopPropagation()} />
+          ) : (
+            <div className="bg-[#1f2c34] p-6 rounded-2xl max-w-sm w-full flex flex-col items-center gap-4 text-center border border-slate-700 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              <div className="w-16 h-16 rounded-full bg-red-600/20 text-red-400 flex items-center justify-center text-3xl">📄</div>
+              <h3 className="text-sm font-bold text-white break-all">Open Document</h3>
+              <a href={fullscreenMedia.url} download target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-green-600 text-white rounded-xl text-xs font-bold shadow hover:bg-green-500">
+                Download & Open File
+              </a>
+              <button onClick={closeFullscreen} className="text-xs text-slate-400 font-bold mt-1">Cancel</button>
+            </div>
           )}
         </div>
       )}
@@ -362,22 +378,19 @@ export default function IndiePulseChatSystem() {
                   
                   {msg.files && msg.files.map((fileObj, fIdx) => (
                     fileObj.type === 'document' ? (
-                      <a 
+                      <div 
                         key={fIdx} 
-                        href={fileObj.url} 
-                        download={fileObj.name}
-                        target="_blank"
-                        rel="noopener noreferrer"
                         className="mb-1 rounded-xl overflow-hidden max-w-[240px] border border-white/20 flex items-center gap-3 bg-black/40 p-2.5 cursor-pointer block hover:bg-black/60 transition-colors"
+                        onClick={() => openFullscreen(fileObj.url, 'document')}
                       >
                         <div className="w-10 h-10 rounded-lg bg-red-600/30 border border-red-400/40 flex items-center justify-center text-xs font-bold text-red-300 shrink-0">
                           📄
                         </div>
                         <div className="flex flex-col min-w-0">
                           <span className="text-xs font-bold text-white truncate max-w-[150px]">{fileObj.name}</span>
-                          <span className="text-[9px] text-slate-300 uppercase">{fileObj.size} • {fileObj.name.split('.').pop() || 'PDF'} (Tap to Download)</span>
+                          <span className="text-[9px] text-slate-300 uppercase">{fileObj.size} • {fileObj.name.split('.').pop() || 'PDF'} (TAP TO DOWNLOAD)</span>
                         </div>
-                      </a>
+                      </div>
                     ) : (
                       <div 
                         key={fIdx} 
@@ -450,7 +463,7 @@ export default function IndiePulseChatSystem() {
                   
                   <div className="bg-[#1f2c34] rounded-full px-3.5 py-2 flex items-center gap-2 border border-slate-800 shadow-inner w-full min-w-0">
                     <span 
-                      onClick={() => { setShowEmojiPicker(!showEmojiPicker); setShowAttachmentMenu(false); }}
+                      onClick={() => { setShowEmojiPicker(!showEmojiPicker); setShowAttachmentMenu(false); setShowDocMenu(false); }}
                       className="text-slate-400 text-base cursor-pointer shrink-0 hover:text-white transition-colors"
                     >
                       😊
@@ -463,7 +476,7 @@ export default function IndiePulseChatSystem() {
                       className="w-full bg-transparent text-white text-xs focus:outline-none placeholder-slate-400 min-w-0"
                     />
                     <span 
-                      onClick={() => { setShowAttachmentMenu(!showAttachmentMenu); setShowEmojiPicker(false); }}
+                      onClick={() => { setShowAttachmentMenu(!showAttachmentMenu); setShowEmojiPicker(false); setShowDocMenu(false); }}
                       className="text-slate-400 hover:text-white cursor-pointer text-lg shrink-0" 
                       title="Attach File"
                     >
@@ -508,6 +521,37 @@ export default function IndiePulseChatSystem() {
               )}
             </div>
 
+            {/* WhatsApp Style Document 5-Option Sub-Menu Popup */}
+            {showDocMenu && (
+              <div className="bg-[#1f2c34] p-4 border-t border-slate-800 grid grid-cols-5 gap-2 text-center shadow-2xl rounded-t-2xl z-50 shrink-0">
+                <label className="flex flex-col items-center gap-1 cursor-pointer">
+                  <div className="w-11 h-11 rounded-full bg-pink-600 flex items-center justify-center text-base text-white shadow">📷</div>
+                  <span className="text-[9px] text-slate-300 font-medium">Camera</span>
+                  <input type="file" accept="image/*" capture="environment" onChange={handleCameraCapture} className="hidden" />
+                </label>
+                <label className="flex flex-col items-center gap-1 cursor-pointer">
+                  <div className="w-11 h-11 rounded-full bg-purple-600 flex items-center justify-center text-base text-white shadow">📹</div>
+                  <span className="text-[9px] text-slate-300 font-medium">Camcorder</span>
+                  <input type="file" accept="video/*" capture="environment" onChange={handleCameraCapture} className="hidden" />
+                </label>
+                <label className="flex flex-col items-center gap-1 cursor-pointer">
+                  <div className="w-11 h-11 rounded-full bg-blue-600 flex items-center justify-center text-base text-white shadow">🖼️</div>
+                  <span className="text-[9px] text-slate-300 font-medium">Photos & videos</span>
+                  <input type="file" accept="image/*,video/*" multiple onChange={handleFileUpload} className="hidden" />
+                </label>
+                <label className="flex flex-col items-center gap-1 cursor-pointer">
+                  <div className="w-11 h-11 rounded-full bg-yellow-600 flex items-center justify-center text-base text-white shadow">☁️</div>
+                  <span className="text-[9px] text-slate-300 font-medium">Drive</span>
+                  <input type="file" accept="*/*" multiple onChange={handleDocumentUpload} className="hidden" />
+                </label>
+                <label className="flex flex-col items-center gap-1 cursor-pointer">
+                  <div className="w-11 h-11 rounded-full bg-emerald-600 flex items-center justify-center text-base text-white shadow">📁</div>
+                  <span className="text-[9px] text-slate-300 font-medium">Files</span>
+                  <input type="file" accept="*/*" multiple onChange={handleDocumentUpload} className="hidden" />
+                </label>
+              </div>
+            )}
+
             {showAttachmentMenu && (
               <div className="bg-[#1f2c34] p-4 border-t border-slate-800 grid grid-cols-4 gap-4 text-center shadow-2xl rounded-t-2xl z-50 shrink-0">
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
@@ -520,11 +564,10 @@ export default function IndiePulseChatSystem() {
                   <span className="text-[10px] text-slate-300 font-medium">Camera</span>
                   <input type="file" accept="image/*,video/*" capture="environment" onChange={handleCameraCapture} className="hidden" />
                 </label>
-                <label className="flex flex-col items-center gap-1 cursor-pointer">
+                <div onClick={() => { setShowDocMenu(!showDocMenu); setShowAttachmentMenu(false); }} className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-lg text-white shadow">📄</div>
                   <span className="text-[10px] text-slate-300 font-medium">Document</span>
-                  <input type="file" accept="*/*" multiple onChange={handleDocumentUpload} className="hidden" />
-                </label>
+                </div>
                 <div onClick={() => alert('Location sharing simulated!')} className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center text-lg text-white shadow">📍</div>
                   <span className="text-[10px] text-slate-300 font-medium">Location</span>
