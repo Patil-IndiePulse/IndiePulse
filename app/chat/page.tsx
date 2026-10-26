@@ -12,11 +12,11 @@ export default function IndiePulseChatSystem() {
   const [activeChat, setActiveChat] = useState<any>(null);
   const [messageText, setMessageText] = useState('');
   
-  // Multiple WhatsApp Style Media Attachment States
-  const [attachedFiles, setAttachedFiles] = useState<{ url: string; name: string; type: 'image' | 'video' | 'document'; isHD: boolean }[]>();
+  // Multiple WhatsApp Style Media & Document Attachment States
+  const [attachedFiles, setAttachedFiles] = useState<{ url: string; name: string; size: string; type: 'image' | 'video' | 'document'; isHD: boolean }[]>();
   const [showHDPopup, setShowHDPopup] = useState(false);
   
-  // Fullscreen Media Viewer State (WhatsApp Style without X button)
+  // Fullscreen Media Viewer State
   const [fullscreenMedia, setFullscreenMedia] = useState<{ url: string; type: 'image' | 'video' } | null>(null);
 
   // WhatsApp Style Popup States
@@ -32,7 +32,6 @@ export default function IndiePulseChatSystem() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
-  // Handle Phone Back Button for Fullscreen Media Viewer
   useEffect(() => {
     const handlePopState = () => {
       if (fullscreenMedia) {
@@ -66,7 +65,7 @@ export default function IndiePulseChatSystem() {
     { id: '3', name: '+91 80507 64670', lastMsg: 'Direct chat started', time: 'Just now', unread: 0, avatar: '8' }
   ]);
 
-  const [messages, setMessages] = useState<Record<string, { sender: string; text: string; files?: { url: string; type: 'image' | 'video' | 'document'; isHD: boolean }[]; audioUrl?: string; duration?: string; time: string; isMe: boolean }[]>>({
+  const [messages, setMessages] = useState<Record<string, { sender: string; text: string; files?: { url: string; name: string; size: string; type: 'image' | 'video' | 'document'; isHD: boolean }[]; audioUrl?: string; duration?: string; time: string; isMe: boolean }[]>>({
     '1': [],
     '2': [],
     '3': []
@@ -110,7 +109,7 @@ export default function IndiePulseChatSystem() {
     setShowAttachmentMenu(false);
   };
 
-  // Multiple File Upload Handler for Gallery/Documents
+  // Gallery File Upload Handler
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newFilesArray = Array.from(e.target.files).map(file => {
@@ -118,7 +117,9 @@ export default function IndiePulseChatSystem() {
         let type: 'image' | 'video' | 'document' = 'document';
         if (file.type.startsWith('image/')) type = 'image';
         else if (file.type.startsWith('video/')) type = 'video';
-        return { url, name: file.name, type, isHD: false };
+        
+        const sizeInMB = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+        return { url, name: file.name, size: sizeInMB, type, isHD: false };
       });
 
       setAttachedFiles(prev => [...(prev || []), ...newFilesArray]);
@@ -126,14 +127,33 @@ export default function IndiePulseChatSystem() {
     }
   };
 
-  // Fixed Direct Live Camera Capture Handler (Strictly opens phone camera)
+  // Document Specific Multiple File Upload Handler (WhatsApp Style Files Picker)
+  const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newDocsArray = Array.from(e.target.files).map(file => {
+        const url = URL.createObjectURL(file);
+        let type: 'image' | 'video' | 'document' = 'document';
+        if (file.type.startsWith('image/')) type = 'image';
+        else if (file.type.startsWith('video/')) type = 'video';
+        
+        const sizeInMB = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+        return { url, name: file.name, size: sizeInMB, type: type, isHD: false };
+      });
+
+      setAttachedFiles(prev => [...(prev || []), ...newDocsArray]);
+      setShowAttachmentMenu(false);
+    }
+  };
+
+  // Direct Live Camera Capture Handler
   const handleCameraCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const url = URL.createObjectURL(file);
       let type: 'image' | 'video' = file.type.startsWith('video/') ? 'video' : 'image';
+      const sizeInMB = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
       
-      setAttachedFiles(prev => [...(prev || []), { url, name: file.name, type, isHD: false }]);
+      setAttachedFiles(prev => [...(prev || []), { url, name: file.name, size: sizeInMB, type, isHD: false }]);
       setShowAttachmentMenu(false);
     }
   };
@@ -162,7 +182,6 @@ export default function IndiePulseChatSystem() {
     }
   };
 
-  // Real Live WhatsApp Style Voice Note Recording using MediaRecorder API
   const startRecording = async () => {
     const filesArray = attachedFiles || [];
     if (!messageText.trim() && filesArray.length === 0) {
@@ -259,7 +278,6 @@ export default function IndiePulseChatSystem() {
     return `${mins}:${remainingSecs < 10 ? '0' : ''}${remainingSecs}`;
   };
 
-  // Expanded Comprehensive Emoji Database without any text strings in flags
   const emojiCategories = {
     recents: ['😀', '😂', '❤️', '🔥', '👍', '🎉', '🚀', '⭐', '😎', '🙏', '💯', '✨', '🇮🇳', '💻', '🎮'],
     smileys: ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😙', '😚', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐', '😕', '😟', '🙁', '😮', '😯', '😲', '😳', '🥺', '😦', '😧', '😨', '😰', '😥', '😢', '😭', '😱', '😖', '😣', '😞', '😩', '🥱', '😴', '😤', '😡', '🤬', '😈', '👿', '💀', '💩', '🤡', '👹', '👺', '👻', '👽', '👾', '🤖', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾', '🤲', '👐', '🙌', '👏', '🤝', '👍', '👎', '👊', '✊', '🤛', '🤜', '🤞', '✌️', '🤟', '🤘', '👌', '🤌', '🤏', '👈', '👉', '👆', '👇', '☝️', '✋', '🤚', '🖐️', '🖖', '👋', '🤙', '💪', '🦾', '🖕', '✍️', '🙏', '🦶', '🦵', '🦿', '💄', '💋', '👄', '🦷', '👂', '🦻', '👃', '👣', '👁️', '👀', '🧠', '🗣️', '👤', '👥'],
@@ -350,14 +368,24 @@ export default function IndiePulseChatSystem() {
                 <div className={`p-2 rounded-2xl text-xs shadow-md ${msg.isMe ? 'bg-gradient-to-r from-pink-600 to-blue-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'bg-[#202c33] text-slate-100 rounded-tl-none'}`}>
                   
                   {msg.files && msg.files.map((fileObj, fIdx) => (
-                    <div key={fIdx} className="mb-1 rounded-xl overflow-hidden max-w-[240px] border border-white/20 cursor-pointer relative" onClick={() => openFullscreen(fileObj.url, fileObj.type === 'video' ? 'video' : 'image')}>
+                    <div 
+                      key={fIdx} 
+                      className="mb-1 rounded-xl overflow-hidden max-w-[240px] border border-white/20 cursor-pointer relative bg-black/40 p-2" 
+                      onClick={() => openFullscreen(fileObj.url, fileObj.type === 'video' ? 'video' : 'image')}
+                    >
                       {fileObj.type === 'image' ? (
                         <img src={fileObj.url} alt="Media" className="w-full h-auto object-cover max-h-[220px]" />
                       ) : fileObj.type === 'video' ? (
                         <video src={fileObj.url} className="w-full h-auto max-h-[220px]" />
                       ) : (
-                        <div className="p-3 bg-black/40 flex items-center gap-2 text-[11px] text-blue-300">
-                          <span>📄 Document</span>
+                        <div className="flex items-center gap-3 p-1">
+                          <div className="w-10 h-10 rounded-lg bg-blue-600/30 border border-blue-400/40 flex items-center justify-center text-xs font-bold text-blue-300">
+                            📄
+                          </div>
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-xs font-bold text-white truncate max-w-[150px]">{fileObj.name}</span>
+                            <span className="text-[9px] text-slate-300 uppercase">{fileObj.size} • {fileObj.name.split('.').pop() || 'DOC'}</span>
+                          </div>
                         </div>
                       )}
                       {fileObj.isHD && (
@@ -392,8 +420,6 @@ export default function IndiePulseChatSystem() {
           </div>
 
           <div className="w-full bg-[#0b141a] flex flex-col shrink-0 z-40 border-t border-slate-900 shadow-lg">
-
-            {/* Note: Attached media preview removed from text bar area to match WhatsApp exact style */}
 
             <div className="bg-[#0b141a] px-2 py-2 w-full shrink-0">
               {isRecording ? (
@@ -442,7 +468,6 @@ export default function IndiePulseChatSystem() {
                       📎
                     </span>
                     
-                    {/* Fixed Camera Input Triggering Direct Live Capture */}
                     <label className="text-slate-400 hover:text-white cursor-pointer text-base shrink-0 relative" title="Live Camera">
                       📷
                       <input 
@@ -496,7 +521,7 @@ export default function IndiePulseChatSystem() {
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-lg text-white shadow">📄</div>
                   <span className="text-[10px] text-slate-300 font-medium">Document</span>
-                  <input type="file" multiple onChange={handleFileUpload} className="hidden" />
+                  <input type="file" multiple onChange={handleDocumentUpload} className="hidden" />
                 </label>
                 <div onClick={() => alert('Location sharing simulated!')} className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center text-lg text-white shadow">📍</div>
