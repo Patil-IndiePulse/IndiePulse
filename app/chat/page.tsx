@@ -132,12 +132,8 @@ export default function IndiePulseChatSystem() {
     if (e.target.files && e.target.files.length > 0) {
       const newDocsArray = Array.from(e.target.files).map(file => {
         const url = URL.createObjectURL(file);
-        let type: 'image' | 'video' | 'document' = 'document';
-        if (file.type.startsWith('image/')) type = 'image';
-        else if (file.type.startsWith('video/')) type = 'video';
-        
         const sizeInMB = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
-        return { url, name: file.name, size: sizeInMB, type: type, isHD: false };
+        return { url, name: file.name, size: sizeInMB, type: 'document' as const, isHD: false };
       });
 
       setAttachedFiles(prev => [...(prev || []), ...newDocsArray]);
@@ -163,7 +159,6 @@ export default function IndiePulseChatSystem() {
     setShowHDPopup(false);
   };
 
-  // Audio Bip Sound Function for WhatsApp Mic Click
   const playMicClickSound = () => {
     try {
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -177,9 +172,7 @@ export default function IndiePulseChatSystem() {
       gainNode.connect(audioCtx.destination);
       osc.start();
       osc.stop(audioCtx.currentTime + 0.1);
-    } catch (e) {
-      // AudioContext fallback
-    }
+    } catch (e) {}
   };
 
   const startRecording = async () => {
@@ -368,30 +361,39 @@ export default function IndiePulseChatSystem() {
                 <div className={`p-2 rounded-2xl text-xs shadow-md ${msg.isMe ? 'bg-gradient-to-r from-pink-600 to-blue-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'bg-[#202c33] text-slate-100 rounded-tl-none'}`}>
                   
                   {msg.files && msg.files.map((fileObj, fIdx) => (
-                    <div 
-                      key={fIdx} 
-                      className="mb-1 rounded-xl overflow-hidden max-w-[240px] border border-white/20 cursor-pointer relative bg-black/40 p-2" 
-                      onClick={() => openFullscreen(fileObj.url, fileObj.type === 'video' ? 'video' : 'image')}
-                    >
-                      {fileObj.type === 'image' ? (
-                        <img src={fileObj.url} alt="Media" className="w-full h-auto object-cover max-h-[220px]" />
-                      ) : fileObj.type === 'video' ? (
-                        <video src={fileObj.url} className="w-full h-auto max-h-[220px]" />
-                      ) : (
-                        <div className="flex items-center gap-3 p-1">
-                          <div className="w-10 h-10 rounded-lg bg-blue-600/30 border border-blue-400/40 flex items-center justify-center text-xs font-bold text-blue-300">
-                            📄
-                          </div>
-                          <div className="flex flex-col min-w-0">
-                            <span className="text-xs font-bold text-white truncate max-w-[150px]">{fileObj.name}</span>
-                            <span className="text-[9px] text-slate-300 uppercase">{fileObj.size} • {fileObj.name.split('.').pop() || 'DOC'}</span>
-                          </div>
+                    fileObj.type === 'document' ? (
+                      <a 
+                        key={fIdx} 
+                        href={fileObj.url} 
+                        download={fileObj.name}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mb-1 rounded-xl overflow-hidden max-w-[240px] border border-white/20 flex items-center gap-3 bg-black/40 p-2.5 cursor-pointer block hover:bg-black/60 transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-red-600/30 border border-red-400/40 flex items-center justify-center text-xs font-bold text-red-300 shrink-0">
+                          📄
                         </div>
-                      )}
-                      {fileObj.isHD && (
-                        <span className="absolute bottom-2 right-2 bg-black/70 text-white text-[9px] font-bold px-1.5 py-0.5 rounded border border-white/40">HD</span>
-                      )}
-                    </div>
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-xs font-bold text-white truncate max-w-[150px]">{fileObj.name}</span>
+                          <span className="text-[9px] text-slate-300 uppercase">{fileObj.size} • {fileObj.name.split('.').pop() || 'PDF'} (Tap to Download)</span>
+                        </div>
+                      </a>
+                    ) : (
+                      <div 
+                        key={fIdx} 
+                        className="mb-1 rounded-xl overflow-hidden max-w-[240px] border border-white/20 cursor-pointer relative" 
+                        onClick={() => openFullscreen(fileObj.url, fileObj.type === 'video' ? 'video' : 'image')}
+                      >
+                        {fileObj.type === 'image' ? (
+                          <img src={fileObj.url} alt="Media" className="w-full h-auto object-cover max-h-[220px]" />
+                        ) : (
+                          <video src={fileObj.url} className="w-full h-auto max-h-[220px]" />
+                        )}
+                        {fileObj.isHD && (
+                          <span className="absolute bottom-2 right-2 bg-black/70 text-white text-[9px] font-bold px-1.5 py-0.5 rounded border border-white/40">HD</span>
+                        )}
+                      </div>
+                    )
                   ))}
 
                   {msg.audioUrl ? (
@@ -521,7 +523,7 @@ export default function IndiePulseChatSystem() {
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-lg text-white shadow">📄</div>
                   <span className="text-[10px] text-slate-300 font-medium">Document</span>
-                  <input type="file" multiple onChange={handleDocumentUpload} className="hidden" />
+                  <input type="file" accept="*/*" multiple onChange={handleDocumentUpload} className="hidden" />
                 </label>
                 <div onClick={() => alert('Location sharing simulated!')} className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center text-lg text-white shadow">📍</div>
