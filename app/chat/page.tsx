@@ -19,7 +19,7 @@ export default function IndiePulseChatSystem() {
   // WhatsApp Style Document Sub-Menu Popup State (Exact 5 Options)
   const [showDocMenu, setShowDocMenu] = useState(false);
   
-  // Full-Size Immersive In-App Chat Media Viewer State
+  // True Full-Screen Immersive In-App Chat Media Viewer State (Without X button & edge-to-edge)
   const [fullscreenMedia, setFullscreenMedia] = useState<{ url: string; name: string; type: 'image' | 'video' | 'document' } | null>(null);
 
   // WhatsApp Style Popup States
@@ -128,7 +128,7 @@ export default function IndiePulseChatSystem() {
     }
   };
 
-  // Direct Mobile Files & Drive System Picker Handler (Opens Google Files / File Manager)
+  // Direct Mobile Files & Drive System Picker Handler
   const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newDocsArray = Array.from(e.target.files).map(file => {
@@ -299,30 +299,34 @@ export default function IndiePulseChatSystem() {
   return (
     <main className="min-h-screen w-full bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden">
       
-      {/* Full-Size Immersive In-App Chat Media Viewer */}
+      {/* True Full-Screen Edge-to-Edge Immersive Media Viewer (No X button, Full screen coverage) */}
       {fullscreenMedia && (
         <div 
           onClick={closeFullscreen}
-          className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center p-3 cursor-pointer"
+          className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-between p-2 cursor-pointer w-full h-[100dvh]"
         >
-          <div className="bg-[#1f2c34] p-4 rounded-3xl max-w-lg w-full h-[85vh] flex flex-col items-center justify-between border border-slate-700 shadow-2xl relative" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center gap-3 w-full border-b border-slate-800 pb-3">
-              <div className="w-10 h-10 rounded-full bg-blue-600/30 text-blue-400 flex items-center justify-center text-xl shrink-0">📄</div>
-              <h3 className="text-xs font-bold text-white truncate flex-1">{fullscreenMedia.name || 'Document'}</h3>
-              <button onClick={closeFullscreen} className="text-slate-400 hover:text-white text-lg px-2 font-bold">✕</button>
+          <div className="w-full py-3 px-4 bg-gradient-to-b from-black/80 to-transparent flex items-center justify-between z-10">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="text-lg">📄</span>
+              <span className="text-xs font-bold text-white truncate max-w-[280px]">{fullscreenMedia.name || 'Document'}</span>
             </div>
+          </div>
 
-            <div className="w-full flex-1 flex items-center justify-center overflow-hidden my-3 bg-black/60 rounded-2xl p-2 border border-slate-800">
-              {fullscreenMedia.url.match(/\.(mp4|webm|mov|m4v)$/i) || fullscreenMedia.type === 'video' ? (
-                <video controls autoPlay src={fullscreenMedia.url} className="max-w-full max-h-full object-contain rounded-xl" />
-              ) : fullscreenMedia.url.match(/\.(jpeg|jpg|png|gif|webp)$/i) || fullscreenMedia.type === 'image' ? (
-                <img src={fullscreenMedia.url} alt="Fullscreen View" className="max-w-full max-h-full object-contain rounded-xl" />
-              ) : (
-                <iframe src={fullscreenMedia.url} className="w-full h-full rounded-xl bg-white" title="Document Viewer" />
-              )}
-            </div>
+          <div className="w-full flex-1 flex items-center justify-center overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
+            {fullscreenMedia.url.match(/\.(mp4|webm|mov|m4v)$/i) || fullscreenMedia.type === 'video' ? (
+              <video controls autoPlay src={fullscreenMedia.url} className="w-full h-full object-contain" />
+            ) : fullscreenMedia.url.match(/\.(jpeg|jpg|png|gif|webp)$/i) || fullscreenMedia.type === 'image' ? (
+              <img src={fullscreenMedia.url} alt="Fullscreen View" className="w-full h-full object-contain" />
+            ) : (
+              <iframe src={fullscreenMedia.url} className="w-full h-full bg-white" title="Document Viewer" />
+            )}
+          </div>
 
-            <button onClick={closeFullscreen} className="w-full py-3.5 bg-blue-600 text-white rounded-2xl text-xs font-bold shadow-lg hover:bg-blue-500 transition-all">
+          <div className="w-full p-4 bg-gradient-to-t from-black/90 to-transparent flex justify-center z-10" onClick={(e) => e.stopPropagation()}>
+            <button 
+              onClick={closeFullscreen} 
+              className="w-full max-w-sm py-3.5 bg-green-600 text-white rounded-full text-xs font-bold shadow-2xl hover:bg-green-500 transition-all uppercase tracking-wider text-center"
+            >
               Close Viewer
             </button>
           </div>
@@ -507,7 +511,7 @@ export default function IndiePulseChatSystem() {
               )}
             </div>
 
-            {/* WhatsApp Style Document 5-Option Sub-Menu Popup with Direct Files App Integration */}
+            {/* WhatsApp Style Document 5-Option Sub-Menu Popup */}
             {showDocMenu && (
               <div className="bg-[#1f2c34] p-4 border-t border-slate-800 grid grid-cols-5 gap-2 text-center shadow-2xl rounded-t-2xl z-50 shrink-0">
                 
@@ -539,7 +543,7 @@ export default function IndiePulseChatSystem() {
                   <input type="file" accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,*/*" multiple onChange={handleDocumentUpload} className="hidden" />
                 </label>
 
-                {/* 5. Files (Direct Mobile File Manager / Google Files App Picker) */}
+                {/* 5. Files (Direct Mobile File Manager Picker) */}
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-11 h-11 rounded-full bg-emerald-600 flex items-center justify-center text-base text-white shadow">📁</div>
                   <span className="text-[9px] text-slate-300 font-medium">Files</span>
