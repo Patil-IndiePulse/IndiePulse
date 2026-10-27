@@ -15,15 +15,22 @@ export default function IndiePulseChatSystem() {
   // WhatsApp Style Dynamic Status Simulation (Online / Typing / Last Seen)
   const [chatStatus, setChatStatus] = useState<'online' | 'typing...' | string>('online');
 
+  // Multiple WhatsApp Style Media & Document Attachment States
   const [attachedFiles, setAttachedFiles] = useState<{ url: string; name: string; size: string; type: 'image' | 'video' | 'document'; isHD: boolean }[]>();
   const [showHDPopup, setShowHDPopup] = useState(false);
+  
+  // WhatsApp Style Document Sub-Menu Popup State (Exact 5 Options)
   const [showDocMenu, setShowDocMenu] = useState(false);
+  
+  // True Full-Screen Immersive In-App Chat Media Viewer State
   const [fullscreenMedia, setFullscreenMedia] = useState<{ url: string; name: string; type: 'image' | 'video' | 'document' } | null>(null);
 
+  // WhatsApp Style Popup States
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
   const [emojiCategory, setEmojiCategory] = useState<'recents' | 'smileys' | 'animals' | 'food' | 'travel' | 'activities' | 'objects' | 'symbols' | 'flags'>('smileys');
   
+  // WhatsApp Style Live Voice Recording States
   const [isRecording, setIsRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -124,23 +131,20 @@ export default function IndiePulseChatSystem() {
     setShowDocMenu(false);
   };
 
-  // Production-Grade India-Centric GPS & Google Maps Location Launcher (Prevents USA Postal Code confusion)
+  // Production-Grade India-Centric GPS & Google Maps Location Launcher
   const handleDirectGoogleMapsLocation = () => {
     const contactName = activeChat ? activeChat.name : '+91 90354 37802';
     setShowAttachmentMenu(false);
     setShowDocMenu(false);
 
-    // Using browser Geolocation to fetch real device coordinates in Belagavi, India, with fallback query
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          // Direct Indian coordinates mapping with country indicator
           window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}&query_place_id=Belagavi+India`, '_blank');
         },
         () => {
-          // Fallback forcing India region search to prevent US postal code mixup
           window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(contactName + ' Belagavi India')}`, '_blank');
         },
         { enableHighAccuracy: true }
@@ -150,12 +154,14 @@ export default function IndiePulseChatSystem() {
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Gallery File Upload Handler (Marks type as 'image' or 'video' so it displays openly like WhatsApp)
+  const handleGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newFilesArray = Array.from(e.target.files).map(file => {
         const url = URL.createObjectURL(file);
         const sizeInMB = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
-        return { url, name: file.name, size: sizeInMB, type: 'document' as const, isHD: false };
+        const isVideo = file.type.startsWith('video');
+        return { url, name: file.name, size: sizeInMB, type: isVideo ? ('video' as const) : ('image' as const), isHD: false };
       });
 
       setAttachedFiles(prev => [...(prev || []), ...newFilesArray]);
@@ -164,6 +170,7 @@ export default function IndiePulseChatSystem() {
     }
   };
 
+  // Direct Document & Files Upload Handler (Marks type as 'document')
   const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newDocsArray = Array.from(e.target.files).map(file => {
@@ -178,13 +185,15 @@ export default function IndiePulseChatSystem() {
     }
   };
 
+  // Direct Live Camera Capture Handler (Displays openly as image/video)
   const handleCameraCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const url = URL.createObjectURL(file);
       const sizeInMB = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+      const isVideo = file.type.startsWith('video');
       
-      setAttachedFiles(prev => [...(prev || []), { url, name: file.name, size: sizeInMB, type: 'document' as const, isHD: false }]);
+      setAttachedFiles(prev => [...(prev || []), { url, name: file.name, size: sizeInMB, type: isVideo ? ('video' as const) : ('image' as const), isHD: false }]);
       setShowAttachmentMenu(false);
       setShowDocMenu(false);
     }
@@ -346,9 +355,9 @@ export default function IndiePulseChatSystem() {
           </div>
 
           <div className="w-full flex-1 flex items-center justify-center overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
-            {fullscreenMedia.url.match(/\.(mp4|webm|mov|m4v)$/i) || fullscreenMedia.type === 'video' ? (
+            {fullscreenMedia.type === 'video' || fullscreenMedia.url.match(/\.(mp4|webm|mov|m4v)$/i) ? (
               <video controls autoPlay src={fullscreenMedia.url} className="w-full h-full object-contain" />
-            ) : fullscreenMedia.url.match(/\.(jpeg|jpg|png|gif|webp)$/i) || fullscreenMedia.type === 'image' ? (
+            ) : fullscreenMedia.type === 'image' || fullscreenMedia.url.match(/\.(jpeg|jpg|png|gif|webp)$/i) ? (
               <img src={fullscreenMedia.url} alt="Fullscreen View" className="w-full h-full object-contain" />
             ) : (
               <iframe src={fullscreenMedia.url} className="w-full h-full bg-white" title="Document Viewer" />
@@ -356,7 +365,7 @@ export default function IndiePulseChatSystem() {
           </div>
 
           <div className="w-full p-4 bg-gradient-to-t from-black/90 to-transparent flex justify-center z-10" onClick={(e) => e.stopPropagation()}>
-            <button
+            <button 
               onClick={closeFullscreen} 
               className="w-full max-w-sm py-3.5 bg-green-600 text-white rounded-full text-xs font-bold shadow-2xl hover:bg-green-500 transition-all uppercase tracking-wider text-center"
             >
@@ -388,7 +397,7 @@ export default function IndiePulseChatSystem() {
       {currentView === 'conversation' && activeChat ? (
         <div className="h-[100dvh] w-full bg-[#0b141a] grid grid-rows-[auto_1fr_auto] overflow-hidden">
           
-          {/* WhatsApp Style Chat Header with Dynamic Online / Typing / Last Seen Status */}
+          {/* WhatsApp Style Chat Header */}
           <div className="bg-[#1f2c34] px-3 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md w-full z-20 shrink-0">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-sm text-white shadow shrink-0">
@@ -419,20 +428,38 @@ export default function IndiePulseChatSystem() {
               <div key={idx} className={`flex flex-col max-w-[85%] ${msg.isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
                 <div className={`p-2 rounded-2xl text-xs shadow-md ${msg.isMe ? 'bg-gradient-to-r from-pink-600 to-blue-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'bg-[#202c33] text-slate-100 rounded-tl-none'}`}>
                   
+                  {/* Render Files / Gallery / Documents with distinction */}
                   {msg.files && msg.files.map((fileObj, fIdx) => (
-                    <div 
-                      key={fIdx} 
-                      className="mb-1 rounded-xl overflow-hidden max-w-[260px] border border-white/20 flex items-center gap-3 bg-black/50 p-3 cursor-pointer block hover:bg-black/70 transition-colors shadow-lg"
-                      onClick={() => openFullscreen(fileObj.url, fileObj.name, 'document')}
-                    >
-                      <div className="w-11 h-11 rounded-xl bg-red-600/30 border border-red-400/40 flex items-center justify-center text-sm font-bold text-red-300 shrink-0">
-                        📄
+                    fileObj.type === 'image' || fileObj.type === 'video' ? (
+                      <div 
+                        key={fIdx} 
+                        className="mb-1 rounded-xl overflow-hidden max-w-[260px] border border-white/20 bg-black/50 cursor-pointer block hover:opacity-95 transition-all shadow-lg relative"
+                        onClick={() => openFullscreen(fileObj.url, fileObj.name, fileObj.type)}
+                      >
+                        {fileObj.type === 'video' ? (
+                          <video src={fileObj.url} className="w-full h-48 object-cover" />
+                        ) : (
+                          <img src={fileObj.url} alt={fileObj.name} className="w-full h-48 object-cover" />
+                        )}
+                        <span className="absolute bottom-1 right-1 text-[9px] bg-black/70 px-1.5 py-0.5 rounded text-white font-mono">
+                          {fileObj.size}
+                        </span>
                       </div>
-                      <div className="flex flex-col min-w-0">
-                        <span className="text-xs font-bold text-white truncate max-w-[160px]">{fileObj.name}</span>
-                        <span className="text-[9px] text-slate-300 uppercase">{fileObj.size} • {fileObj.name.split('.').pop() || 'FILE'} (TAP TO FULLSCREEN)</span>
+                    ) : (
+                      <div 
+                        key={fIdx} 
+                        className="mb-1 rounded-xl overflow-hidden max-w-[260px] border border-white/20 flex items-center gap-3 bg-black/50 p-3 cursor-pointer block hover:bg-black/70 transition-colors shadow-lg"
+                        onClick={() => openFullscreen(fileObj.url, fileObj.name, 'document')}
+                      >
+                        <div className="w-11 h-11 rounded-xl bg-red-600/30 border border-red-400/40 flex items-center justify-center text-sm font-bold text-red-300 shrink-0">
+                          📄
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-xs font-bold text-white truncate max-w-[160px]">{fileObj.name}</span>
+                          <span className="text-[9px] text-slate-300 uppercase">{fileObj.size} • {fileObj.name.split('.').pop() || 'FILE'} (TAP TO FULLSCREEN)</span>
+                        </div>
                       </div>
-                    </div>
+                    )
                   ))}
 
                   {msg.audioUrl ? (
@@ -547,7 +574,7 @@ export default function IndiePulseChatSystem() {
               )}
             </div>
 
-            {/* WhatsApp Style Document Sub-Menu */}
+            {/* WhatsApp Style Document 5-Option Sub-Menu */}
             {showDocMenu && (
               <div className="bg-[#1f2c34] p-4 border-t border-slate-800 grid grid-cols-5 gap-2 text-center shadow-2xl rounded-t-2xl z-50 shrink-0">
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
@@ -563,7 +590,7 @@ export default function IndiePulseChatSystem() {
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-11 h-11 rounded-full bg-blue-600 flex items-center justify-center text-base text-white shadow">🖼️</div>
                   <span className="text-[9px] text-slate-300 font-medium">Photos & videos</span>
-                  <input type="file" accept="image/*,video/*" multiple onChange={handleFileUpload} className="hidden" />
+                  <input type="file" accept="image/*,video/*" multiple onChange={handleGalleryUpload} className="hidden" />
                 </label>
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-11 h-11 rounded-full bg-yellow-600 flex items-center justify-center text-base text-white shadow">☁️</div>
@@ -580,10 +607,11 @@ export default function IndiePulseChatSystem() {
 
             {showAttachmentMenu && (
               <div className="bg-[#1f2c34] p-4 border-t border-slate-800 grid grid-cols-4 gap-4 text-center shadow-2xl rounded-t-2xl z-50 shrink-0">
+                {/* Gallery Button linked to direct open media rendering */}
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center text-lg text-white shadow">🖼️</div>
                   <span className="text-[10px] text-slate-300 font-medium">Gallery</span>
-                  <input type="file" accept="image/*,video/*" multiple onChange={handleFileUpload} className="hidden" />
+                  <input type="file" accept="image/*,video/*" multiple onChange={handleGalleryUpload} className="hidden" />
                 </label>
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-12 h-12 rounded-full bg-pink-600 flex items-center justify-center text-lg text-white shadow">📷</div>
@@ -594,7 +622,6 @@ export default function IndiePulseChatSystem() {
                   <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-lg text-white shadow">📄</div>
                   <span className="text-[10px] text-slate-300 font-medium">Document</span>
                 </div>
-                {/* Production-Grade India-Centric Google Maps Pin Icon Location Button */}
                 <div onClick={handleDirectGoogleMapsLocation} className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center text-white shadow animate-pulse">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
