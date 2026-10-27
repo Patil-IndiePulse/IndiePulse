@@ -68,7 +68,7 @@ export default function IndiePulseChatSystem() {
     { id: '3', name: '+91 80507 64670', lastMsg: 'Direct chat started', time: 'Just now', unread: 0, avatar: '8' }
   ]);
 
-  const [messages, setMessages] = useState<Record<string, { sender: string; text: string; files?: { url: string; name: string; size: string; type: 'image' | 'video' | 'document'; isHD: boolean }[]; audioUrl?: string; duration?: string; time: string; isMe: boolean }[]>>({
+  const [messages, setMessages] = useState<Record<string, { sender: string; text: string; files?: { url: string; name: string; size: string; type: 'image' | 'video' | 'document'; isHD: boolean }[]; locationUrl?: string; locationName?: string; audioUrl?: string; duration?: string; time: string; isMe: boolean }[]>>({
     '1': [],
     '2': [],
     '3': []
@@ -111,6 +111,43 @@ export default function IndiePulseChatSystem() {
     setShowEmojiPicker(false);
     setShowAttachmentMenu(false);
     setShowDocMenu(false);
+  };
+
+  // Real GPS Live Location Share Handler (Direct Google Maps integration)
+  const handleShareLiveLocation = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const mapUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+        const locationTitle = `Live GPS Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+
+        const newMsg = {
+          sender: 'You',
+          text: '',
+          locationUrl: mapUrl,
+          locationName: locationTitle,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          isMe: true
+        };
+
+        setMessages(prev => ({
+          ...prev,
+          [activeChat.id]: [...(prev[activeChat.id] || []), newMsg]
+        }));
+        setShowAttachmentMenu(false);
+        setShowDocMenu(false);
+      },
+      () => {
+        alert('Unable to retrieve your location. Please check GPS permissions.');
+      },
+      { enableHighAccuracy: true }
+    );
   };
 
   // Gallery File Upload Handler
@@ -299,7 +336,7 @@ export default function IndiePulseChatSystem() {
   return (
     <main className="min-h-screen w-full bg-[#0b141a] text-white flex flex-col font-sans select-none relative overflow-x-hidden">
       
-      {/* True Full-Screen Edge-to-Edge Immersive Media Viewer (No X button, Full screen coverage) */}
+      {/* True Full-Screen Edge-to-Edge Immersive Media Viewer */}
       {fullscreenMedia && (
         <div 
           onClick={closeFullscreen}
@@ -383,6 +420,32 @@ export default function IndiePulseChatSystem() {
               <div key={idx} className={`flex flex-col max-w-[85%] ${msg.isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
                 <div className={`p-2 rounded-2xl text-xs shadow-md ${msg.isMe ? 'bg-gradient-to-r from-pink-600 to-blue-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'bg-[#202c33] text-slate-100 rounded-tl-none'}`}>
                   
+                  {/* Real GPS Live Location Card Viewer */}
+                  {msg.locationUrl ? (
+                    <a 
+                      href={msg.locationUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="mb-1 rounded-xl overflow-hidden max-w-[260px] border border-white/20 flex flex-col gap-2 bg-black/60 p-3 block hover:bg-black/80 transition-colors shadow-lg cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-10 h-10 rounded-xl bg-green-600/30 border border-green-400/40 flex items-center justify-center text-sm font-bold text-green-300 shrink-0">
+                          📍
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-xs font-bold text-white truncate">{msg.locationName || 'Live GPS Location'}</span>
+                          <span className="text-[9px] text-green-400 font-bold uppercase tracking-wider">TAP TO OPEN GOOGLE MAPS LIVE</span>
+                        </div>
+                      </div>
+                      <div className="w-full h-24 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-green-900/40 to-blue-900/40 flex items-center justify-center">
+                          <span className="text-2xl animate-bounce">📍</span>
+                        </div>
+                        <span className="absolute bottom-1 right-1 text-[8px] bg-black/70 px-1.5 py-0.5 rounded text-white font-mono">GPS Active</span>
+                      </div>
+                    </a>
+                  ) : null}
+
                   {msg.files && msg.files.map((fileObj, fIdx) => (
                     <div 
                       key={fIdx} 
@@ -569,8 +632,9 @@ export default function IndiePulseChatSystem() {
                   <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-lg text-white shadow">📄</div>
                   <span className="text-[10px] text-slate-300 font-medium">Document</span>
                 </div>
-                <div onClick={() => alert('Location sharing simulated!')} className="flex flex-col items-center gap-1 cursor-pointer">
-                  <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center text-lg text-white shadow">📍</div>
+                {/* Active Real GPS Live Location Button */}
+                <div onClick={handleShareLiveLocation} className="flex flex-col items-center gap-1 cursor-pointer">
+                  <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center text-lg text-white shadow animate-pulse">📍</div>
                   <span className="text-[10px] text-slate-300 font-medium">Location</span>
                 </div>
               </div>
