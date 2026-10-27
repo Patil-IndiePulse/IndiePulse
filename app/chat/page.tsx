@@ -12,6 +12,9 @@ export default function IndiePulseChatSystem() {
   const [activeChat, setActiveChat] = useState<any>(null);
   const [messageText, setMessageText] = useState('');
   
+  // WhatsApp Style Dynamic Status Simulation (Online / Typing / Last Seen)
+  const [chatStatus, setChatStatus] = useState<'online' | 'typing...' | string>('online');
+
   const [attachedFiles, setAttachedFiles] = useState<{ url: string; name: string; size: string; type: 'image' | 'video' | 'document'; isHD: boolean }[]>();
   const [showHDPopup, setShowHDPopup] = useState(false);
   const [showDocMenu, setShowDocMenu] = useState(false);
@@ -41,6 +44,21 @@ export default function IndiePulseChatSystem() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [currentView, fullscreenMedia]);
 
+  // WhatsApp Style Dynamic Status Rotator for Active Chat
+  useEffect(() => {
+    if (currentView === 'conversation' && activeChat) {
+      setChatStatus('online');
+      const typingTimer = setTimeout(() => {
+        setChatStatus('typing...');
+        const backOnlineTimer = setTimeout(() => {
+          setChatStatus('online');
+        }, 3000);
+        return () => clearTimeout(backOnlineTimer);
+      }, 4000);
+      return () => clearTimeout(typingTimer);
+    }
+  }, [activeChat, currentView]);
+
   const openFullscreen = (url: string, name: string, type: 'image' | 'video' | 'document') => {
     setFullscreenMedia({ url, name, type });
     window.history.pushState({ fullscreen: true }, '');
@@ -56,7 +74,7 @@ export default function IndiePulseChatSystem() {
   };
 
   const [registeredContacts, setRegisteredContacts] = useState([
-    { id: '1', name: '+91 90354 37802', lastMsg: 'Tap to start chatting', time: '', unread: 0, avatar: '9' },
+    { id: '1', name: '+91 90354 37802', lastMsg: 'Tap to start chatting', time: '12:50 PM', unread: 0, avatar: '9' },
     { id: '2', name: 'Studio Alpha Developer', lastMsg: 'New indie build uploaded!', time: 'Yesterday', unread: 0, avatar: 'S' },
     { id: '3', name: '+91 80507 64670', lastMsg: 'Direct chat started', time: 'Just now', unread: 0, avatar: '8' }
   ]);
@@ -106,15 +124,30 @@ export default function IndiePulseChatSystem() {
     setShowDocMenu(false);
   };
 
-  // Production-Grade AI Real-Time Contact Location Launcher (Directly puts contact number/name into Google Maps Search & tracks live GPS)
+  // Production-Grade India-Centric GPS & Google Maps Location Launcher (Prevents USA Postal Code confusion)
   const handleDirectGoogleMapsLocation = () => {
-    const contactIdentifier = activeChat ? activeChat.name : '+91 90354 37802';
+    const contactName = activeChat ? activeChat.name : '+91 90354 37802';
     setShowAttachmentMenu(false);
     setShowDocMenu(false);
 
-    // Automatically target the specific contact number/name in Google Maps search query for accurate live tracking
-    const mapsQueryUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(contactIdentifier)}&basemap=roadmap`;
-    window.open(mapsQueryUrl, '_blank');
+    // Using browser Geolocation to fetch real device coordinates in Belagavi, India, with fallback query
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          // Direct Indian coordinates mapping with country indicator
+          window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}&query_place_id=Belagavi+India`, '_blank');
+        },
+        () => {
+          // Fallback forcing India region search to prevent US postal code mixup
+          window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(contactName + ' Belagavi India')}`, '_blank');
+        },
+        { enableHighAccuracy: true }
+      );
+    } else {
+      window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(contactName + ' Belagavi India')}`, '_blank');
+    }
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -323,7 +356,7 @@ export default function IndiePulseChatSystem() {
           </div>
 
           <div className="w-full p-4 bg-gradient-to-t from-black/90 to-transparent flex justify-center z-10" onClick={(e) => e.stopPropagation()}>
-            <button 
+            <button
               onClick={closeFullscreen} 
               className="w-full max-w-sm py-3.5 bg-green-600 text-white rounded-full text-xs font-bold shadow-2xl hover:bg-green-500 transition-all uppercase tracking-wider text-center"
             >
@@ -355,6 +388,7 @@ export default function IndiePulseChatSystem() {
       {currentView === 'conversation' && activeChat ? (
         <div className="h-[100dvh] w-full bg-[#0b141a] grid grid-rows-[auto_1fr_auto] overflow-hidden">
           
+          {/* WhatsApp Style Chat Header with Dynamic Online / Typing / Last Seen Status */}
           <div className="bg-[#1f2c34] px-3 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md w-full z-20 shrink-0">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-sm text-white shadow shrink-0">
@@ -362,7 +396,9 @@ export default function IndiePulseChatSystem() {
               </div>
               <div className="flex flex-col min-w-0">
                 <h2 className="text-xs font-bold text-white tracking-wide truncate">{activeChat.name}</h2>
-                <span className="text-[9px] text-blue-400 font-semibold">online</span>
+                <span className={`text-[9px] font-semibold ${chatStatus === 'online' || chatStatus === 'typing...' ? 'text-green-400 animate-pulse' : 'text-slate-400'}`}>
+                  {chatStatus === 'typing...' ? 'typing...' : chatStatus === 'online' ? 'online' : `last seen ${activeChat.time || '12:50 PM'}`}
+                </span>
               </div>
             </div>
             <div className="flex items-center gap-4 text-slate-300 text-sm shrink-0 pr-1">
@@ -511,45 +547,34 @@ export default function IndiePulseChatSystem() {
               )}
             </div>
 
-            {/* WhatsApp Style Document 5-Option Sub-Menu Popup */}
+            {/* WhatsApp Style Document Sub-Menu */}
             {showDocMenu && (
               <div className="bg-[#1f2c34] p-4 border-t border-slate-800 grid grid-cols-5 gap-2 text-center shadow-2xl rounded-t-2xl z-50 shrink-0">
-                
-                {/* 1. Camera */}
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-11 h-11 rounded-full bg-pink-600 flex items-center justify-center text-base text-white shadow">📷</div>
                   <span className="text-[9px] text-slate-300 font-medium">Camera</span>
                   <input type="file" accept="image/*" capture="environment" onChange={handleCameraCapture} className="hidden" />
                 </label>
-
-                {/* 2. Camera Camcorder */}
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-11 h-11 rounded-full bg-purple-600 flex items-center justify-center text-base text-white shadow">📹</div>
                   <span className="text-[9px] text-slate-300 font-medium">Camcorder</span>
                   <input type="file" accept="video/*" capture="environment" onChange={handleCameraCapture} className="hidden" />
                 </label>
-
-                {/* 3. Photos & Videos */}
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-11 h-11 rounded-full bg-blue-600 flex items-center justify-center text-base text-white shadow">🖼️</div>
                   <span className="text-[9px] text-slate-300 font-medium">Photos & videos</span>
                   <input type="file" accept="image/*,video/*" multiple onChange={handleFileUpload} className="hidden" />
                 </label>
-
-                {/* 4. Drive */}
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-11 h-11 rounded-full bg-yellow-600 flex items-center justify-center text-base text-white shadow">☁️</div>
                   <span className="text-[9px] text-slate-300 font-medium">Drive</span>
                   <input type="file" accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,*/*" multiple onChange={handleDocumentUpload} className="hidden" />
                 </label>
-
-                {/* 5. Files (Direct Mobile File Manager Picker) */}
                 <label className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-11 h-11 rounded-full bg-emerald-600 flex items-center justify-center text-base text-white shadow">📁</div>
                   <span className="text-[9px] text-slate-300 font-medium">Files</span>
                   <input type="file" accept="*/*" multiple onChange={handleDocumentUpload} className="hidden" />
                 </label>
-
               </div>
             )}
 
@@ -569,7 +594,7 @@ export default function IndiePulseChatSystem() {
                   <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-lg text-white shadow">📄</div>
                   <span className="text-[10px] text-slate-300 font-medium">Document</span>
                 </div>
-                {/* Production-Grade Google Maps Pin Icon Location Launcher with Auto Search Number/Name */}
+                {/* Production-Grade India-Centric Google Maps Pin Icon Location Button */}
                 <div onClick={handleDirectGoogleMapsLocation} className="flex flex-col items-center gap-1 cursor-pointer">
                   <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center text-white shadow animate-pulse">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
