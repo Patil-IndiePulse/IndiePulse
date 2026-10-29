@@ -3,7 +3,7 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAqJQjH7D4-rfWxzDk77thLODs",
+  apiKey: "AIzaSyAkPi0XwEWUqjqH7D4-rfWxzDk77tHLOds",
   authDomain: "indiepulse-app.firebaseapp.com",
   projectId: "indiepulse-app",
   storageBucket: "indiepulse-app.firebasestorage.app",
