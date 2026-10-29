@@ -6,7 +6,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAkPi0XWewUqJhD4-rfWxzDk77thLODs",
   authDomain: "indiepulse-app.firebaseapp.com",
   projectId: "indiepulse-app",
-  storageBucket: "indiepulse-app.appspot.com",
+  storageBucket: "indiepulse-app.firebasestorage.app",
   messagingSenderId: "205468452506",
   appId: "1:205468452506:web:5abaa26dcf045706a3c123",
   measurementId: "G-385Q8FPELX"
