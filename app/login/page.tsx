@@ -2,14 +2,22 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { auth } from "@/app/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`Logged in successfully with: ${email}`);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      alert(`Logged in successfully with: ${email}`);
+      
+    } catch (error: any) {
+      alert("Login Failed: " + error.message);
+    }
   };
 
   return (
