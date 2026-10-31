@@ -11,10 +11,41 @@ export default function LoginPage() {
   
   const [user, setUser] = useState<any>(null);
   const [showPopup, setShowPopup] = useState(false);
+  
+  // Multi-account states (Google/Steam style)
+  const [savedAccounts, setSavedAccounts] = useState<any[]>([]);
+  const [showSwitchModal, setShowSwitchModal] = useState(false);
 
   useEffect(() => {
+    // Load saved accounts from localStorage
+    try {
+      const accounts = JSON.parse(localStorage.getItem('indiepulse_accounts') || '[]');
+      setSavedAccounts(accounts);
+    } catch (e) {
+      console.error("Failed to load accounts", e);
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      if (currentUser && currentUser.email) {
+        // Ensure current logged-in user is saved in local storage list
+        try {
+          const accounts = JSON.parse(localStorage.getItem('indiepulse_accounts') || '[]');
+          const exists = accounts.some((acc: any) => acc.email === currentUser.email);
+          if (!exists) {
+            accounts.push({
+              email: currentUser.email,
+              name: currentUser.displayName || currentUser.email.split('@')[0],
+              photo: currentUser.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${currentUser.email}`
+            });
+            localStorage.setItem('indiepulse_accounts', JSON.stringify(accounts));
+            setSavedAccounts(accounts);
+          }
+          localStorage.setItem('indiepulse_current_account', currentUser.email);
+        } catch (err) {
+          console.error(err);
+        }
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -22,9 +53,23 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      alert(`Logged in successfully with: ${email}`);
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+      const loggedUser = userCred.user;
       
+      // Save/Update in local multi-account storage
+      const accounts = JSON.parse(localStorage.getItem('indiepulse_accounts') || '[]');
+      if (!accounts.some((acc: any) => acc.email === loggedUser.email)) {
+        accounts.push({
+          email: loggedUser.email,
+          name: loggedUser.displayName || loggedUser.email?.split('@')[0],
+          photo: loggedUser.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${loggedUser.email}`
+        });
+        localStorage.setItem('indiepulse_accounts', JSON.stringify(accounts));
+      }
+      localStorage.setItem('indiepulse_current_account', loggedUser.email || '');
+
+      alert(`Logged in successfully with: ${email}`);
+      window.location.reload();
     } catch (error: any) {
       alert("Login Failed: " + error.message);
     }
@@ -32,7 +77,18 @@ export default function LoginPage() {
 
   const handleLogout = async () => {
     await signOut(auth);
+    localStorage.removeItem('indiepulse_current_account');
     setShowPopup(false);
+    setShowSwitchModal(false);
+  };
+
+  // Switch to selected account helper
+  const handleSwitchAccount = (accEmail: string) => {
+    localStorage.setItem('indiepulse_current_account', accEmail);
+    alert(`Switched context to: ${accEmail}\n(Note: To fully switch backend session if needed, please login with password or use Google/Apple auth).`);
+    setShowSwitchModal(false);
+    setShowPopup(false);
+    window.location.reload();
   };
 
   return (
@@ -66,14 +122,17 @@ export default function LoginPage() {
         {user ? (
           <div className="relative">
             <button
-              onClick={() => setShowPopup(!showPopup)}
+              onClick={() => {
+                setShowPopup(!showPopup);
+                setShowSwitchModal(false);
+              }}
               className="w-11 h-11 rounded-full bg-emerald-500 hover:bg-emerald-400 flex items-center justify-center text-white font-bold text-lg shadow-xl shadow-emerald-500/20 border-2 border-white/20 transition-all cursor-pointer focus:outline-none"
             >
               {user.email ? user.email.charAt(0).toUpperCase() : "B"}
             </button>
 
             {/* Google / Steam Style Popup Menu */}
-            {showPopup && (
+            {showPopup && !showSwitchModal && (
               <div className="absolute right-0 mt-3 w-80 bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl p-5 text-white backdrop-blur-md z-50">
                 
                 {/* User Info Header */}
@@ -82,7 +141,7 @@ export default function LoginPage() {
                     {user.email ? user.email.charAt(0).toUpperCase() : "B"}
                   </div>
                   <p className="text-sm font-semibold truncate text-slate-200">{user.email}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">IndiePulse Account</p>
+                  <p className="text-xs text-slate-400 mt-0.5">IndiePulse Account ({savedAccounts.length} saved)</p>
                 </div>
 
                 {/* Options List with Emojis */}
@@ -90,8 +149,8 @@ export default function LoginPage() {
                   
                   {/* Option 1: Switch Account */}
                   <button 
-                    onClick={() => alert("Switch Account feature activated.")}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/80 transition text-slate-300 hover:text-white text-left"
+                    onClick={() => setShowSwitchModal(true)}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/80 transition text-slate-300 hover:text-white text-left cursor-pointer"
                   >
                     <span className="text-base">🔄</span>
                     <span className="font-medium">Switch account</span>
@@ -101,10 +160,11 @@ export default function LoginPage() {
                   <button 
                     onClick={() => {
                       signOut(auth);
+                      localStorage.removeItem('indiepulse_current_account');
                       alert("Browsing IndiePulse without an account.");
                       window.location.href = "/";
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/80 transition text-slate-300 hover:text-white text-left"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/80 transition text-slate-300 hover:text-white text-left cursor-pointer"
                   >
                     <span className="text-base">🚫</span>
                     <span className="font-medium">Use IndiePulse without an account</span>
@@ -113,7 +173,7 @@ export default function LoginPage() {
                   {/* Option 3: Add Another Account */}
                   <button 
                     onClick={() => window.location.href = "/signup"}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/80 transition text-slate-300 hover:text-white text-left"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/80 transition text-slate-300 hover:text-white text-left cursor-pointer"
                   >
                     <span className="text-base">➕</span>
                     <span className="font-medium">Add another account</span>
@@ -121,8 +181,8 @@ export default function LoginPage() {
 
                   {/* Option 4: Manage Account on IndiePulse */}
                   <button 
-                    onClick={() => alert("Opening IndiePulse Account Management...")}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/80 transition text-slate-300 hover:text-white text-left"
+                    onClick={() => alert(`Managing IndiePulse Account.\nTotal saved accounts on this device: ${savedAccounts.length}`)}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/80 transition text-slate-300 hover:text-white text-left cursor-pointer"
                   >
                     <span className="text-base">⚙️</span>
                     <span className="font-medium">Manage account on IndiePulse</span>
@@ -142,6 +202,55 @@ export default function LoginPage() {
 
               </div>
             )}
+
+            {/* Switch Account Selection Modal / View */}
+            {showPopup && showSwitchModal && (
+              <div className="absolute right-0 mt-3 w-80 bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl p-5 text-white backdrop-blur-md z-50">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+                  <h3 className="text-sm font-bold">Select Account</h3>
+                  <button 
+                    onClick={() => setShowSwitchModal(false)}
+                    className="text-xs text-indigo-400 hover:underline cursor-pointer"
+                  >
+                    Back
+                  </button>
+                </div>
+
+                <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
+                  {savedAccounts.length > 0 ? (
+                    savedAccounts.map((acc, index) => (
+                      <div 
+                        key={index}
+                        onClick={() => handleSwitchAccount(acc.email)}
+                        className={`p-2.5 rounded-xl border flex items-center gap-3 cursor-pointer transition ${
+                          user?.email === acc.email 
+                            ? 'bg-indigo-600/20 border-indigo-500 text-white' 
+                            : 'bg-slate-800/50 border-slate-800 hover:bg-slate-800 text-slate-300'
+                        }`}
+                      >
+                        <div className="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-sm shrink-0">
+                          {acc.email.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="overflow-hidden">
+                          <p className="text-xs font-semibold truncate">{acc.name}</p>
+                          <p className="text-[11px] text-slate-400 truncate">{acc.email}</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-slate-400 text-center py-4">No other accounts saved yet.</p>
+                  )}
+                </div>
+
+                <button 
+                  onClick={() => window.location.href = "/signup"}
+                  className="w-full mt-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <span>➕</span> Add another account
+                </button>
+              </div>
+            )}
+
           </div>
         ) : null}
       </div>
@@ -166,7 +275,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder=""
+              placeholder="Enter your email"
               required
               className="w-full bg-slate-950/60 border border-slate-800 rounded-xl p-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-all"
             />
@@ -183,7 +292,7 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder=""
+              placeholder="Enter password"
               required
               className="w-full bg-slate-950/60 border border-slate-800 rounded-xl p-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-all"
             />
