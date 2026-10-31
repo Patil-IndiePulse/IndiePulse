@@ -209,9 +209,9 @@ export default function LoginPage() {
                   <h3 className="text-sm font-bold">Select Account</h3>
                   <button 
                     onClick={() => setShowSwitchModal(false)}
-                    className="w-7 h-7 bg-blue-600 hover:bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold transition cursor-pointer shadow-md"
+                    className="text-xs text-indigo-400 hover:underline cursor-pointer"
                   >
-                    &larr;
+                    Close
                   </button>
                 </div>
 
@@ -250,20 +250,20 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Manage Accounts List Modal (Google Style Step 1) */}
+            {/* Manage Accounts List Modal (Clean UI) */}
             {showPopup && showManageModal && !selectedAccountForDetail && (
               <div className="absolute right-0 mt-3 w-80 bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl p-5 text-white backdrop-blur-md z-50">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
                   <h3 className="text-sm font-bold">Manage Saved Accounts</h3>
                   <button 
                     onClick={() => setShowManageModal(false)}
-                    className="w-7 h-7 bg-blue-600 hover:bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold transition cursor-pointer shadow-md"
+                    className="text-xs text-indigo-400 hover:underline cursor-pointer"
                   >
-                    &larr;
+                    Close
                   </button>
                 </div>
 
-                <p className="text-[11px] text-slate-400 mb-3">Click on an account to manage or remove it from this device.</p>
+                <p className="text-[11px] text-slate-400 mb-3">Click on an account to view details or remove it.</p>
 
                 <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
                   {savedAccounts.length > 0 ? (
@@ -289,17 +289,17 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Individual Account Detail & Remove View (Google Style Step 2) */}
+            {/* Individual Account Detail & Clean Remove View */}
             {showPopup && showManageModal && selectedAccountForDetail && (
               <div className="absolute right-0 mt-3 w-80 bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl p-6 text-white backdrop-blur-md z-50 text-center">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                  <h3 className="text-xs font-bold text-slate-400">Account Details</h3>
                   <button 
                     onClick={() => setSelectedAccountForDetail(null)}
-                    className="w-7 h-7 bg-blue-600 hover:bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold transition cursor-pointer shadow-md"
+                    className="text-xs text-indigo-400 hover:underline cursor-pointer"
                   >
-                    &larr;
+                    Back to list
                   </button>
-                  <h3 className="text-xs font-bold text-slate-400">Account Details</h3>
                 </div>
 
                 <div className="w-16 h-16 mx-auto rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-2xl mb-3 shadow-lg">
