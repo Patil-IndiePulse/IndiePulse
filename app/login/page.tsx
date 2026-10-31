@@ -9,12 +9,10 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
-  
   const [user, setUser] = useState<any>(null);
   const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
-    
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
@@ -63,11 +61,10 @@ export default function LoginPage() {
         </Link>
       </div>
 
-      {/* Top Right Google-Style Profile Icon & Popup Menu */}
+      {/* Top Right Google/Steam Style Profile Icon & Advanced Popup Menu */}
       <div className="absolute top-6 right-6 z-50">
         {user ? (
           <div className="relative">
-            
             <button
               onClick={() => setShowPopup(!showPopup)}
               className="w-11 h-11 rounded-full bg-emerald-500 hover:bg-emerald-400 flex items-center justify-center text-white font-bold text-lg shadow-xl shadow-emerald-500/20 border-2 border-white/20 transition-all cursor-pointer focus:outline-none"
@@ -75,22 +72,74 @@ export default function LoginPage() {
               {user.email ? user.email.charAt(0).toUpperCase() : "B"}
             </button>
 
+            {/* Google / Steam Style Popup Menu */}
             {showPopup && (
-              <div className="absolute right-0 mt-3 w-72 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-4 text-center text-white backdrop-blur-md">
-                <div className="w-14 h-14 mx-auto rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-2xl mb-2 shadow-md">
-                  {user.email ? user.email.charAt(0).toUpperCase() : "B"}
-                </div>
-                <p className="text-sm font-semibold truncate text-slate-200">{user.email}</p>
-                <p className="text-xs text-slate-400 mt-1">IndiePulse Account</p>
+              <div className="absolute right-0 mt-3 w-80 bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl p-5 text-white backdrop-blur-md z-50">
                 
-                <hr className="my-3 border-slate-700" />
+                {/* User Info Header */}
+                <div className="text-center pb-4 border-b border-slate-800">
+                  <div className="w-14 h-14 mx-auto rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-2xl mb-2 shadow-md">
+                    {user.email ? user.email.charAt(0).toUpperCase() : "B"}
+                  </div>
+                  <p className="text-sm font-semibold truncate text-slate-200">{user.email}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">IndiePulse Account</p>
+                </div>
 
+                {/* Options List with Emojis */}
+                <div className="py-2 flex flex-col gap-1 text-sm">
+                  
+                  {/* Option 1: Switch Account */}
+                  <button 
+                    onClick={() => alert("Switch Account feature activated.")}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/80 transition text-slate-300 hover:text-white text-left"
+                  >
+                    <span className="text-base">🔄</span>
+                    <span className="font-medium">Switch account</span>
+                  </button>
+
+                  {/* Option 2: Use IndiePulse Without Account */}
+                  <button 
+                    onClick={() => {
+                      signOut(auth);
+                      alert("Browsing IndiePulse without an account.");
+                      window.location.href = "/";
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/80 transition text-slate-300 hover:text-white text-left"
+                  >
+                    <span className="text-base">🚫</span>
+                    <span className="font-medium">Use IndiePulse without an account</span>
+                  </button>
+
+                  {/* Option 3: Add Another Account */}
+                  <button 
+                    onClick={() => window.location.href = "/signup"}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/80 transition text-slate-300 hover:text-white text-left"
+                  >
+                    <span className="text-base">➕</span>
+                    <span className="font-medium">Add another account</span>
+                  </button>
+
+                  {/* Option 4: Manage Account on IndiePulse */}
+                  <button 
+                    onClick={() => alert("Opening IndiePulse Account Management...")}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/80 transition text-slate-300 hover:text-white text-left"
+                  >
+                    <span className="text-base">⚙️</span>
+                    <span className="font-medium">Manage account on IndiePulse</span>
+                  </button>
+
+                </div>
+
+                <hr className="my-2 border-slate-800" />
+
+                {/* Option 5: Pink Logout Button */}
                 <button
                   onClick={handleLogout}
-                  className="w-full py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-lg transition text-sm font-medium cursor-pointer"
+                  className="w-full mt-2 py-2.5 bg-pink-600 hover:bg-pink-500 text-white rounded-xl transition text-sm font-bold shadow-lg shadow-pink-600/30 flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  Sign Out / Logout
+                  <span>🚪</span> Sign Out / Logout
                 </button>
+
               </div>
             )}
           </div>
