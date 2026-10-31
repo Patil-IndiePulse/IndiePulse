@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [user, setUser] = useState<any>(null);
   const [showPopup, setShowPopup] = useState(false);
   
-  // Multi-account states (Google/Steam style)
+  // Multi-account states
   const [savedAccounts, setSavedAccounts] = useState<any[]>([]);
   const [showSwitchModal, setShowSwitchModal] = useState(false);
 
@@ -28,7 +28,6 @@ export default function LoginPage() {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       if (currentUser && currentUser.email) {
-        // Ensure current logged-in user is saved in local storage list
         try {
           const accounts = JSON.parse(localStorage.getItem('indiepulse_accounts') || '[]');
           const exists = accounts.some((acc: any) => acc.email === currentUser.email);
@@ -69,7 +68,7 @@ export default function LoginPage() {
       localStorage.setItem('indiepulse_current_account', loggedUser.email || '');
 
       alert(`Logged in successfully with: ${email}`);
-      window.location.reload();
+      window.location.href = "/";
     } catch (error: any) {
       alert("Login Failed: " + error.message);
     }
@@ -82,13 +81,11 @@ export default function LoginPage() {
     setShowSwitchModal(false);
   };
 
-  // Switch to selected account helper
+  // Switch account helper: Autofills email in login box for seamless switching
   const handleSwitchAccount = (accEmail: string) => {
-    localStorage.setItem('indiepulse_current_account', accEmail);
-    alert(`Switched context to: ${accEmail}\n(Note: To fully switch backend session if needed, please login with password or use Google/Apple auth).`);
+    setEmail(accEmail);
     setShowSwitchModal(false);
     setShowPopup(false);
-    window.location.reload();
   };
 
   return (
@@ -98,7 +95,7 @@ export default function LoginPage() {
       <div className="absolute top-10 left-10 w-72 h-72 bg-indigo-500/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute bottom-10 right-10 w-72 h-72 bg-blue-500/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-      {/* Top Left Back Button (Bright Blue Color) */}
+      {/* Top Left Back Button */}
       <div className="absolute top-6 left-6 z-20">
         <Link 
           href="/" 
@@ -117,7 +114,7 @@ export default function LoginPage() {
         </Link>
       </div>
 
-      {/* Top Right Google/Steam Style Profile Icon & Advanced Popup Menu */}
+      {/* Top Right Profile Icon & Advanced Popup Menu */}
       <div className="absolute top-6 right-6 z-50">
         {user ? (
           <div className="relative">
@@ -131,11 +128,10 @@ export default function LoginPage() {
               {user.email ? user.email.charAt(0).toUpperCase() : "B"}
             </button>
 
-            {/* Google / Steam Style Popup Menu */}
+            {/* Popup Menu */}
             {showPopup && !showSwitchModal && (
               <div className="absolute right-0 mt-3 w-80 bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl p-5 text-white backdrop-blur-md z-50">
                 
-                {/* User Info Header */}
                 <div className="text-center pb-4 border-b border-slate-800">
                   <div className="w-14 h-14 mx-auto rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-2xl mb-2 shadow-md">
                     {user.email ? user.email.charAt(0).toUpperCase() : "B"}
@@ -144,10 +140,7 @@ export default function LoginPage() {
                   <p className="text-xs text-slate-400 mt-0.5">IndiePulse Account ({savedAccounts.length} saved)</p>
                 </div>
 
-                {/* Options List with Emojis */}
                 <div className="py-2 flex flex-col gap-1 text-sm">
-                  
-                  {/* Option 1: Switch Account */}
                   <button 
                     onClick={() => setShowSwitchModal(true)}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/80 transition text-slate-300 hover:text-white text-left cursor-pointer"
@@ -156,7 +149,6 @@ export default function LoginPage() {
                     <span className="font-medium">Switch account</span>
                   </button>
 
-                  {/* Option 2: Use IndiePulse Without Account */}
                   <button 
                     onClick={() => {
                       signOut(auth);
@@ -170,7 +162,6 @@ export default function LoginPage() {
                     <span className="font-medium">Use IndiePulse without an account</span>
                   </button>
 
-                  {/* Option 3: Add Another Account */}
                   <button 
                     onClick={() => window.location.href = "/signup"}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/80 transition text-slate-300 hover:text-white text-left cursor-pointer"
@@ -179,7 +170,6 @@ export default function LoginPage() {
                     <span className="font-medium">Add another account</span>
                   </button>
 
-                  {/* Option 4: Manage Account on IndiePulse */}
                   <button 
                     onClick={() => alert(`Managing IndiePulse Account.\nTotal saved accounts on this device: ${savedAccounts.length}`)}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/80 transition text-slate-300 hover:text-white text-left cursor-pointer"
@@ -187,12 +177,10 @@ export default function LoginPage() {
                     <span className="text-base">⚙️</span>
                     <span className="font-medium">Manage account on IndiePulse</span>
                   </button>
-
                 </div>
 
                 <hr className="my-2 border-slate-800" />
 
-                {/* Option 5: Pink Logout Button */}
                 <button
                   onClick={handleLogout}
                   className="w-full mt-2 py-2.5 bg-pink-600 hover:bg-pink-500 text-white rounded-xl transition text-sm font-bold shadow-lg shadow-pink-600/30 flex items-center justify-center gap-2 cursor-pointer"
@@ -203,7 +191,7 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Switch Account Selection Modal / View */}
+            {/* Switch Account Modal */}
             {showPopup && showSwitchModal && (
               <div className="absolute right-0 mt-3 w-80 bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl p-5 text-white backdrop-blur-md z-50">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
@@ -264,7 +252,7 @@ export default function LoginPage() {
           <h2 className="text-3xl font-black tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">
             Login to IndiePulse
           </h2>
-          <p className="text-slate-400 text-sm mt-1.5">Enter your credentials to access your creator dashboard.</p>
+          <p className="text-slate-400 text-sm mt-1.5">Select an account or enter credentials to sign in.</p>
         </div>
 
         {/* Login Form */}
