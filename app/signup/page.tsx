@@ -70,13 +70,13 @@ export default function SignupPage() {
             <label className="block text-xs font-medium text-slate-400 mb-1">Password</label>
             <input 
               type="password" 
-              placeholder="Create a password" 
+              placeholder="Create a strong password" 
               className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white outline-none focus:border-indigo-500 transition-all"
             />
           </div>
           
           <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-all shadow-lg shadow-blue-600/20 cursor-pointer mt-2">
-            Sign Up
+            Create account
           </button>
         </div>
 
