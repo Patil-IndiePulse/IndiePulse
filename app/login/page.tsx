@@ -15,6 +15,7 @@ export default function LoginPage() {
   // Multi-account states
   const [savedAccounts, setSavedAccounts] = useState<any[]>([]);
   const [showSwitchModal, setShowSwitchModal] = useState(false);
+  const [showManageModal, setShowManageModal] = useState(false);
 
   useEffect(() => {
     // Load saved accounts from localStorage
@@ -55,7 +56,6 @@ export default function LoginPage() {
       const userCred = await signInWithEmailAndPassword(auth, email, password);
       const loggedUser = userCred.user;
       
-      // Save/Update in local multi-account storage
       const accounts = JSON.parse(localStorage.getItem('indiepulse_accounts') || '[]');
       if (!accounts.some((acc: any) => acc.email === loggedUser.email)) {
         accounts.push({
@@ -79,13 +79,21 @@ export default function LoginPage() {
     localStorage.removeItem('indiepulse_current_account');
     setShowPopup(false);
     setShowSwitchModal(false);
+    setShowManageModal(false);
   };
 
-  // Switch account helper: Autofills email in login box for seamless switching
   const handleSwitchAccount = (accEmail: string) => {
     setEmail(accEmail);
     setShowSwitchModal(false);
     setShowPopup(false);
+  };
+
+  // Remove specific account from local storage list
+  const handleRemoveAccount = (accEmail: string) => {
+    const updatedAccounts = savedAccounts.filter((acc) => acc.email !== accEmail);
+    setSavedAccounts(updatedAccounts);
+    localStorage.setItem('indiepulse_accounts', JSON.stringify(updatedAccounts));
+    alert(`Removed ${accEmail} from saved accounts.`);
   };
 
   return (
@@ -122,14 +130,15 @@ export default function LoginPage() {
               onClick={() => {
                 setShowPopup(!showPopup);
                 setShowSwitchModal(false);
+                setShowManageModal(false);
               }}
               className="w-11 h-11 rounded-full bg-emerald-500 hover:bg-emerald-400 flex items-center justify-center text-white font-bold text-lg shadow-xl shadow-emerald-500/20 border-2 border-white/20 transition-all cursor-pointer focus:outline-none"
             >
               {user.email ? user.email.charAt(0).toUpperCase() : "B"}
             </button>
 
-            {/* Popup Menu */}
-            {showPopup && !showSwitchModal && (
+            {/* Main Popup Menu */}
+            {showPopup && !showSwitchModal && !showManageModal && (
               <div className="absolute right-0 mt-3 w-80 bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl p-5 text-white backdrop-blur-md z-50">
                 
                 <div className="text-center pb-4 border-b border-slate-800">
@@ -170,8 +179,9 @@ export default function LoginPage() {
                     <span className="font-medium">Add another account</span>
                   </button>
 
+                  {/* Manage Account Option */}
                   <button 
-                    onClick={() => alert(`Managing IndiePulse Account.\nTotal saved accounts on this device: ${savedAccounts.length}`)}
+                    onClick={() => setShowManageModal(true)}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/80 transition text-slate-300 hover:text-white text-left cursor-pointer"
                   >
                     <span className="text-base">⚙️</span>
@@ -236,6 +246,54 @@ export default function LoginPage() {
                 >
                   <span>➕</span> Add another account
                 </button>
+              </div>
+            )}
+
+            {/* Manage Accounts Modal */}
+            {showPopup && showManageModal && (
+              <div className="absolute right-0 mt-3 w-80 bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl p-5 text-white backdrop-blur-md z-50">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+                  <h3 className="text-sm font-bold">Manage Saved Accounts</h3>
+                  <button 
+                    onClick={() => setShowManageModal(false)}
+                    className="text-xs text-indigo-400 hover:underline cursor-pointer"
+                  >
+                    Back
+                  </button>
+                </div>
+
+                <p className="text-[11px] text-slate-400 mb-3">Remove accounts you no longer want saved on this device.</p>
+
+                <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
+                  {savedAccounts.length > 0 ? (
+                    savedAccounts.map((acc, index) => (
+                      <div 
+                        key={index}
+                        className="p-2.5 rounded-xl border bg-slate-800/50 border-slate-800 flex items-center justify-between gap-2"
+                      >
+                        <div className="flex items-center gap-2.5 overflow-hidden">
+                          <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-xs shrink-0">
+                            {acc.email.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="overflow-hidden">
+                            <p className="text-xs font-semibold truncate">{acc.name}</p>
+                            <p className="text-[10px] text-slate-400 truncate">{acc.email}</p>
+                          </div>
+                        </div>
+
+                        <button 
+                          onClick={() => handleRemoveAccount(acc.email)}
+                          className="px-2.5 py-1 bg-pink-600/20 hover:bg-pink-600 text-pink-400 hover:text-white rounded-lg text-xs font-medium transition cursor-pointer shrink-0"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-slate-400 text-center py-4">No accounts saved to manage.</p>
+                  )}
+                </div>
+
               </div>
             )}
 
