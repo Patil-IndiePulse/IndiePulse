@@ -16,6 +16,30 @@ export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  // Helper function to save accounts locally so multiple accounts persist (Steam/Google style)
+  const saveAccountLocally = (userEmail: string, userName: string, userPhoto: string = '') => {
+    try {
+      const existingAccounts = JSON.parse(localStorage.getItem('indiepulse_accounts') || '[]');
+      
+      // Check if account already exists in stored list
+      const isAlreadySaved = existingAccounts.some((acc: any) => acc.email === userEmail);
+      
+      if (!isAlreadySaved) {
+        const newAccount = {
+          email: userEmail,
+          name: userName || userEmail.split('@')[0],
+          photo: userPhoto || `https://api.dicebear.com/7.x/bottts/svg?seed=${userEmail}`
+        };
+        existingAccounts.push(newAccount);
+        localStorage.setItem('indiepulse_accounts', JSON.stringify(existingAccounts));
+      }
+      // Set active current account
+      localStorage.setItem('indiepulse_current_account', userEmail);
+    } catch (error) {
+      console.error("Error saving account locally:", error);
+    }
+  };
+
   // 1. Email & Password Signup Handler
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +49,10 @@ export default function SignupPage() {
       if (auth.currentUser) {
         await updateProfile(auth.currentUser, { displayName: name });
       }
+
+      // Save to local multi-account storage
+      saveAccountLocally(email, name);
+
       alert(`Account created successfully for: ${userCredential.user.email}`);
       window.location.href = "/login";
     } catch (error: any) {
@@ -37,7 +65,12 @@ export default function SignupPage() {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      alert(`Successfully signed up with Google: ${result.user.email}`);
+      const user = result.user;
+
+      // Save Google account to local storage list
+      saveAccountLocally(user.email || '', user.displayName || 'Google User', user.photoURL || '');
+
+      alert(`Successfully signed up with Google: ${user.email}`);
       window.location.href = "/login";
     } catch (error: any) {
       alert("Google Signup Failed: " + error.message);
@@ -49,7 +82,12 @@ export default function SignupPage() {
     const provider = new OAuthProvider('apple.com');
     try {
       const result = await signInWithPopup(auth, provider);
-      alert(`Successfully signed up with Apple: ${result.user.email}`);
+      const user = result.user;
+
+      // Save Apple account to local storage list
+      saveAccountLocally(user.email || '', user.displayName || 'Apple User');
+
+      alert(`Successfully signed up with Apple: ${user.email}`);
       window.location.href = "/login";
     } catch (error: any) {
       alert("Apple Signup Failed: " + error.message);
