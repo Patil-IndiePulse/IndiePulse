@@ -1,13 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { auth } from "@/app/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  
+  
+  const [user, setUser] = useState<any>(null);
+  const [showPopup, setShowPopup] = useState(false);
+
+  useEffect(() => {
+    
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,6 +30,11 @@ export default function LoginPage() {
     } catch (error: any) {
       alert("Login Failed: " + error.message);
     }
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    setShowPopup(false);
   };
 
   return (
@@ -44,6 +61,40 @@ export default function LoginPage() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
         </Link>
+      </div>
+
+      {/* Top Right Google-Style Profile Icon & Popup Menu */}
+      <div className="absolute top-6 right-6 z-50">
+        {user ? (
+          <div className="relative">
+            
+            <button
+              onClick={() => setShowPopup(!showPopup)}
+              className="w-11 h-11 rounded-full bg-emerald-500 hover:bg-emerald-400 flex items-center justify-center text-white font-bold text-lg shadow-xl shadow-emerald-500/20 border-2 border-white/20 transition-all cursor-pointer focus:outline-none"
+            >
+              {user.email ? user.email.charAt(0).toUpperCase() : "B"}
+            </button>
+
+            {showPopup && (
+              <div className="absolute right-0 mt-3 w-72 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-4 text-center text-white backdrop-blur-md">
+                <div className="w-14 h-14 mx-auto rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-2xl mb-2 shadow-md">
+                  {user.email ? user.email.charAt(0).toUpperCase() : "B"}
+                </div>
+                <p className="text-sm font-semibold truncate text-slate-200">{user.email}</p>
+                <p className="text-xs text-slate-400 mt-1">IndiePulse Account</p>
+                
+                <hr className="my-3 border-slate-700" />
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-lg transition text-sm font-medium cursor-pointer"
+                >
+                  Sign Out / Logout
+                </button>
+              </div>
+            )}
+          </div>
+        ) : null}
       </div>
 
       {/* Login Card Container */}
