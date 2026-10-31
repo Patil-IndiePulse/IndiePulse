@@ -16,6 +16,7 @@ export default function LoginPage() {
   const [savedAccounts, setSavedAccounts] = useState<any[]>([]);
   const [showSwitchModal, setShowSwitchModal] = useState(false);
   const [showManageModal, setShowManageModal] = useState(false);
+  const [selectedAccountForDetail, setSelectedAccountForDetail] = useState<any>(null);
 
   useEffect(() => {
     // Load saved accounts from localStorage
@@ -80,6 +81,7 @@ export default function LoginPage() {
     setShowPopup(false);
     setShowSwitchModal(false);
     setShowManageModal(false);
+    setSelectedAccountForDetail(null);
   };
 
   const handleSwitchAccount = (accEmail: string) => {
@@ -88,18 +90,19 @@ export default function LoginPage() {
     setShowPopup(false);
   };
 
-  // Remove specific account from local storage list
+  // Remove specific account from local storage (Google Style)
   const handleRemoveAccount = (accEmail: string) => {
     const updatedAccounts = savedAccounts.filter((acc) => acc.email !== accEmail);
     setSavedAccounts(updatedAccounts);
     localStorage.setItem('indiepulse_accounts', JSON.stringify(updatedAccounts));
-    alert(`Removed ${accEmail} from saved accounts.`);
+    setSelectedAccountForDetail(null); // Go back to list view
+    alert(`Account removed: ${accEmail}`);
   };
 
   return (
     <main className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
       
-      {/* Background Glow & Design Elements */}
+      {/* Background Glow */}
       <div className="absolute top-10 left-10 w-72 h-72 bg-indigo-500/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute bottom-10 right-10 w-72 h-72 bg-blue-500/20 rounded-full blur-[120px] pointer-events-none"></div>
 
@@ -122,7 +125,7 @@ export default function LoginPage() {
         </Link>
       </div>
 
-      {/* Top Right Profile Icon & Advanced Popup Menu */}
+      {/* Top Right Profile Icon & Popup Menu */}
       <div className="absolute top-6 right-6 z-50">
         {user ? (
           <div className="relative">
@@ -131,6 +134,7 @@ export default function LoginPage() {
                 setShowPopup(!showPopup);
                 setShowSwitchModal(false);
                 setShowManageModal(false);
+                setSelectedAccountForDetail(null);
               }}
               className="w-11 h-11 rounded-full bg-emerald-500 hover:bg-emerald-400 flex items-center justify-center text-white font-bold text-lg shadow-xl shadow-emerald-500/20 border-2 border-white/20 transition-all cursor-pointer focus:outline-none"
             >
@@ -138,7 +142,7 @@ export default function LoginPage() {
             </button>
 
             {/* Main Popup Menu */}
-            {showPopup && !showSwitchModal && !showManageModal && (
+            {showPopup && !showSwitchModal && !showManageModal && !selectedAccountForDetail && (
               <div className="absolute right-0 mt-3 w-80 bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl p-5 text-white backdrop-blur-md z-50">
                 
                 <div className="text-center pb-4 border-b border-slate-800">
@@ -249,8 +253,8 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Manage Accounts Modal */}
-            {showPopup && showManageModal && (
+            {/* Manage Accounts List Modal (Google Style Step 1) */}
+            {showPopup && showManageModal && !selectedAccountForDetail && (
               <div className="absolute right-0 mt-3 w-80 bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl p-5 text-white backdrop-blur-md z-50">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
                   <h3 className="text-sm font-bold">Manage Saved Accounts</h3>
@@ -262,38 +266,60 @@ export default function LoginPage() {
                   </button>
                 </div>
 
-                <p className="text-[11px] text-slate-400 mb-3">Remove accounts you no longer want saved on this device.</p>
+                <p className="text-[11px] text-slate-400 mb-3">Click on an account to manage or remove it from this device[span_15](start_span)[span_15](end_span)[span_16](start_span)[span_16](end_span).</p>
 
                 <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
                   {savedAccounts.length > 0 ? (
                     savedAccounts.map((acc, index) => (
                       <div 
                         key={index}
-                        className="p-2.5 rounded-xl border bg-slate-800/50 border-slate-800 flex items-center justify-between gap-2"
+                        onClick={() => setSelectedAccountForDetail(acc)}
+                        className="p-3 rounded-xl border bg-slate-800/50 border-slate-800 hover:bg-slate-800 flex items-center gap-3 cursor-pointer transition"
                       >
-                        <div className="flex items-center gap-2.5 overflow-hidden">
-                          <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-xs shrink-0">
-                            {acc.email.charAt(0).toUpperCase()}
-                          </div>
-                          <div className="overflow-hidden">
-                            <p className="text-xs font-semibold truncate">{acc.name}</p>
-                            <p className="text-[10px] text-slate-400 truncate">{acc.email}</p>
-                          </div>
+                        <div className="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-sm shrink-0">
+                          {acc.email.charAt(0).toUpperCase()}
                         </div>
-
-                        <button 
-                          onClick={() => handleRemoveAccount(acc.email)}
-                          className="px-2.5 py-1 bg-pink-600/20 hover:bg-pink-600 text-pink-400 hover:text-white rounded-lg text-xs font-medium transition cursor-pointer shrink-0"
-                        >
-                          Remove
-                        </button>
+                        <div className="overflow-hidden">
+                          <p className="text-xs font-semibold truncate">{acc.name}</p>
+                          <p className="text-[11px] text-slate-400 truncate">{acc.email}</p>
+                        </div>
                       </div>
                     ))
                   ) : (
                     <p className="text-xs text-slate-400 text-center py-4">No accounts saved to manage.</p>
                   )}
                 </div>
+              </div>
+            )}
 
+            {/* Individual Account Detail & Remove View (Google Style Step 2 - like your screenshot) */}
+            {showPopup && showManageModal && selectedAccountForDetail && (
+              <div className="absolute right-0 mt-3 w-80 bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl p-6 text-white backdrop-blur-md z-50 text-center">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                  <button 
+                    onClick={() => setSelectedAccountForDetail(null)}
+                    className="text-xs text-indigo-400 hover:underline cursor-pointer flex items-center gap-1"
+                  >
+                    &larr; Back
+                  </button>
+                  <h3 className="text-xs font-bold text-slate-400">Account Details</h3>
+                </div>
+
+                {/* Big Profile Avatar */}
+                <div className="w-16 h-16 mx-auto rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-2xl mb-3 shadow-lg">
+                  {selectedAccountForDetail.email.charAt(0).toUpperCase()}
+                </div>
+
+                <p className="text-sm font-bold text-white truncate">{selectedAccountForDetail.name}</p>
+                <p className="text-xs text-slate-400 truncate mb-6">{selectedAccountForDetail.email}</p>
+
+                {/* Google Style Remove Account Button */}
+                <button 
+                  onClick={() => handleRemoveAccount(selectedAccountForDetail.email)}
+                  className="w-full py-3 bg-pink-600 hover:bg-pink-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-pink-600/30 transition cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <span>🗑️</span> Remove account[span_17](start_span)[span_17](end_span)[span_18](start_span)[span_18](end_span)
+                </button>
               </div>
             )}
 
