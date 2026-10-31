@@ -1,8 +1,61 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
+import { auth } from "@/app/firebase";
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithPopup, 
+  GoogleAuthProvider, 
+  OAuthProvider, 
+  updateProfile 
+} from "firebase/auth";
 
 export default function SignupPage() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  // 1. Email & Password Signup Handler
+  const handleEmailSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // Update user display name
+      if (auth.currentUser) {
+        await updateProfile(auth.currentUser, { displayName: name });
+      }
+      alert(`Account created successfully for: ${userCredential.user.email}`);
+      window.location.href = "/login";
+    } catch (error: any) {
+      alert("Signup Failed: " + error.message);
+    }
+  };
+
+  // 2. Google Signup Handler
+  const handleGoogleSignup = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      alert(`Successfully signed up with Google: ${result.user.email}`);
+      window.location.href = "/login";
+    } catch (error: any) {
+      alert("Google Signup Failed: " + error.message);
+    }
+  };
+
+  // 3. Apple Signup Handler
+  const handleAppleSignup = async () => {
+    const provider = new OAuthProvider('apple.com');
+    try {
+      const result = await signInWithPopup(auth, provider);
+      alert(`Successfully signed up with Apple: ${result.user.email}`);
+      window.location.href = "/login";
+    } catch (error: any) {
+      alert("Apple Signup Failed: " + error.message);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-4">
       <div className="bg-slate-900 border border-slate-800 p-8 rounded-2xl max-w-md w-full shadow-2xl">
@@ -11,7 +64,10 @@ export default function SignupPage() {
         
         {/* Social Login Buttons */}
         <div className="space-y-3 mb-6">
-          <button className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-3 cursor-pointer">
+          <button 
+            onClick={handleGoogleSignup}
+            className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-3 cursor-pointer"
+          >
             {/* Google SVG Logo */}
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
@@ -34,7 +90,10 @@ export default function SignupPage() {
             Sign up with Google
           </button>
           
-          <button className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-3 cursor-pointer">
+          <button 
+            onClick={handleAppleSignup}
+            className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-3 cursor-pointer"
+          >
             <span>🍎</span> Sign up with Apple
           </button>
         </div>
@@ -47,12 +106,15 @@ export default function SignupPage() {
         </div>
 
         {/* Regular Signup Form */}
-        <div className="space-y-4">
+        <form onSubmit={handleEmailSignup} className="space-y-4">
           <div>
             <label className="block text-xs font-medium text-slate-400 mb-1">Full Name</label>
             <input 
               type="text" 
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               placeholder="Enter your name" 
+              required
               className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white outline-none focus:border-indigo-500 transition-all"
             />
           </div>
@@ -61,7 +123,10 @@ export default function SignupPage() {
             <label className="block text-xs font-medium text-slate-400 mb-1">Email Address</label>
             <input 
               type="email" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email" 
+              required
               className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white outline-none focus:border-indigo-500 transition-all"
             />
           </div>
@@ -70,15 +135,21 @@ export default function SignupPage() {
             <label className="block text-xs font-medium text-slate-400 mb-1">Password</label>
             <input 
               type="password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Create a strong password" 
+              required
               className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white outline-none focus:border-indigo-500 transition-all"
             />
           </div>
           
-          <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-all shadow-lg shadow-blue-600/20 cursor-pointer mt-2">
+          <button 
+            type="submit"
+            className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-all shadow-lg shadow-blue-600/20 cursor-pointer mt-2"
+          >
             Create account
           </button>
-        </div>
+        </form>
 
         {/* Login Link */}
         <div className="mt-6 text-center text-sm text-slate-400">
