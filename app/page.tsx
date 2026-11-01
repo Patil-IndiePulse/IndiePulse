@@ -1,11 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { auth } from "@/app/firebase";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 export default function Home() {
   const router = useRouter();
+  const [user, setUser] = useState<any>(null);
   const [feedback, setFeedback] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -16,12 +19,41 @@ export default function Home() {
   // Menu drawer state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Lock Popup States
+  const [showLockPopup, setShowLockPopup] = useState(false);
+  const [lockedFeatureName, setLockedFeatureName] = useState('');
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
   const mockSearchResults = [
     { id: '1', title: 'Cyber Nexus // RPG', type: 'Game', link: '/play/1' },
     { id: '2', title: 'Neon Protocol Zero', type: 'Game', link: '/play/2' },
     { id: '3', title: 'Quantum Runner 3D', type: 'Game', link: '/play/3' },
     { id: 'Bharat Patil (Founder)', title: 'Bharat Patil (Founder)', type: 'Creator', link: '/profile' },
   ].filter(item => item.title.toLowerCase().includes(searchQuery.toLowerCase()));
+
+  // 5 Main Protected Menu Options
+  const menuOptions = [
+    { name: 'Discover Games & Projects', href: '/discover' },
+    { name: 'Community Feed', href: '/community' },
+    { name: 'Leaderboard & Rankings', href: '/leaderboard' },
+    { name: 'Quests & Rewards', href: '/quests' },
+    { name: 'My Profile', href: '/profile' },
+  ];
+
+  const handleProtectedClick = (e: React.MouseEvent, optionName: string) => {
+    if (!user) {
+      e.preventDefault(); // Stop navigation if not logged in
+      setLockedFeatureName(optionName);
+      setShowLockPopup(true);
+      setIsMenuOpen(false); // Close menu drawer to show popup clearly
+    }
+  };
 
   const handleFeedbackSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,48 +96,76 @@ export default function Home() {
             {isMenuOpen && (
               <div className="absolute top-full left-0 mt-3 w-72 bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-3.5 shadow-2xl z-50">
                 
-                {/* Login & Get Started Buttons */}
+                {/* Login & Get Started Buttons or Sign Out if logged in */}
                 <div className="flex gap-2 w-full mb-1">
-                  <Link 
-                    href="/login"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="flex-1 py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 text-center rounded-xl text-xs font-bold text-white border border-pink-400/40 shadow"
-                  >
-                    Login
-                  </Link>
-                  <Link 
-                    href="/signup"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="flex-1 py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 text-center rounded-xl text-xs font-bold text-white border border-pink-400/40 shadow"
-                  >
-                    Get Started
-                  </Link>
+                  {!user ? (
+                    <>
+                      <Link 
+                        href="/login"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="flex-1 py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 text-center rounded-xl text-xs font-bold text-white border border-pink-400/40 shadow"
+                      >
+                        Login
+                      </Link>
+                      <Link 
+                        href="/signup"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="flex-1 py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 text-center rounded-xl text-xs font-bold text-white border border-pink-400/40 shadow"
+                      >
+                        Get Started
+                      </Link>
+                    </>
+                  ) : (
+                    <button 
+                      onClick={() => {
+                        signOut(auth);
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full py-2.5 bg-pink-600 hover:bg-pink-500 text-center rounded-xl text-xs font-bold text-white border border-pink-400/40 shadow cursor-pointer"
+                    >
+                      Sign Out
+                    </button>
+                  )}
                 </div>
 
                 <div className="text-[10px] uppercase tracking-widest text-pink-400 font-bold px-1 mt-1">Navigation & Control</div>
                 
-                <a href="/discover" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-3 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 flex items-center justify-between">
-                  <span>🧭 Discover Games & Projects</span> <span>→</span>
-                </a>
+                {menuOptions.map((opt, idx) => {
+                  const isLocked = !user;
+                  return (
+                    <a
+                      key={idx}
+                      href={opt.href}
+                      onClick={(e) => handleProtectedClick(e, opt.name)}
+                      className={`px-3.5 py-3 border rounded-xl text-xs font-medium flex items-center justify-between transition ${
+                        isLocked 
+                          ? 'bg-slate-900/60 border-slate-800 text-slate-400' 
+                          : 'bg-slate-900/90 border-slate-700 text-slate-200 hover:text-white'
+                      }`}
+                    >
+                      <span>
+                        {opt.name === 'Discover Games & Projects' && '🧭 '}
+                        {opt.name === 'Community Feed' && '💬 '}
+                        {opt.name === 'Leaderboard & Rankings' && '🏆 '}
+                        {opt.name === 'Quests & Rewards' && '⚡ '}
+                        {opt.name === 'My Profile' && '👤 '}
+                        {opt.name}
+                      </span>
+                      {isLocked ? (
+                        <span className="text-sm" title="Locked - Please Login">🔐</span>
+                      ) : (
+                        <span className="text-pink-400">→</span>
+                      )}
+                    </a>
+                  );
+                })}
 
-                <a href="/community" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-3 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 flex items-center justify-between">
-                  <span>💬 Community Feed</span> <span>→</span>
-                </a>
-
-                <a href="/leaderboard" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-3 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 flex items-center justify-between">
-                  <span>🏆 Leaderboard & Rankings</span> <span>→</span>
-                </a>
-
-                <a href="/quests" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-3 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 flex items-center justify-between">
-                  <span>⚡ Quests & Rewards</span> <span>→</span>
-                </a>
-
-                <a href="/profile" onClick={() => setIsMenuOpen(false)} className="px-3.5 py-3 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 flex items-center justify-between">
-                  <span>👤 My Profile</span> <span>→</span>
-                </a>
-
-                <a href="/menu" onClick={() => setIsMenuOpen(false)} className="mt-1 px-3.5 py-3 bg-gradient-to-r from-pink-600/30 to-purple-600/30 border border-pink-500/50 rounded-xl text-xs font-bold text-pink-300 flex items-center justify-between">
-                  <span>⚙️ Settings and Activity</span> <span>→</span>
+                <a 
+                  href="/menu" 
+                  onClick={(e) => handleProtectedClick(e, 'Settings and Activity')} 
+                  className="mt-1 px-3.5 py-3 bg-gradient-to-r from-pink-600/30 to-purple-600/30 border border-pink-500/50 rounded-xl text-xs font-bold text-pink-300 flex items-center justify-between"
+                >
+                  <span>⚙️ Settings and Activity</span> <span>{!user ? '🔐' : '→'}</span>
                 </a>
               </div>
             )}
@@ -164,10 +224,8 @@ export default function Home() {
       {/* Hero Section */}
       <div className="flex-1 px-5 py-8 max-w-6xl mx-auto w-full flex flex-col relative z-10">
         
-        {/* Top Header Row: Classic Pink-Themed User Avatar DP on Left & Google-Style Color Mixed IndiePulse Logo on Right */}
+        {/* Top Header Row */}
         <div className="w-full flex items-center justify-between mb-8 px-1">
-          
-          {/* Classic Round User Avatar DP with Pink/Purple Theme Match */}
           <Link href="/profile" className="relative group cursor-pointer" aria-label="User Profile">
             <div className="w-16 h-16 rounded-full p-[2.5px] bg-gradient-to-tr from-pink-500 via-purple-500 to-pink-400 shadow-[0_0_20px_rgba(236,72,153,0.6)] transition-transform group-hover:scale-105">
               <div className="w-full h-full rounded-full bg-[#111827] overflow-hidden flex items-center justify-center border-2 border-[#030014]">
@@ -178,7 +236,6 @@ export default function Home() {
             </div>
           </Link>
 
-          {/* Google-Style Color Mixed IndiePulse Branding Logo */}
           <div className="flex flex-col items-end cursor-pointer group">
             <div className="text-3xl md:text-4xl font-black tracking-wider font-sans bg-gradient-to-r from-blue-400 via-pink-500 to-yellow-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(236,72,153,0.6)]">
               IndiePulse
@@ -190,7 +247,6 @@ export default function Home() {
               </svg>
             </div>
           </div>
-
         </div>
 
         <div className="flex flex-col items-center justify-center text-center max-w-4xl mx-auto pt-4 pb-6">
@@ -219,7 +275,7 @@ export default function Home() {
             
             <Link 
               href="/community"
-              className="w-full sm:w-auto px-7 py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl text-sm font-bold shadow-[0_0_25px_rgba(216,72,236,0.5)] transition-all inline-flex items-center justify-center gap-2 cursor-pointer border border-pink-400/50"
+              className="w-full sm:w-auto px-7 py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-purple-500 text-white rounded-xl text-sm font-bold shadow-[0_0_25px_rgba(216,72,236,0.5)] transition-all inline-flex items-center justify-center gap-2 cursor-pointer border border-pink-400/50"
             >
               <span>+</span> CREATE POST
             </Link>
@@ -229,7 +285,6 @@ export default function Home() {
             <a href="/community" className="w-full sm:w-auto px-6 py-3.5 bg-slate-900/90 hover:bg-slate-800 text-pink-300 font-semibold rounded-xl border border-pink-500/40 shadow-[0_0_15px_rgba(236,72,153,0.25)] transition-all text-center">
               Explore Community Feed
             </a>
-            {/* Chat Button linked directly to /chat folder */}
             <Link 
               href="/chat"
               className="w-full sm:w-auto px-6 py-3.5 bg-slate-900/90 hover:bg-slate-800 text-emerald-400 font-semibold rounded-xl border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.25)] transition-all text-center cursor-pointer flex items-center justify-center gap-2 mx-auto"
@@ -247,23 +302,13 @@ export default function Home() {
             <span className="text-xs font-bold px-3 py-1 bg-pink-500/20 text-pink-300 rounded-md uppercase tracking-wider border border-pink-500/30 shadow-[0_0_12px_rgba(236,72,153,0.3)]">Live & Hot</span>
             <h2 className="text-2xl font-bold mt-2.5 text-white">Trending Indie Games</h2>
           </div>
-          <div className="flex gap-2.5">
-            <button className="w-10 h-10 rounded-xl bg-slate-900 border border-pink-500/30 flex items-center justify-center text-pink-400 hover:text-white transition-all cursor-pointer shadow-[0_0_12px_rgba(236,72,153,0.3)]">
-              ←
-            </button>
-            <button className="w-10 h-10 rounded-xl bg-slate-900 border border-pink-500/30 flex items-center justify-center text-pink-400 hover:text-white transition-all cursor-pointer shadow-[0_0_12px_rgba(236,72,153,0.3)]">
-              →
-            </button>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-slate-900/90 border border-pink-500/35 rounded-2xl overflow-hidden hover:border-pink-400 transition-all group shadow-[0_0_25px_rgba(236,72,153,0.25)]">
             <div className="h-44 bg-gradient-to-br from-pink-950 via-purple-950 to-slate-950 flex items-center justify-center relative overflow-hidden">
               <span className="text-5xl group-hover:scale-110 transition-transform duration-300">🎮</span>
-              <span className="absolute top-3.5 right-3.5 px-2.5 py-1 bg-black/70 backdrop-blur-md text-[11px] text-pink-300 rounded-lg font-semibold border border-pink-500/40">
-                WebGL
-              </span>
+              <span className="absolute top-3.5 right-3.5 px-2.5 py-1 bg-black/70 backdrop-blur-md text-[11px] text-pink-300 rounded-lg font-semibold border border-pink-500/40">WebGL</span>
             </div>
             <div className="p-6">
               <div className="text-[11px] text-pink-400 uppercase font-bold mb-1.5 tracking-wide">Cyberpunk / Action</div>
@@ -271,7 +316,7 @@ export default function Home() {
               <p className="text-xs text-slate-300 mb-5 line-clamp-2 leading-relaxed">An immersive cyberpunk role-playing adventure uploaded by an indie developer.</p>
               <div className="flex items-center justify-between pt-4 border-t border-slate-800">
                 <span className="text-xs text-slate-300 font-semibold">🔥 1.2k Plays</span>
-                <Link href="/play/1" className="px-3.5 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-[0_0_15px_rgba(236,72,153,0.5)] border border-pink-400/40">
+                <Link href="/play/1" className="px-3.5 py-2 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-[0_0_15px_rgba(236,72,153,0.5)] border border-pink-400/40">
                   Play Game Now ⚡
                 </Link>
               </div>
@@ -281,9 +326,7 @@ export default function Home() {
           <div className="bg-slate-900/90 border border-pink-500/35 rounded-2xl overflow-hidden hover:border-pink-400 transition-all group shadow-[0_0_25px_rgba(236,72,153,0.25)]">
             <div className="h-44 bg-gradient-to-br from-purple-950 via-pink-950 to-slate-950 flex items-center justify-center relative overflow-hidden">
               <span className="text-5xl group-hover:scale-110 transition-transform duration-300">🧩</span>
-              <span className="absolute top-3.5 right-3.5 px-2.5 py-1 bg-black/70 backdrop-blur-md text-[11px] text-purple-300 rounded-lg font-semibold border border-purple-500/40">
-                Puzzle
-              </span>
+              <span className="absolute top-3.5 right-3.5 px-2.5 py-1 bg-black/70 backdrop-blur-md text-[11px] text-purple-300 rounded-lg font-semibold border border-purple-500/40">Puzzle</span>
             </div>
             <div className="p-6">
               <div className="text-[11px] text-purple-400 uppercase font-bold mb-1.5 tracking-wide">Strategy / Grid</div>
@@ -291,7 +334,7 @@ export default function Home() {
               <p className="text-xs text-slate-300 mb-5 line-clamp-2 leading-relaxed">A tactical grid-based strategy simulation test built on indie engine.</p>
               <div className="flex items-center justify-between pt-4 border-t border-slate-800">
                 <span className="text-xs text-slate-300 font-semibold">🔥 850 Plays</span>
-                <Link href="/play/2" className="px-3.5 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-[0_0_15px_rgba(236,72,153,0.5)] border border-pink-400/40">
+                <Link href="/play/2" className="px-3.5 py-2 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-[0_0_15px_rgba(236,72,153,0.5)] border border-pink-400/40">
                   Play Game Now ⚡
                 </Link>
               </div>
@@ -301,9 +344,7 @@ export default function Home() {
           <div className="bg-slate-900/90 border border-pink-500/35 rounded-2xl overflow-hidden hover:border-pink-400 transition-all group shadow-[0_0_25px_rgba(236,72,153,0.25)]">
             <div className="h-44 bg-gradient-to-br from-indigo-950 via-pink-950 to-slate-950 flex items-center justify-center relative overflow-hidden">
               <span className="text-5xl group-hover:scale-110 transition-transform duration-300">🚀</span>
-              <span className="absolute top-3.5 right-3.5 px-2.5 py-1 bg-black/70 backdrop-blur-md text-[11px] text-indigo-300 rounded-lg font-semibold border border-pink-500/40">
-                Arcade
-              </span>
+              <span className="absolute top-3.5 right-3.5 px-2.5 py-1 bg-black/70 backdrop-blur-md text-[11px] text-indigo-300 rounded-lg font-semibold border border-pink-500/40">Arcade</span>
             </div>
             <div className="p-6">
               <div className="text-[11px] text-indigo-400 uppercase font-bold mb-1.5 tracking-wide">Arcade / Runner</div>
@@ -311,63 +352,13 @@ export default function Home() {
               <p className="text-xs text-slate-300 mb-5 line-clamp-2 leading-relaxed">Fast-paced futuristic endless runner game featuring neon obstacles.</p>
               <div className="flex items-center justify-between pt-4 border-t border-slate-800">
                 <span className="text-xs text-slate-300 font-semibold">🔥 3.4k Plays</span>
-                <Link href="/play/3" className="px-3.5 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-[0_0_15px_rgba(236,72,153,0.5)] border border-pink-400/40">
+                <Link href="/play/3" className="px-3.5 py-2 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-[0_0_15px_rgba(236,72,153,0.5)] border border-pink-400/40">
                   Play Game Now ⚡
                 </Link>
               </div>
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Core Drives Section */}
-      <section className="px-5 py-12 max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
-        <Link 
-          href="/development" 
-          className="block bg-slate-900/90 border border-pink-500/35 p-7 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_25px_rgba(236,72,153,0.2)]"
-        >
-          <span className="text-xs font-bold px-3 py-1 bg-pink-500/20 text-pink-300 rounded-lg border border-pink-500/30">Core Drive 2</span>
-          <h3 className="text-xl font-bold mt-5 mb-3 text-white">Development & Accomplishment</h3>
-          <p className="text-sm text-slate-300 leading-relaxed">Earn points by uploading game builds, completing milestones, and reviewing indie projects.</p>
-        </Link>
-
-        <Link 
-          href="/social-influence" 
-          className="block bg-slate-900/90 border border-pink-500/35 p-7 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_25px_rgba(236,72,153,0.2)]"
-        >
-          <span className="text-xs font-bold px-3 py-1 bg-purple-500/20 text-purple-300 rounded-lg border border-pink-500/30">Core Drive 5</span>
-          <h3 className="text-xl font-bold mt-5 mb-3 text-white">Social Influence & Peer Praise</h3>
-          <p className="text-sm text-slate-300 leading-relaxed">Gain badges, unlock special creator status, and receive peer validation from global gamers.</p>
-        </Link>
-        
-        <Link 
-          href="/curiosity" 
-          className="block bg-slate-900/90 border border-pink-500/35 p-7 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_25px_rgba(236,72,153,0.2)]"
-        >
-          <span className="text-xs font-bold px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-lg border border-pink-500/30">Core Drive 7</span>
-          <h3 className="text-xl font-bold mt-5 mb-3 text-white">Unpredictability & Curiosity</h3>
-          <p className="text-sm text-slate-300 leading-relaxed">Unlock secret community drops, mystery game tests, and surprise rewards as you level up.</p>
-        </Link>
-
-        <Link 
-          href="/community/feed" 
-          className="block bg-slate-900/90 border border-pink-500/35 p-7 rounded-2xl hover:border-pink-400 transition-all cursor-pointer md:col-span-3 shadow-[0_0_25px_rgba(236,72,153,0.2)]"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold px-3 py-1 bg-pink-500/20 text-pink-300 rounded-lg border border-pink-500/30">Live Feed</span>
-            <span className="text-[11px] px-2.5 py-1 bg-slate-800 text-pink-300 rounded-lg">DevLog #4</span>
-          </div>
-          <h3 className="text-xl font-bold mb-3 flex items-center gap-2.5 text-white">
-            <span>💬</span> Live Community Feed
-          </h3>
-          <p className="text-sm text-slate-300 mb-5 line-clamp-2 leading-relaxed">
-            "Just integrated dynamic lighting and shadow effects into our cyberpunk indie RPG! Check out the early alpha..."
-          </p>
-          <div className="flex items-center justify-between text-xs text-pink-400 font-bold pt-3.5 border-t border-slate-800">
-            <span>❤️ 42 Likes • 12 Comments</span>
-            <span>Join Discussion →</span>
-          </div>
-        </Link>
       </section>
 
       {/* Founder's Note Section */}
@@ -408,6 +399,42 @@ export default function Home() {
           )}
         </div>
       </section>
+
+      {/* Lock Warning Popup Modal */}
+      {showLockPopup && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-pink-500/50 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="w-16 h-16 bg-pink-600/20 border border-pink-500/30 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-[0_0_20px_rgba(236,72,153,0.4)]">
+              🔐
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">Authentication Required</h3>
+            <p className="text-xs text-slate-300 mb-6 leading-relaxed">
+              Please sign-up or login to access <span className="text-pink-400 font-semibold">"{lockedFeatureName}"</span> and explore IndiePulse!
+            </p>
+
+            <div className="flex flex-col gap-2.5">
+              <Link 
+                href="/login" 
+                className="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 rounded-xl text-xs font-bold transition text-white shadow-lg shadow-pink-600/30 border border-pink-400/40 cursor-pointer"
+              >
+                Login Now
+              </Link>
+              <Link 
+                href="/signup" 
+                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl text-xs font-bold transition text-white shadow-lg shadow-purple-600/30 border border-pink-400/40 cursor-pointer"
+              >
+                Create Account (Sign Up)
+              </Link>
+              <button 
+                onClick={() => setShowLockPopup(false)}
+                className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-white mt-1 cursor-pointer"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="w-full border-t border-pink-500/20 bg-[#030014] py-8 px-6 mt-auto relative z-10 text-xs text-slate-400">
