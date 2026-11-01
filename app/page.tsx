@@ -96,38 +96,39 @@ export default function Home() {
             {isMenuOpen && (
               <div className="absolute top-full left-0 mt-3 w-72 bg-[#070514] border border-pink-500/40 rounded-2xl p-4 flex flex-col gap-3.5 shadow-2xl z-50">
                 
-                {/* Dynamic Auth Header inside Menu Drawer */}
-                <div className="flex items-center justify-between gap-1 w-full mb-1 bg-slate-900/90 border border-slate-800 p-2 rounded-xl">
+                {/* Dynamic Auth Header inside Menu Drawer - All 3 Buttons in One Line */}
+                <div className="flex items-center justify-between gap-1.5 w-full mb-1 bg-slate-900/90 border border-slate-800 p-2 rounded-xl">
                   {!user ? (
                     <div className="flex gap-2 w-full">
                       <Link 
                         href="/login"
                         onClick={() => setIsMenuOpen(false)}
-                        className="flex-1 py-2 bg-gradient-to-r from-pink-600 to-purple-600 text-center rounded-lg text-xs font-bold text-white border border-pink-400/40 shadow"
+                        className="flex-1 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 text-center rounded-lg text-[11px] font-bold text-white border border-pink-400/40 shadow"
                       >
                         Login
                       </Link>
                       <Link 
                         href="/signup"
                         onClick={() => setIsMenuOpen(false)}
-                        className="flex-1 py-2 bg-gradient-to-r from-pink-600 to-purple-600 text-center rounded-lg text-xs font-bold text-white border border-pink-400/40 shadow"
+                        className="flex-1 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 text-center rounded-lg text-[11px] font-bold text-white border border-pink-400/40 shadow"
                       >
                         Get Started
                       </Link>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between w-full px-1 py-1 gap-2">
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-slate-200">
-                        <span className="text-emerald-400 text-sm">Login ✓</span>
-                        <span className="text-slate-500">|</span>
-                        <span className="text-emerald-400 text-sm">Get Started ✓</span>
+                    <div className="flex items-center justify-between w-full gap-1">
+                      <div className="px-2 py-1 bg-pink-600/20 border border-pink-500/40 rounded-lg text-[10px] font-bold text-pink-300 flex items-center gap-1 shadow">
+                        Login <span className="text-emerald-400">✓</span>
+                      </div>
+                      <div className="px-2 py-1 bg-pink-600/20 border border-pink-500/40 rounded-lg text-[10px] font-bold text-pink-300 flex items-center gap-1 shadow">
+                        Get Started <span className="text-emerald-400">✓</span>
                       </div>
                       <button 
                         onClick={() => {
                           signOut(auth);
                           setIsMenuOpen(false);
                         }}
-                        className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-center rounded-lg text-xs font-bold text-white shadow cursor-pointer transition"
+                        className="px-2.5 py-1 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-center rounded-lg text-[10px] font-bold text-white border border-pink-400/40 shadow cursor-pointer transition"
                       >
                         Sign Out
                       </button>
@@ -428,7 +429,7 @@ export default function Home() {
               </Link>
               <Link 
                 href="/signup" 
-                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-purple-500 rounded-xl text-xs font-bold transition text-white shadow-lg shadow-purple-600/30 border border-pink-400/40 cursor-pointer"
+                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl text-xs font-bold transition text-white shadow-lg shadow-purple-600/30 border border-pink-400/40 cursor-pointer"
               >
                 Create Account (Sign Up)
               </Link>
