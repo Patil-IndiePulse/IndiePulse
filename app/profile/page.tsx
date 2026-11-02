@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function ProfilePage() {
@@ -14,12 +14,27 @@ export default function ProfilePage() {
 
   const availableGenres = ['Action', 'RPG', 'Puzzle', 'Strategy', 'Sci-Fi', 'Adventure', 'Horror'];
 
+  // Load saved profile data from localStorage when page opens
+  useEffect(() => {
+    const savedName = localStorage.getItem('indiePulse_name');
+    const savedBio = localStorage.getItem('indiePulse_bio');
+    const savedPic = localStorage.getItem('indiePulse_pic');
+    const savedGenres = localStorage.getItem('indiePulse_genres');
+
+    if (savedName) setName(savedName);
+    if (savedBio) setBio(savedBio);
+    if (savedPic) setProfilePic(savedPic);
+    if (savedGenres) setSelectedGenres(JSON.parse(savedGenres));
+  }, []);
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const reader = new FileReader();
       reader.onload = (uploadEvent) => {
         if (uploadEvent.target?.result) {
-          setProfilePic(uploadEvent.target.result as string);
+          const base64Img = uploadEvent.target.result as string;
+          setProfilePic(base64Img);
+          localStorage.setItem('indiePulse_pic', base64Img); // Save instantly
         }
       };
       reader.readAsDataURL(e.target.files[0]);
@@ -27,11 +42,25 @@ export default function ProfilePage() {
   };
 
   const toggleGenre = (genre: string) => {
+    let updatedGenres;
     if (selectedGenres.includes(genre)) {
-      setSelectedGenres(selectedGenres.filter((g) => g !== genre));
+      updatedGenres = selectedGenres.filter((g) => g !== genre);
     } else {
-      setSelectedGenres([...selectedGenres, genre]);
+      updatedGenres = [...selectedGenres, genre];
     }
+    setSelectedGenres(updatedGenres);
+    localStorage.setItem('indiePulse_genres', JSON.stringify(updatedGenres));
+  };
+
+  const handleSaveProfile = () => {
+    if (isEditing) {
+      // Save all data to localStorage when clicking "Save Profile"
+      localStorage.setItem('indiePulse_name', name);
+      localStorage.setItem('indiePulse_bio', bio);
+      if (profilePic) localStorage.setItem('indiePulse_pic', profilePic);
+      localStorage.setItem('indiePulse_genres', JSON.stringify(selectedGenres));
+    }
+    setIsEditing(!isEditing);
   };
 
   return (
@@ -94,7 +123,7 @@ export default function ProfilePage() {
 
             {/* Edit / Save Profile Toggle Button */}
             <button
-              onClick={() => setIsEditing(!isEditing)}
+              onClick={handleSaveProfile}
               className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors"
             >
               {isEditing ? 'Save Profile' : 'Edit Profile'}
