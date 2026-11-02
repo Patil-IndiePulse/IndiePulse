@@ -23,10 +23,20 @@ export default function Home() {
   const [showLockPopup, setShowLockPopup] = useState(false);
   const [lockedFeatureName, setLockedFeatureName] = useState('');
 
+  // Profile Picture State for Homepage
+  const [homeProfilePic, setHomeProfilePic] = useState<string | null>(null);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
+
+    // Load saved profile picture from localStorage on homepage load
+    const savedPic = localStorage.getItem('indiePulse_pic');
+    if (savedPic) {
+      setHomeProfilePic(savedPic);
+    }
+
     return () => unsubscribe();
   }, []);
 
@@ -237,9 +247,13 @@ export default function Home() {
           <Link href="/profile" className="relative group cursor-pointer" aria-label="User Profile">
             <div className="w-16 h-16 rounded-full p-[2.5px] bg-gradient-to-tr from-pink-500 via-purple-500 to-pink-400 shadow-[0_0_20px_rgba(236,72,153,0.6)] transition-transform group-hover:scale-105">
               <div className="w-full h-full rounded-full bg-[#111827] overflow-hidden flex items-center justify-center border-2 border-[#030014]">
-                <svg className="w-9 h-9 text-[#9ca3af] translate-y-1.5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
+                {homeProfilePic ? (
+                  <img src={homeProfilePic} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <svg className="w-9 h-9 text-[#9ca3af] translate-y-1.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                )}
               </div>
             </div>
           </Link>
@@ -429,7 +443,7 @@ export default function Home() {
               </Link>
               <Link 
                 href="/signup" 
-                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl text-xs font-bold transition text-white shadow-lg shadow-purple-600/30 border border-pink-400/40 cursor-pointer"
+                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-purple-500 rounded-xl text-xs font-bold transition text-white shadow-lg shadow-purple-600/30 border border-pink-400/40 cursor-pointer"
               >
                 Create Account (Sign Up)
               </Link>
