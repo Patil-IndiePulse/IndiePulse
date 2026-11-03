@@ -23,8 +23,13 @@ export default function CommunityPage() {
   const currentEmail = user?.email || 'bharatrajupatil5200@gmail.com';
   const currentName = user?.displayName || localStorage.getItem('indiePulse_name') || 'Bharat Patil';
 
+  // Forcefully clear old cached keys and load clean v4 data
   useEffect(() => {
-    const savedPosts = localStorage.getItem('indiePulse_community_posts_v3');
+    localStorage.removeItem('indiePulse_community_posts');
+    localStorage.removeItem('indiePulse_community_posts_v2');
+    localStorage.removeItem('indiePulse_community_posts_v3');
+
+    const savedPosts = localStorage.getItem('indiePulse_community_posts_v4');
     if (savedPosts) {
       try {
         setPosts(JSON.parse(savedPosts));
@@ -57,7 +62,7 @@ export default function CommunityPage() {
         }
       ];
       setPosts(initialPosts);
-      localStorage.setItem('indiePulse_community_posts_v3', JSON.stringify(initialPosts));
+      localStorage.setItem('indiePulse_community_posts_v4', JSON.stringify(initialPosts));
     }
   }, []);
 
@@ -91,7 +96,7 @@ export default function CommunityPage() {
 
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
-    localStorage.setItem('indiePulse_community_posts_v3', JSON.stringify(updatedPosts));
+    localStorage.setItem('indiePulse_community_posts_v4', JSON.stringify(updatedPosts));
 
     setNewPost("");
     setMediaFile(null);
@@ -104,7 +109,7 @@ export default function CommunityPage() {
       post.id === id ? { ...post, likes: post.likes + 1 } : post
     );
     setPosts(updatedPosts);
-    localStorage.setItem('indiePulse_community_posts_v3', JSON.stringify(updatedPosts));
+    localStorage.setItem('indiePulse_community_posts_v4', JSON.stringify(updatedPosts));
   };
 
   return (
