@@ -1,36 +1,76 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { auth } from "@/app/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function CommunityPage() {
-  const [posts, setPosts] = useState([
-    { author: "Rahul (You)", content: "Working on a new indie platform using Next.js and Tailwind CSS! Excited to share soon. 🚀", likes: 24, comments: 5 },
-    { author: "Aarav Dev", content: "Just released an update for Cyber Neon Runner. Check out the new levels! 🎮✨", likes: 42, comments: 12 },
-    { author: "Neha_Gamer", content: "Looking for feedback on my new puzzle game mechanics. Anyone interested in testing? 🧩", likes: 18, comments: 7 }
-  ]);
-
+  const [user, setUser] = useState<any>(null);
+  const [posts, setPosts] = useState<any[]>([]);
   const [newPost, setNewPost] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Load user authentication and name from localStorage
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const currentEmail = user?.email || 'bharatrajupatil5200@gmail.com';
+  const currentName = user?.displayName || localStorage.getItem('indiePulse_name') || 'Bharat Patil';
+
+  // Fetch community posts from localStorage on page load
+  useEffect(() => {
+    const savedPosts = localStorage.getItem('indiePulse_community_posts');
+    if (savedPosts) {
+      try {
+        setPosts(JSON.parse(savedPosts));
+      } catch (e) {
+        setPosts([]);
+      }
+    } else {
+      const initialPosts = [
+        { id: '1', authorName: "Bharat Patil", authorEmail: "bharatrajupatil5200@gmail.com", content: "Working on a new indie platform using Next.js and Tailwind CSS! Excited to share soon. 🚀", likes: 24, comments: 5, time: "Just now" },
+        { id: '2', authorName: "Aarav Dev", authorEmail: "aarav@gmail.com", content: "Just released an update for Cyber Neon Runner. Check out the new levels! 🎮✨", likes: 42, comments: 12, time: "2 hours ago" },
+        { id: '3', authorName: "Neha_Gamer", authorEmail: "neha@gmail.com", content: "Looking for feedback on my new puzzle game mechanics. Anyone interested in testing? 🧩", likes: 18, comments: 7, time: "5 hours ago" }
+      ];
+      setPosts(initialPosts);
+      localStorage.setItem('indiePulse_community_posts', JSON.stringify(initialPosts));
+    }
+  }, []);
 
   const handlePostSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPost.trim()) return;
 
-    setPosts([
-      { author: "Rahul (You)", content: newPost, likes: 1, comments: 0 },
-      ...posts
-    ]);
+    const newPostObj = {
+      id: Date.now().toString(),
+      authorName: currentName,
+      authorEmail: currentEmail,
+      content: newPost,
+      likes: 1,
+      comments: 0,
+      time: "Just now"
+    };
+
+    const updatedPosts = [newPostObj, ...posts];
+    setPosts(updatedPosts);
+    // Permanently save to localStorage so it doesn't disappear on refresh or back navigation
+    localStorage.setItem('indiePulse_community_posts', JSON.stringify(updatedPosts));
+
     setNewPost("");
     setIsModalOpen(false);
   };
 
-  const handleLike = (index: number) => {
-    setPosts(prevPosts => 
-      prevPosts.map((post, i) => 
-        i === index ? { ...post, likes: post.likes + 1 } : post
-      )
+  const handleLike = (id: string) => {
+    const updatedPosts = posts.map((post) => 
+      post.id === id ? { ...post, likes: post.likes + 1 } : post
     );
+    setPosts(updatedPosts);
+    localStorage.setItem('indiePulse_community_posts', JSON.stringify(updatedPosts));
   };
 
   return (
@@ -70,27 +110,33 @@ export default function CommunityPage() {
 
         {/* Posts Feed */}
         <div className="flex flex-col gap-3 mb-2 text-left max-h-[380px] overflow-y-auto pr-1">
-          {posts.map((post, index) => (
-            <div 
-              key={index} 
-              className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 transition-all"
-            >
-              <div className="flex justify-between items-center mb-1">
-                <span className="font-bold text-slate-200 text-sm">{post.author}</span>
-                <span className="text-xs text-slate-400">Just now</span>
+          {posts.map((post) => {
+            // Show "You" on your own posts, and real author name to other users
+            const isMyPost = post.authorEmail === currentEmail || post.authorName === currentName;
+            const displayAuthor = isMyPost ? "You" : post.authorName;
+
+            return (
+              <div 
+                key={post.id} 
+                className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 transition-all"
+              >
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-bold text-pink-400 text-sm">{displayAuthor}</span>
+                  <span className="text-xs text-slate-400">{post.time}</span>
+                </div>
+                <p className="text-slate-300 text-sm mb-3">{post.content}</p>
+                <div className="flex items-center gap-4 text-xs text-slate-400">
+                  <button 
+                    onClick={() => handleLike(post.id)}
+                    className="flex items-center gap-1 hover:text-pink-400 transition-colors cursor-pointer"
+                  >
+                    ❤️ {post.likes} likes
+                  </button>
+                  <span>💬 {post.comments} comments</span>
+                </div>
               </div>
-              <p className="text-slate-300 text-sm mb-3">{post.content}</p>
-              <div className="flex items-center gap-4 text-xs text-slate-400">
-                <button 
-                  onClick={() => handleLike(index)}
-                  className="flex items-center gap-1 hover:text-pink-400 transition-colors cursor-pointer"
-                >
-                  ❤️ {post.likes} likes
-                </button>
-                <span>💬 {post.comments} comments</span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -117,7 +163,7 @@ export default function CommunityPage() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all text-xs cursor-pointer border border-pink-400/40"
+                  className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-xs cursor-pointer border border-slate-700"
                 >
                   Cancel
                 </button>
