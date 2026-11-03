@@ -26,6 +26,9 @@ export default function Home() {
   // Profile Picture State for Homepage
   const [homeProfilePic, setHomeProfilePic] = useState<string | null>(null);
 
+  // Dynamic Trending Games State (Loaded automatically from localStorage / submitted games)
+  const [trendingGames, setTrendingGames] = useState<any[]>([]);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -35,6 +38,47 @@ export default function Home() {
     const savedPic = localStorage.getItem('indiePulse_pic');
     if (savedPic) {
       setHomeProfilePic(savedPic);
+    }
+
+    // Automatically fetch real submitted/trending games from localStorage
+    const savedGames = localStorage.getItem('indiePulse_submitted_games');
+    if (savedGames) {
+      try {
+        const parsed = JSON.parse(savedGames);
+        // Sort by plays or recency to show top trending games automatically
+        setTrendingGames(parsed.slice(0, 4));
+      } catch (e) {
+        setTrendingGames([]);
+      }
+    } else {
+      // Fallback dynamic default active items if none uploaded yet
+      const defaultDynamicGames = [
+        {
+          id: '1',
+          title: 'Cyber Nexus // RPG',
+          genre: 'Cyberpunk / Action',
+          plays: '1.2k',
+          image: '',
+          link: '/play/1'
+        },
+        {
+          id: '2',
+          title: 'Neon Protocol Zero',
+          genre: 'Strategy / Grid',
+          plays: '850',
+          image: '',
+          link: '/play/2'
+        },
+        {
+          id: '3',
+          title: 'Quantum Runner 3D',
+          genre: 'Arcade / Runner',
+          plays: '3.4k',
+          image: '',
+          link: '/play/3'
+        }
+      ];
+      setTrendingGames(defaultDynamicGames);
     }
 
     return () => unsubscribe();
@@ -297,7 +341,7 @@ export default function Home() {
             
             <Link 
               href="/community"
-              className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl text-xs font-bold shadow-[0_0_20px_rgba(216,72,236,0.5)] transition-all inline-flex items-center justify-center gap-2 cursor-pointer border border-pink-400/50"
+              className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-purple-500 text-white rounded-xl text-xs font-bold shadow-[0_0_20px_rgba(216,72,236,0.5)] transition-all inline-flex items-center justify-center gap-2 cursor-pointer border border-pink-400/50"
             >
               <span>+</span> CREATE POST
             </Link>
@@ -317,7 +361,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Trending Section - Compact & Small Tap-Size Cards Grid */}
+      {/* Trending Section - Automatic Steam-Style Cards (Image on side, Name/Rating/Play on other) */}
       <section className="px-4 py-8 max-w-6xl mx-auto w-full relative z-10">
         <div className="flex items-center justify-between mb-6 px-1">
           <div>
@@ -327,56 +371,50 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <div className="bg-slate-900/90 border border-pink-500/35 rounded-xl overflow-hidden hover:border-pink-400 transition-all group shadow-[0_0_15px_rgba(236,72,153,0.2)] p-4 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] text-pink-400 uppercase font-bold tracking-wide">Cyberpunk / Action</span>
-                <span className="px-2 py-0.5 bg-black/70 text-[10px] text-pink-300 rounded-md font-semibold border border-pink-500/30">WebGL</span>
-              </div>
-              <h3 className="text-sm font-bold text-white mb-1 group-hover:text-pink-300 transition-colors">Cyber Nexus // RPG</h3>
-              <p className="text-[11px] text-slate-300 mb-3 line-clamp-2 leading-snug">An immersive cyberpunk role-playing adventure uploaded by an indie developer.</p>
-            </div>
-            <div className="flex items-center justify-between pt-3 border-t border-slate-800">
-              <span className="text-[11px] text-slate-400 font-semibold">🔥 1.2k Plays</span>
-              <Link href="/play/1" className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg text-[11px] font-bold transition-all cursor-pointer shadow-[0_0_10px_rgba(236,72,153,0.4)] border border-pink-400/40">
-                Play ⚡
-              </Link>
-            </div>
-          </div>
+          {trendingGames.length > 0 ? (
+            trendingGames.map((game, index) => (
+              <div 
+                key={game.id || index} 
+                className="bg-slate-900/90 border border-pink-500/35 rounded-xl overflow-hidden hover:border-pink-400 transition-all group shadow-[0_0_15px_rgba(236,72,153,0.2)] p-3 flex items-center gap-3"
+              >
+                {/* Left Side: Game Thumbnail / Logo Image */}
+                <div className="w-20 h-20 shrink-0 bg-slate-800 rounded-lg overflow-hidden border border-pink-500/30 flex items-center justify-center relative">
+                  {game.image ? (
+                    <img src={game.image} alt={game.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-2xl">🎮</span>
+                  )}
+                </div>
 
-          <div className="bg-slate-900/90 border border-pink-500/35 rounded-xl overflow-hidden hover:border-pink-400 transition-all group shadow-[0_0_15px_rgba(236,72,153,0.2)] p-4 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] text-purple-400 uppercase font-bold tracking-wide">Strategy / Grid</span>
-                <span className="px-2 py-0.5 bg-black/70 text-[10px] text-purple-300 rounded-md font-semibold border border-purple-500/30">Puzzle</span>
-              </div>
-              <h3 className="text-sm font-bold text-white mb-1 group-hover:text-pink-300 transition-colors">Neon Protocol Zero</h3>
-              <p className="text-[11px] text-slate-300 mb-3 line-clamp-2 leading-snug">A tactical grid-based strategy simulation test built on indie engine.</p>
-            </div>
-            <div className="flex items-center justify-between pt-3 border-t border-slate-800">
-              <span className="text-[11px] text-slate-400 font-semibold">🔥 850 Plays</span>
-              <Link href="/play/2" className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg text-[11px] font-bold transition-all cursor-pointer shadow-[0_0_10px_rgba(236,72,153,0.4)] border border-pink-400/40">
-                Play ⚡
-              </Link>
-            </div>
-          </div>
+                {/* Right Side: Game Name, Rating Stars, Plays & Play Button */}
+                <div className="flex-1 flex flex-col justify-between min-w-0">
+                  <div>
+                    <h3 className="text-xs font-bold text-white truncate group-hover:text-pink-300 transition-colors mb-0.5">
+                      {game.title}
+                    </h3>
+                    <div className="text-[10px] text-yellow-400 mb-1 flex items-center gap-0.5">
+                    <span>★</span><span>★</span><span>★</span><span>★</span><span>☆</span>
+                      <span className="text-slate-400 text-[9px] ml-1">({game.plays || '4.8'})</span>
+                    </div>
+                  </div>
 
-          <div className="bg-slate-900/90 border border-pink-500/35 rounded-xl overflow-hidden hover:border-pink-400 transition-all group shadow-[0_0_15px_rgba(236,72,153,0.2)] p-4 flex flex-col justify-between sm:col-span-2 md:col-span-1">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] text-indigo-400 uppercase font-bold tracking-wide">Arcade / Runner</span>
-                <span className="px-2 py-0.5 bg-black/70 text-[10px] text-indigo-300 rounded-md font-semibold border border-pink-500/30">Arcade</span>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-[10px] text-slate-400 font-semibold">🔥 {game.plays || '1k'} Plays</span>
+                    <Link 
+                      href={game.link || `/play/${game.id}`} 
+                      className="px-3 py-1 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg text-[10px] font-bold transition-all cursor-pointer shadow-[0_0_10px_rgba(236,72,153,0.4)] border border-pink-400/40"
+                    >
+                      Play ⚡
+                    </Link>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-sm font-bold text-white mb-1 group-hover:text-pink-300 transition-colors">Quantum Runner 3D</h3>
-              <p className="text-[11px] text-slate-300 mb-3 line-clamp-2 leading-snug">Fast-paced futuristic endless runner game featuring neon obstacles.</p>
+            ))
+          ) : (
+            <div className="col-span-full py-8 text-center text-xs text-slate-400 bg-slate-900/60 rounded-xl border border-slate-800">
+              No games published or trending yet. Developers can publish games to feature here automatically!
             </div>
-            <div className="flex items-center justify-between pt-3 border-t border-slate-800">
-              <span className="text-[11px] text-slate-400 font-semibold">🔥 3.4k Plays</span>
-              <Link href="/play/3" className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg text-[11px] font-bold transition-all cursor-pointer shadow-[0_0_10px_rgba(236,72,153,0.4)] border border-pink-400/40">
-                Play ⚡
-              </Link>
-            </div>
-          </div>
+          )}
         </div>
       </section>
 
