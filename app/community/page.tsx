@@ -13,7 +13,6 @@ export default function CommunityPage() {
   const [mediaType, setMediaType] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Load user authentication and profile details
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -24,9 +23,8 @@ export default function CommunityPage() {
   const currentEmail = user?.email || 'bharatrajupatil5200@gmail.com';
   const currentName = user?.displayName || localStorage.getItem('indiePulse_name') || 'Bharat Patil';
 
-  // Fetch community posts and clear legacy mock data
   useEffect(() => {
-    const savedPosts = localStorage.getItem('indiePulse_community_posts_v2');
+    const savedPosts = localStorage.getItem('indiePulse_community_posts_v3');
     if (savedPosts) {
       try {
         setPosts(JSON.parse(savedPosts));
@@ -59,11 +57,10 @@ export default function CommunityPage() {
         }
       ];
       setPosts(initialPosts);
-      localStorage.setItem('indiePulse_community_posts_v2', JSON.stringify(initialPosts));
+      localStorage.setItem('indiePulse_community_posts_v3', JSON.stringify(initialPosts));
     }
   }, []);
 
-  // Handle Image / Video File Upload from Gallery
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -94,7 +91,7 @@ export default function CommunityPage() {
 
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
-    localStorage.setItem('indiePulse_community_posts_v2', JSON.stringify(updatedPosts));
+    localStorage.setItem('indiePulse_community_posts_v3', JSON.stringify(updatedPosts));
 
     setNewPost("");
     setMediaFile(null);
@@ -107,17 +104,15 @@ export default function CommunityPage() {
       post.id === id ? { ...post, likes: post.likes + 1 } : post
     );
     setPosts(updatedPosts);
-    localStorage.setItem('indiePulse_community_posts_v2', JSON.stringify(updatedPosts));
+    localStorage.setItem('indiePulse_community_posts_v3', JSON.stringify(updatedPosts));
   };
 
   return (
     <main className="min-h-screen bg-slate-950 text-white flex flex-col px-4 py-6 max-w-xl mx-auto w-full relative overflow-x-hidden select-none">
       
-      {/* Background Decorative Glow Effects */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none"></div>
 
-      {/* Top Header Row with Clear Pink 'Back' Button */}
       <div className="w-full flex items-start mb-6 relative z-10">
         <Link 
           href="/" 
@@ -127,7 +122,6 @@ export default function CommunityPage() {
         </Link>
       </div>
 
-      {/* Community Container */}
       <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-6 rounded-2xl w-full shadow-2xl shadow-purple-950/50 text-center relative z-10 mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-semibold mb-3">
           COMMUNITY FEED
@@ -135,7 +129,6 @@ export default function CommunityPage() {
         <h2 className="text-2xl font-black mb-2 tracking-tight">💬 IndiePulse Community</h2>
         <p className="text-slate-400 text-sm mb-6">Connect with fellow developers, share updates, and discuss ideas!</p>
         
-        {/* Create Post Action Button */}
         <div className="mb-6">
           <button 
             onClick={() => setIsModalOpen(true)}
@@ -145,10 +138,9 @@ export default function CommunityPage() {
           </button>
         </div>
 
-        {/* Posts Feed */}
         <div className="flex flex-col gap-4 mb-2 text-left max-h-[420px] overflow-y-auto pr-1">
           {posts.map((post) => {
-            const isMyPost = post.authorEmail === currentEmail || post.authorName === currentName;
+            const isMyPost = post.authorEmail === currentEmail || post.authorName === currentName || post.authorName === 'Bharat Patil';
             const displayAuthor = isMyPost ? "You" : post.authorName;
 
             return (
@@ -165,7 +157,6 @@ export default function CommunityPage() {
                   <p className="text-slate-300 text-sm leading-relaxed">{post.content}</p>
                 )}
 
-                {/* Display Uploaded Image/Video if present */}
                 {post.media && (
                   <div className="rounded-xl overflow-hidden border border-slate-700 bg-slate-950 mt-1">
                     {post.mediaType === 'video' ? (
@@ -191,7 +182,6 @@ export default function CommunityPage() {
         </div>
       </div>
 
-      {/* Create Post Popup Modal with Media Upload */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
           <div className="bg-slate-900 border border-pink-500/40 rounded-3xl p-6 w-full max-w-md shadow-2xl relative animate-in fade-in zoom-in duration-200">
@@ -210,7 +200,6 @@ export default function CommunityPage() {
                 className="w-full bg-slate-950 border border-pink-500/30 rounded-2xl p-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-pink-400 resize-none h-28 shadow-inner"
               />
 
-              {/* Gallery Media Upload Option */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] text-pink-300 font-semibold flex items-center gap-1.5 cursor-pointer">
                   <span>📷</span> Attach Photo or Video from Gallery:
@@ -223,7 +212,6 @@ export default function CommunityPage() {
                 />
               </div>
 
-              {/* Preview Selected Media */}
               {mediaFile && (
                 <div className="relative w-full h-24 bg-slate-950 rounded-xl overflow-hidden border border-pink-500/30 flex items-center justify-center">
                   {mediaType === 'video' ? (
