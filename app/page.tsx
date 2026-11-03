@@ -297,7 +297,7 @@ export default function Home() {
             
             <Link 
               href="/community"
-              className="w-full sm:w-auto px-7 py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-purple-500 text-white rounded-xl text-sm font-bold shadow-[0_0_25px_rgba(216,72,236,0.5)] transition-all inline-flex items-center justify-center gap-2 cursor-pointer border border-pink-400/50"
+              className="w-full sm:w-auto px-7 py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl text-sm font-bold shadow-[0_0_25px_rgba(216,72,236,0.5)] transition-all inline-flex items-center justify-center gap-2 cursor-pointer border border-pink-400/50"
             >
               <span>+</span> CREATE POST
             </Link>
@@ -383,6 +383,56 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Core Drives & Community Feed Section (Fully Restored & Linked) */}
+      <section className="px-5 py-12 max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
+        <Link 
+          href="/development" 
+          className="block bg-slate-900/90 border border-pink-500/35 p-7 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_25px_rgba(236,72,153,0.2)]"
+        >
+          <span className="text-xs font-bold px-3 py-1 bg-pink-500/20 text-pink-300 rounded-lg border border-pink-500/30">Core Drive 2</span>
+          <h3 className="text-xl font-bold mt-5 mb-3 text-white">Development & Accomplishment</h3>
+          <p className="text-sm text-slate-300 leading-relaxed">Earn points by uploading game builds, completing milestones, and reviewing indie projects.</p>
+        </Link>
+
+        <Link 
+          href="/social-influence" 
+          className="block bg-slate-900/90 border border-pink-500/35 p-7 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_25px_rgba(236,72,153,0.2)]"
+        >
+          <span className="text-xs font-bold px-3 py-1 bg-purple-500/20 text-purple-300 rounded-lg border border-pink-500/30">Core Drive 5</span>
+          <h3 className="text-xl font-bold mt-5 mb-3 text-white">Social Influence & Peer Praise</h3>
+          <p className="text-sm text-slate-300 leading-relaxed">Gain badges, unlock special creator status, and receive peer validation from global gamers.</p>
+        </Link>
+        
+        <Link 
+          href="/curiosity" 
+          className="block bg-slate-900/90 border border-pink-500/35 p-7 rounded-2xl hover:border-pink-400 transition-all cursor-pointer shadow-[0_0_25px_rgba(236,72,153,0.2)]"
+        >
+          <span className="text-xs font-bold px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-lg border border-pink-500/30">Core Drive 7</span>
+          <h3 className="text-xl font-bold mt-5 mb-3 text-white">Unpredictability & Curiosity</h3>
+          <p className="text-sm text-slate-300 leading-relaxed">Unlock secret community drops, mystery game tests, and surprise rewards as you level up.</p>
+        </Link>
+
+        <Link 
+          href="/community" 
+          className="block bg-slate-900/90 border border-pink-500/35 p-7 rounded-2xl hover:border-pink-400 transition-all cursor-pointer md:col-span-3 shadow-[0_0_25px_rgba(236,72,153,0.2)]"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-xs font-bold px-3 py-1 bg-pink-500/20 text-pink-300 rounded-lg border border-pink-500/30">Live Feed</span>
+            <span className="text-[11px] px-2.5 py-1 bg-slate-800 text-pink-300 rounded-lg">DevLog #4</span>
+          </div>
+          <h3 className="text-xl font-bold mb-3 flex items-center gap-2.5 text-white">
+            <span>💬</span> Live Community Feed
+          </h3>
+          <p className="text-sm text-slate-300 mb-5 line-clamp-2 leading-relaxed">
+            "Just integrated dynamic lighting and shadow effects into our cyberpunk indie RPG! Check out the early alpha..."
+          </p>
+          <div className="flex items-center justify-between text-xs text-pink-400 font-bold pt-3.5 border-t border-slate-800">
+            <span>❤️ 42 Likes • 12 Comments</span>
+            <span>Join Discussion →</span>
+          </div>
+        </Link>
+      </section>
+
       {/* Founder's Note Section */}
       <section className="px-5 pb-16 max-w-6xl mx-auto w-full relative z-10">
         <div className="bg-slate-900/95 border border-pink-500/45 rounded-2xl p-7 shadow-[0_0_35px_rgba(236,72,153,0.25)] transition-all">
@@ -443,7 +493,7 @@ export default function Home() {
               </Link>
               <Link 
                 href="/signup" 
-                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-purple-500 rounded-xl text-xs font-bold transition text-white shadow-lg shadow-purple-600/30 border border-pink-400/40 cursor-pointer"
+                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl text-xs font-bold transition text-white shadow-lg shadow-purple-600/30 border border-pink-400/40 cursor-pointer"
               >
                 Create Account (Sign Up)
               </Link>
