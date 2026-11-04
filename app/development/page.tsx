@@ -4,29 +4,30 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function DevelopmentPage() {
-  const [uploadedBuildsCount, setUploadedBuildsCount] = useState(3);
-  const [milestones, setMilestones] = useState('12 / 15');
-  const [xpPoints, setXpPoints] = useState('1,450 XP');
+  const [uploadedBuildsCount, setUploadedBuildsCount] = useState<number>(3);
+  const [milestones] = useState<string>('12 / 15');
+  const [xpPoints, setXpPoints] = useState<string>('1,450 XP');
 
-  // Automatically count real submitted games from localStorage if available
   useEffect(() => {
-    const savedGames = localStorage.getItem('indiePulse_submitted_games');
-    if (savedGames) {
-      try {
-        const parsed = JSON.parse(savedGames);
-        if (parsed.length > 0) {
-          setUploadedBuildsCount(parsed.length);
-          setXpPoints(`${parsed.length * 350 + 400} XP`);
+    if (typeof window !== 'undefined') {
+      const savedGames = localStorage.getItem('indiePulse_submitted_games');
+      if (savedGames) {
+        try {
+          const parsed = JSON.parse(savedGames);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setUploadedBuildsCount(parsed.length);
+            setXpPoints(`${parsed.length * 350 + 400} XP`);
+          }
+        } catch (e) {
+          // Fallback default
         }
-      } catch (e) {
-        // Fallback default
       }
     }
   }, []);
 
   return (
     <main className="min-h-screen bg-slate-950 text-white flex flex-col p-8 relative">
-      {/* Top Left Back Button (Larger & Clearer matching Login page) */}
+      {/* Top Left Back Button */}
       <div className="absolute top-6 left-8">
         <Link 
           href="/" 
@@ -55,7 +56,9 @@ export default function DevelopmentPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-slate-950/50 border border-slate-800 p-5 rounded-xl">
             <h4 className="text-sm text-slate-400 mb-1">Uploaded Builds</h4>
-            <p className="text-2xl font-bold text-indigo-400">{uploadedBuildsCount < 10 ? `0${uploadedBuildsCount}` : uploadedBuildsCount}</p>
+            <p className="text-2xl font-bold text-indigo-400">
+              {uploadedBuildsCount < 10 ? `0${uploadedBuildsCount}` : uploadedBuildsCount}
+            </p>
           </div>
           <div className="bg-slate-950/50 border border-slate-800 p-5 rounded-xl">
             <h4 className="text-sm text-slate-400 mb-1">Milestones Completed</h4>
