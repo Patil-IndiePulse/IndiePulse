@@ -29,7 +29,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v12');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v13');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,7 +62,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v12', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v13', JSON.stringify(initialPosts));
       }
     }
 
@@ -118,7 +118,7 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v12', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v13', JSON.stringify(updatedPosts));
     }
 
     setUploadSuccess(true);
@@ -138,7 +138,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v12', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v13', JSON.stringify(updatedPosts));
     }
   };
 
@@ -254,15 +254,16 @@ export default function CommunityPage() {
                   ) : (
                     <img src={mediaFile} alt="Preview" className="h-full object-contain" />
                   )}
-                  {/* Absolute small circular remove button in top-right corner */}
-                  <button 
-                    type="button" 
-                    onClick={() => { setMediaFile(null); setMediaType(null); }}
-                    className="absolute top-2 right-2 bg-pink-600 hover:bg-pink-700 text-white rounded-full w-7 h-7 text-xs font-black flex items-center justify-center shadow-lg cursor-pointer border border-pink-400 z-30"
-                    title="Remove media"
-                  >
-                    ✕
-                  </button>
+                  {/* Strict isolated absolute styling for small corner X button */}
+                  <div className="absolute top-2 right-2 z-50">
+                    <button 
+                      type="button" 
+                      onClick={() => { setMediaFile(null); setMediaType(null); }}
+                      className="w-6 h-6 bg-pink-600 hover:bg-pink-700 text-white rounded-full text-xs font-black flex items-center justify-center shadow-md cursor-pointer border border-pink-400"
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
               )}
 
