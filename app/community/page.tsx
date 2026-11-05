@@ -29,7 +29,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v13');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v14');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,7 +62,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v13', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v14', JSON.stringify(initialPosts));
       }
     }
 
@@ -118,7 +118,7 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v13', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v14', JSON.stringify(updatedPosts));
     }
 
     setUploadSuccess(true);
@@ -138,7 +138,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v13', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v14', JSON.stringify(updatedPosts));
     }
   };
 
@@ -248,22 +248,23 @@ export default function CommunityPage() {
               </div>
 
               {mediaFile && (
-                <div className="relative w-full h-32 bg-slate-950 rounded-xl overflow-hidden border border-pink-500/30 flex items-center justify-center">
-                  {mediaType === 'video' ? (
-                    <span className="text-xs text-emerald-400">📹 Video attached successfully</span>
-                  ) : (
-                    <img src={mediaFile} alt="Preview" className="h-full object-contain" />
-                  )}
-                  {/* Strict isolated absolute styling for small corner X button */}
-                  <div className="absolute top-2 right-2 z-50">
-                    <button 
-                      type="button" 
-                      onClick={() => { setMediaFile(null); setMediaType(null); }}
-                      className="w-6 h-6 bg-pink-600 hover:bg-pink-700 text-white rounded-full text-xs font-black flex items-center justify-center shadow-md cursor-pointer border border-pink-400"
-                    >
-                      ✕
-                    </button>
+                <div className="relative w-full h-32 bg-slate-950 rounded-xl overflow-hidden border border-pink-500/30">
+                  <div className="w-full h-full flex items-center justify-center">
+                    {mediaType === 'video' ? (
+                      <span className="text-xs text-emerald-400">📹 Video attached successfully</span>
+                    ) : (
+                      <img src={mediaFile} alt="Preview" className="h-full object-contain" />
+                    )}
                   </div>
+                  {/* Fixed absolute tiny circular remove button */}
+                  <button 
+                    type="button" 
+                    onClick={() => { setMediaFile(null); setMediaType(null); }}
+                    className="absolute top-2 right-2 w-7 h-7 bg-pink-600 hover:bg-pink-700 text-white rounded-full text-xs font-bold flex items-center justify-center shadow-lg cursor-pointer border border-pink-400 z-50"
+                    title="Remove media"
+                  >
+                    ✕
+                  </button>
                 </div>
               )}
 
