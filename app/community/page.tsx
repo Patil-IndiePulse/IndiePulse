@@ -29,7 +29,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v15');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v17');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,7 +62,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v15', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v17', JSON.stringify(initialPosts));
       }
     }
 
@@ -99,9 +99,11 @@ export default function CommunityPage() {
     }
   };
 
-  const handlePostSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handlePostSubmit = (e: React.FormEvent | React.TouchEvent) => {
+    if (e) e.preventDefault();
     if (!newPost.trim() && !mediaFile) return;
+
+    if (uploadSuccess) return;
 
     const newPostObj = {
       id: Date.now().toString(),
@@ -118,7 +120,7 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v15', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v17', JSON.stringify(updatedPosts));
     }
 
     setUploadSuccess(true);
@@ -129,7 +131,7 @@ export default function CommunityPage() {
       setMediaType(null);
       setUploadSuccess(false);
       setIsModalOpen(false);
-    }, 900);
+    }, 800);
   };
 
   const handleLike = (id: string) => {
@@ -138,7 +140,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v15', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v17', JSON.stringify(updatedPosts));
     }
   };
 
@@ -248,41 +250,38 @@ export default function CommunityPage() {
               </div>
 
               {mediaFile && (
-                <div style={{ position: 'relative', width: '100%', height: '140px', backgroundColor: '#020617', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(236, 72, 153, 0.3)' }}>
+                <div style={{ position: 'relative', width: '100%', height: '140px', backgroundColor: '#020617', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(236, 72, 153, 0.3)', display: 'block' }}>
                   <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {mediaType === 'video' ? (
                       <span style={{ fontSize: '12px', color: '#34d399' }}>📹 Video attached successfully</span>
                     ) : (
-                      <img src={mediaFile} alt="Preview" style={{ height: '100%', objectFit: 'contain' }} />
+                      <img src={mediaFile} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     )}
                   </div>
-                  {/* Inline CSS applied to force a small circular remove button */}
-                  <button 
-                    type="button" 
-                    onClick={() => { setMediaFile(null); setMediaType(null); }}
-                    style={{
-                      position: 'absolute',
-                      top: '8px',
-                      right: '8px',
-                      width: '28px',
-                      height: '28px',
-                      backgroundColor: '#db2777',
-                      color: '#ffffff',
-                      borderRadius: '50%',
-                      border: '1px solid #f472b6',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '13px',
-                      fontWeight: 'bold',
-                      cursor: 'pointer',
-                      boxShadow: '0 4px 6px rgba(0,0,0,0.4)',
-                      zIndex: 999
-                    }}
-                    title="Remove media"
-                  >
-                    ✕
-                  </button>
+                  <div style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 9999 }}>
+                    <button 
+                      type="button" 
+                      onClick={() => { setMediaFile(null); setMediaType(null); }}
+                      style={{
+                        width: '26px',
+                        height: '26px',
+                        backgroundColor: '#db2777',
+                        color: '#ffffff',
+                        borderRadius: '50%',
+                        border: '1px solid #f472b6',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.5)'
+                      }}
+                      title="Remove media"
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -297,7 +296,7 @@ export default function CommunityPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={uploadSuccess}
+                  onTouchEnd={handlePostSubmit}
                   className={`flex-1 py-3 font-bold rounded-xl transition-all text-xs cursor-pointer border flex items-center justify-center gap-1.5 ${
                     uploadSuccess 
                       ? 'bg-emerald-600 text-white border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.5)]' 
