@@ -22,14 +22,13 @@ export default function CommunityPage() {
       }
     });
 
-    // Safely load from localStorage on client side
     if (typeof window !== 'undefined') {
       const savedCustomName = localStorage.getItem('indiePulse_name');
       if (savedCustomName) {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v7');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v8');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,12 +61,28 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v7', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v8', JSON.stringify(initialPosts));
       }
     }
 
     return () => unsubscribe();
   }, []);
+
+  // Handle Android Back button to close modal
+  useEffect(() => {
+    const handlePopState = () => {
+      if (isModalOpen) {
+        setIsModalOpen(false);
+      }
+    };
+    if (isModalOpen) {
+      window.history.pushState({ modalOpen: true }, '');
+      window.addEventListener('popstate', handlePopState);
+    }
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [isModalOpen]);
 
   const currentEmail = user?.email || 'bharatrajupatil5200@gmail.com';
 
@@ -102,7 +117,7 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v7', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v8', JSON.stringify(updatedPosts));
     }
 
     setNewPost("");
@@ -117,7 +132,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v7', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v8', JSON.stringify(updatedPosts));
     }
   };
 
@@ -227,7 +242,7 @@ export default function CommunityPage() {
               </div>
 
               {mediaFile && (
-                <div className="relative w-full h-24 bg-slate-950 rounded-xl overflow-hidden border border-pink-500/30 flex items-center justify-center">
+                <div className="relative w-full h-32 bg-slate-950 rounded-xl overflow-hidden border border-pink-500/30 flex items-center justify-center">
                   {mediaType === 'video' ? (
                     <span className="text-xs text-emerald-400">📹 Video attached successfully</span>
                   ) : (
@@ -236,9 +251,9 @@ export default function CommunityPage() {
                   <button 
                     type="button" 
                     onClick={() => { setMediaFile(null); setMediaType(null); }}
-                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-[10px] flex items-center justify-center font-bold"
+                    className="absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white rounded-full px-2.5 py-1 text-[11px] font-bold border border-slate-700 transition-colors cursor-pointer flex items-center gap-1"
                   >
-                    ✕
+                    ✕ Remove
                   </button>
                 </div>
               )}
