@@ -13,6 +13,7 @@ export default function CommunityPage() {
   const [mediaType, setMediaType] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentName, setCurrentName] = useState('Bharat Patil');
+  const [uploadSuccess, setUploadSuccess] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -28,7 +29,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v8');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v9');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -61,7 +62,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v8', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v9', JSON.stringify(initialPosts));
       }
     }
 
@@ -117,13 +118,19 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v8', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v9', JSON.stringify(updatedPosts));
     }
 
-    setNewPost("");
-    setMediaFile(null);
-    setMediaType(null);
-    setIsModalOpen(false);
+    // Show success green tick and message
+    setUploadSuccess(true);
+
+    setTimeout(() => {
+      setNewPost("");
+      setMediaFile(null);
+      setMediaType(null);
+      setUploadSuccess(false);
+      setIsModalOpen(false);
+    }, 1200);
   };
 
   const handleLike = (id: string) => {
@@ -132,7 +139,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v8', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v9', JSON.stringify(updatedPosts));
     }
   };
 
@@ -248,13 +255,22 @@ export default function CommunityPage() {
                   ) : (
                     <img src={mediaFile} alt="Preview" className="h-full object-contain" />
                   )}
+                  {/* Small Pink X Remove Button */}
                   <button 
                     type="button" 
                     onClick={() => { setMediaFile(null); setMediaType(null); }}
-                    className="absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white rounded-full px-2.5 py-1 text-[11px] font-bold border border-slate-700 transition-colors cursor-pointer flex items-center gap-1"
+                    className="absolute top-2 right-2 bg-pink-600 hover:bg-pink-700 text-white rounded-full w-7 h-7 text-xs font-black flex items-center justify-center shadow-md cursor-pointer border border-pink-400"
+                    title="Remove media"
                   >
-                    ✕ Remove
+                    ✕
                   </button>
+                </div>
+              )}
+
+              {/* Upload Success Status Feedback */}
+              {uploadSuccess && (
+                <div className="flex items-center justify-center gap-2 py-2 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-emerald-400 text-xs font-bold animate-pulse">
+                  <span>✓</span> Post Uploaded Successfully!
                 </div>
               )}
 
@@ -268,9 +284,10 @@ export default function CommunityPage() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all text-xs cursor-pointer border border-pink-400/40"
+                  disabled={uploadSuccess}
+                  className="flex-1 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all text-xs cursor-pointer border border-pink-400/40 flex items-center justify-center gap-1.5"
                 >
-                  Post Now 🚀
+                  {uploadSuccess ? 'Uploading...' : 'Post Now 🚀'}
                 </button>
               </div>
             </form>
