@@ -12,59 +12,64 @@ export default function CommunityPage() {
   const [mediaFile, setMediaFile] = useState<string | null>(null);
   const [mediaType, setMediaType] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentName, setCurrentName] = useState('Bharat Patil');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      if (currentUser?.displayName) {
+        setCurrentName(currentUser.displayName);
+      }
     });
+
+    // Safely load from localStorage on client side
+    if (typeof window !== 'undefined') {
+      const savedCustomName = localStorage.getItem('indiePulse_name');
+      if (savedCustomName) {
+        setCurrentName(savedCustomName);
+      }
+
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v7');
+      if (savedPosts) {
+        try {
+          setPosts(JSON.parse(savedPosts));
+        } catch (e) {
+          setPosts([]);
+        }
+      } else {
+        const initialPosts = [
+          { 
+            id: '1', 
+            authorName: "Bharat Patil", 
+            authorEmail: "bharatrajupatil5200@gmail.com", 
+            content: "Working on a new indie platform using Next.js and Tailwind CSS! Excited to share soon. 🚀", 
+            media: null,
+            mediaType: null,
+            likes: 24, 
+            comments: 5, 
+            time: "Just now" 
+          },
+          { 
+            id: '2', 
+            authorName: "Aarav Dev", 
+            authorEmail: "aarav@gmail.com", 
+            content: "Just released an update for Cyber Neon Runner. Check out the new levels! 🎮✨", 
+            media: null,
+            mediaType: null,
+            likes: 42, 
+            comments: 12, 
+            time: "2 hours ago" 
+          }
+        ];
+        setPosts(initialPosts);
+        localStorage.setItem('indiePulse_community_posts_v7', JSON.stringify(initialPosts));
+      }
+    }
+
     return () => unsubscribe();
   }, []);
 
   const currentEmail = user?.email || 'bharatrajupatil5200@gmail.com';
-  const currentName = user?.displayName || localStorage.getItem('indiePulse_name') || 'Bharat Patil';
-
-  // Forcefully clear old cached keys and load clean v4 data
-  useEffect(() => {
-    localStorage.removeItem('indiePulse_community_posts');
-    localStorage.removeItem('indiePulse_community_posts_v2');
-    localStorage.removeItem('indiePulse_community_posts_v3');
-
-    const savedPosts = localStorage.getItem('indiePulse_community_posts_v4');
-    if (savedPosts) {
-      try {
-        setPosts(JSON.parse(savedPosts));
-      } catch (e) {
-        setPosts([]);
-      }
-    } else {
-      const initialPosts = [
-        { 
-          id: '1', 
-          authorName: "Bharat Patil", 
-          authorEmail: "bharatrajupatil5200@gmail.com", 
-          content: "Working on a new indie platform using Next.js and Tailwind CSS! Excited to share soon. 🚀", 
-          media: null,
-          mediaType: null,
-          likes: 24, 
-          comments: 5, 
-          time: "Just now" 
-        },
-        { 
-          id: '2', 
-          authorName: "Aarav Dev", 
-          authorEmail: "aarav@gmail.com", 
-          content: "Just released an update for Cyber Neon Runner. Check out the new levels! 🎮✨", 
-          media: null,
-          mediaType: null,
-          likes: 42, 
-          comments: 12, 
-          time: "2 hours ago" 
-        }
-      ];
-      setPosts(initialPosts);
-      localStorage.setItem('indiePulse_community_posts_v4', JSON.stringify(initialPosts));
-    }
-  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -96,7 +101,9 @@ export default function CommunityPage() {
 
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
-    localStorage.setItem('indiePulse_community_posts_v4', JSON.stringify(updatedPosts));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('indiePulse_community_posts_v7', JSON.stringify(updatedPosts));
+    }
 
     setNewPost("");
     setMediaFile(null);
@@ -109,7 +116,9 @@ export default function CommunityPage() {
       post.id === id ? { ...post, likes: post.likes + 1 } : post
     );
     setPosts(updatedPosts);
-    localStorage.setItem('indiePulse_community_posts_v4', JSON.stringify(updatedPosts));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('indiePulse_community_posts_v7', JSON.stringify(updatedPosts));
+    }
   };
 
   return (
