@@ -29,7 +29,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v18');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v15');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,7 +62,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v18', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v15', JSON.stringify(initialPosts));
       }
     }
 
@@ -99,10 +99,9 @@ export default function CommunityPage() {
     }
   };
 
-  const handlePostSubmit = (e: any) => {
-    if (e && e.preventDefault) e.preventDefault();
+  const handlePostSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!newPost.trim() && !mediaFile) return;
-    if (uploadSuccess) return;
 
     const newPostObj = {
       id: Date.now().toString(),
@@ -119,7 +118,7 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v18', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v15', JSON.stringify(updatedPosts));
     }
 
     setUploadSuccess(true);
@@ -130,7 +129,7 @@ export default function CommunityPage() {
       setMediaType(null);
       setUploadSuccess(false);
       setIsModalOpen(false);
-    }, 800);
+    }, 900);
   };
 
   const handleLike = (id: string) => {
@@ -139,7 +138,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v18', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v15', JSON.stringify(updatedPosts));
     }
   };
 
@@ -257,6 +256,7 @@ export default function CommunityPage() {
                       <img src={mediaFile} alt="Preview" style={{ height: '100%', objectFit: 'contain' }} />
                     )}
                   </div>
+                  {/* Inline CSS applied to force a small circular remove button */}
                   <button 
                     type="button" 
                     onClick={() => { setMediaFile(null); setMediaType(null); }}
@@ -296,9 +296,7 @@ export default function CommunityPage() {
                   Cancel
                 </button>
                 <button
-                  type="button"
-                  onClick={handlePostSubmit}
-                  onTouchEnd={(e) => { e.preventDefault(); handlePostSubmit(e); }}
+                  type="submit"
                   disabled={uploadSuccess}
                   className={`flex-1 py-3 font-bold rounded-xl transition-all text-xs cursor-pointer border flex items-center justify-center gap-1.5 ${
                     uploadSuccess 
