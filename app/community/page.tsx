@@ -29,7 +29,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v14');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v15');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,7 +62,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v14', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v15', JSON.stringify(initialPosts));
       }
     }
 
@@ -118,7 +118,7 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v14', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v15', JSON.stringify(updatedPosts));
     }
 
     setUploadSuccess(true);
@@ -138,7 +138,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v14', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v15', JSON.stringify(updatedPosts));
     }
   };
 
@@ -248,19 +248,37 @@ export default function CommunityPage() {
               </div>
 
               {mediaFile && (
-                <div className="relative w-full h-32 bg-slate-950 rounded-xl overflow-hidden border border-pink-500/30">
-                  <div className="w-full h-full flex items-center justify-center">
+                <div style={{ position: 'relative', width: '100%', height: '140px', backgroundColor: '#020617', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(236, 72, 153, 0.3)' }}>
+                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {mediaType === 'video' ? (
-                      <span className="text-xs text-emerald-400">📹 Video attached successfully</span>
+                      <span style={{ fontSize: '12px', color: '#34d399' }}>📹 Video attached successfully</span>
                     ) : (
-                      <img src={mediaFile} alt="Preview" className="h-full object-contain" />
+                      <img src={mediaFile} alt="Preview" style={{ height: '100%', objectFit: 'contain' }} />
                     )}
                   </div>
-                  {/* Fixed absolute tiny circular remove button */}
+                  {/* Inline CSS applied to force a small circular remove button */}
                   <button 
                     type="button" 
                     onClick={() => { setMediaFile(null); setMediaType(null); }}
-                    className="absolute top-2 right-2 w-7 h-7 bg-pink-600 hover:bg-pink-700 text-white rounded-full text-xs font-bold flex items-center justify-center shadow-lg cursor-pointer border border-pink-400 z-50"
+                    style={{
+                      position: 'absolute',
+                      top: '8px',
+                      right: '8px',
+                      width: '28px',
+                      height: '28px',
+                      backgroundColor: '#db2777',
+                      color: '#ffffff',
+                      borderRadius: '50%',
+                      border: '1px solid #f472b6',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '13px',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 6px rgba(0,0,0,0.4)',
+                      zIndex: 999
+                    }}
                     title="Remove media"
                   >
                     ✕
