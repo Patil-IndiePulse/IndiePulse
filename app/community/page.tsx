@@ -29,7 +29,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v9');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v10');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,7 +62,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v9', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v10', JSON.stringify(initialPosts));
       }
     }
 
@@ -118,10 +118,10 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v9', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v10', JSON.stringify(updatedPosts));
     }
 
-    // Show success green tick and message
+    // Show success state on button
     setUploadSuccess(true);
 
     setTimeout(() => {
@@ -130,7 +130,7 @@ export default function CommunityPage() {
       setMediaType(null);
       setUploadSuccess(false);
       setIsModalOpen(false);
-    }, 1200);
+    }, 1000);
   };
 
   const handleLike = (id: string) => {
@@ -139,7 +139,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v9', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v10', JSON.stringify(updatedPosts));
     }
   };
 
@@ -255,11 +255,11 @@ export default function CommunityPage() {
                   ) : (
                     <img src={mediaFile} alt="Preview" className="h-full object-contain" />
                   )}
-                  {/* Small Pink X Remove Button */}
+                  {/* Tiny Corner Pink X Button */}
                   <button 
                     type="button" 
                     onClick={() => { setMediaFile(null); setMediaType(null); }}
-                    className="absolute top-2 right-2 bg-pink-600 hover:bg-pink-700 text-white rounded-full w-7 h-7 text-xs font-black flex items-center justify-center shadow-md cursor-pointer border border-pink-400"
+                    className="absolute top-2 right-2 bg-pink-600 hover:bg-pink-700 text-white rounded-full w-6 h-6 text-[11px] font-black flex items-center justify-center shadow-lg cursor-pointer border border-pink-400 z-20"
                     title="Remove media"
                   >
                     ✕
@@ -267,17 +267,11 @@ export default function CommunityPage() {
                 </div>
               )}
 
-              {/* Upload Success Status Feedback */}
-              {uploadSuccess && (
-                <div className="flex items-center justify-center gap-2 py-2 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-emerald-400 text-xs font-bold animate-pulse">
-                  <span>✓</span> Post Uploaded Successfully!
-                </div>
-              )}
-
               <div className="flex gap-3 mt-1">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
+                  disabled={uploadSuccess}
                   className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-xs cursor-pointer border border-slate-700"
                 >
                   Cancel
@@ -285,9 +279,13 @@ export default function CommunityPage() {
                 <button
                   type="submit"
                   disabled={uploadSuccess}
-                  className="flex-1 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all text-xs cursor-pointer border border-pink-400/40 flex items-center justify-center gap-1.5"
+                  className={`flex-1 py-3 font-bold rounded-xl transition-all text-xs cursor-pointer border flex items-center justify-center gap-1.5 ${
+                    uploadSuccess 
+                      ? 'bg-emerald-600 text-white border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.5)]' 
+                      : 'bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white shadow-[0_0_15px_rgba(236,72,153,0.5)] border-pink-400/40'
+                  }`}
                 >
-                  {uploadSuccess ? 'Uploading...' : 'Post Now 🚀'}
+                  {uploadSuccess ? '✓ Success' : 'Post Now 🚀'}
                 </button>
               </div>
             </form>
