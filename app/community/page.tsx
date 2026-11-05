@@ -29,7 +29,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v11');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v12');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,7 +62,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v11', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v12', JSON.stringify(initialPosts));
       }
     }
 
@@ -118,10 +118,9 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v11', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v12', JSON.stringify(updatedPosts));
     }
 
-    // Show success state on button
     setUploadSuccess(true);
 
     setTimeout(() => {
@@ -130,7 +129,7 @@ export default function CommunityPage() {
       setMediaType(null);
       setUploadSuccess(false);
       setIsModalOpen(false);
-    }, 1000);
+    }, 900);
   };
 
   const handleLike = (id: string) => {
@@ -139,7 +138,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v11', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v12', JSON.stringify(updatedPosts));
     }
   };
 
@@ -255,11 +254,11 @@ export default function CommunityPage() {
                   ) : (
                     <img src={mediaFile} alt="Preview" className="h-full object-contain" />
                   )}
-                  {/* Tiny Corner Pink X Button */}
+                  {/* Absolute small circular remove button in top-right corner */}
                   <button 
                     type="button" 
                     onClick={() => { setMediaFile(null); setMediaType(null); }}
-                    className="absolute top-2 right-2 bg-pink-600 hover:bg-pink-700 text-white rounded-full w-6 h-6 text-[11px] font-black flex items-center justify-center shadow-lg cursor-pointer border border-pink-400 z-20"
+                    className="absolute top-2 right-2 bg-pink-600 hover:bg-pink-700 text-white rounded-full w-7 h-7 text-xs font-black flex items-center justify-center shadow-lg cursor-pointer border border-pink-400 z-30"
                     title="Remove media"
                   >
                     ✕
