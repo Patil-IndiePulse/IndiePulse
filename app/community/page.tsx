@@ -27,6 +27,11 @@ function CommunityContent() {
     });
 
     if (typeof window !== 'undefined') {
+      // मोठ्या कंपन्यांची पद्धत: युझर ज्या मागच्या पेजवरून आला आहे तो पाथ सेव्ह करून ठेवणे
+      if (document.referrer && document.referrer.includes(window.location.origin) && !document.referrer.includes('/community')) {
+        sessionStorage.setItem('indiePulse_prev_page', document.referrer);
+      }
+
       const savedCustomName = localStorage.getItem('indiePulse_name');
       if (savedCustomName) {
         setCurrentName(savedCustomName);
@@ -123,6 +128,20 @@ function CommunityContent() {
     }
   };
 
+  // अचूक मागच्या पेजवर जाण्याची स्मार्ट फंक्शन पद्धत
+  const navigateToPreviousPage = () => {
+    if (typeof window !== 'undefined') {
+      const prevPage = sessionStorage.getItem('indiePulse_prev_page');
+      if (prevPage) {
+        window.location.href = prevPage;
+      } else if (window.history.length > 2) {
+        router.back();
+      } else {
+        router.push('/');
+      }
+    }
+  };
+
   const handleCancel = (e: any) => {
     if (e) {
       e.preventDefault();
@@ -134,13 +153,7 @@ function CommunityContent() {
     setMediaType(null);
     setIsSubmitting(false);
     
-    if (typeof window !== 'undefined') {
-      if (window.history.length > 2) {
-        router.back();
-      } else {
-        router.push('/');
-      }
-    }
+    navigateToPreviousPage();
   };
 
   const executePostSubmission = (e: any) => {
@@ -178,7 +191,7 @@ function CommunityContent() {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
 
-    // Success message दाखवल्यानंतर थेट मागच्या पेजवर जाण्याची Big Tech पद्धत (?modal=true सह)
+    // Success message दाखवल्यानंतर अचूकपणे मागील युझरच्या पेजवर जाणे
     setTimeout(() => {
       setIsModalOpen(false);
       setNewPost("");
@@ -186,13 +199,7 @@ function CommunityContent() {
       setMediaType(null);
       setIsSubmitting(false);
 
-      if (typeof window !== 'undefined') {
-        if (window.history.length > 2) {
-          router.back();
-        } else {
-          router.push('/');
-        }
-      }
+      navigateToPreviousPage();
     }, 800);
   };
 
