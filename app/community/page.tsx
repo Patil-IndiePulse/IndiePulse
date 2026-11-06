@@ -30,7 +30,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v31');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v32');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -63,7 +63,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v31', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(initialPosts));
       }
     }
 
@@ -100,6 +100,14 @@ export default function CommunityPage() {
     }
   };
 
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    setNewPost("");
+    setMediaFile(null);
+    setMediaType(null);
+    setIsSubmitting(false);
+  };
+
   const executePostSubmission = (e: any) => {
     if (e) {
       e.preventDefault();
@@ -110,7 +118,7 @@ export default function CommunityPage() {
 
     setIsSubmitting(true);
 
-    // Force DOM styling instantly for mobile browsers without waiting for react state batching
+    // Force DOM styling instantly for mobile browsers
     if (submitBtnRef.current) {
       submitBtnRef.current.style.backgroundColor = '#059669';
       submitBtnRef.current.style.borderColor = '#34d399';
@@ -133,17 +141,22 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v31', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
 
-    // Guaranteed delay to let mobile user experience the green success message before closing modal
+    // Success message दाखवल्यानंतर लगेच मागच्या पेजवर (ऑटो-बॅक) जाण्यासाठी 800ms चा अचूक डिले
     setTimeout(() => {
       setIsModalOpen(false);
       setNewPost("");
       setMediaFile(null);
       setMediaType(null);
       setIsSubmitting(false);
-    }, 1000);
+      
+      // जर विंडो हिस्टरीत मागे जाणे शक्य असेल तर मागे जावे, अन्यथा मॉडेल बंद होईलच
+      if (window.history.length > 1) {
+        window.history.back();
+      }
+    }, 800);
   };
 
   const handleLike = (id: string) => {
@@ -152,7 +165,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v31', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
   };
 
@@ -301,7 +314,7 @@ export default function CommunityPage() {
               <div className="flex gap-3 mt-1">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={handleCancel}
                   disabled={isSubmitting}
                   className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-xs cursor-pointer border border-slate-700"
                 >
