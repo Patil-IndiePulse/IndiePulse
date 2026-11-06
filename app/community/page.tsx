@@ -112,8 +112,9 @@ export default function CommunityPage() {
     setMediaFile(null);
     setMediaType(null);
     setIsSubmitting(false);
-    // 빅테크 방식: थेट होम किंवा मागील पेजवर जाणे
-    router.push('/');
+    
+    // मोठ्या कंपन्यांप्रमाणे खात्रीशीर होम पेजवर रीडायरेक्ट करणे
+    window.location.href = '/';
   };
 
   const executePostSubmission = (e: any) => {
@@ -152,16 +153,9 @@ export default function CommunityPage() {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
 
-    // Success message दाखवल्यानंतर लगेच मागच्या पेजवर (ऑटो-बॅक) जाण्याची खात्रीशीर यंत्रणा
+    // Success message दाखवल्यानंतर मोबाईल आणि लॅपटॉपवर १००% खात्रीशीरपणे मागील पेजवर जाण्यासाठी window.location.href वापरणे
     setTimeout(() => {
-      setIsModalOpen(false);
-      setNewPost("");
-      setMediaFile(null);
-      setMediaType(null);
-      setIsSubmitting(false);
-      
-      // मोठ्या कंपन्यांप्रमाणे Next.js router वापरून खात्रीशीरपणे मागील पेजवर पाठवणे
-      router.push('/');
+      window.location.href = '/';
     }, 800);
   };
 
