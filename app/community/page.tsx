@@ -29,7 +29,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v15');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v19');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,7 +62,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v15', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v19', JSON.stringify(initialPosts));
       }
     }
 
@@ -99,9 +99,9 @@ export default function CommunityPage() {
     }
   };
 
-  const handlePostSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const executePostSubmission = () => {
     if (!newPost.trim() && !mediaFile) return;
+    if (uploadSuccess) return;
 
     const newPostObj = {
       id: Date.now().toString(),
@@ -118,9 +118,10 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v15', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v19', JSON.stringify(updatedPosts));
     }
 
+    // Force Success state on mobile & laptop instantly
     setUploadSuccess(true);
 
     setTimeout(() => {
@@ -138,7 +139,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v15', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v19', JSON.stringify(updatedPosts));
     }
   };
 
@@ -219,7 +220,7 @@ export default function CommunityPage() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-900 border border-pink-500/40 rounded-3xl p-6 w-full max-w-md shadow-2xl relative animate-in fade-in zoom-in duration-200">
+          <div className="bg-slate-900 border border-pink-500/40 rounded-3xl p-6 w-full max-w-md shadow-2xl relative">
             
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-bold text-white flex items-center gap-2 whitespace-nowrap">
@@ -227,7 +228,7 @@ export default function CommunityPage() {
               </h3>
             </div>
 
-            <form onSubmit={handlePostSubmit} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4">
               <textarea
                 value={newPost}
                 onChange={(e) => setNewPost(e.target.value)}
@@ -256,7 +257,7 @@ export default function CommunityPage() {
                       <img src={mediaFile} alt="Preview" style={{ height: '100%', objectFit: 'contain' }} />
                     )}
                   </div>
-                  {/* Inline CSS applied to force a small circular remove button */}
+                  {/* Strict inline positioning for small corner X button */}
                   <button 
                     type="button" 
                     onClick={() => { setMediaFile(null); setMediaType(null); }}
@@ -264,8 +265,8 @@ export default function CommunityPage() {
                       position: 'absolute',
                       top: '8px',
                       right: '8px',
-                      width: '28px',
-                      height: '28px',
+                      width: '26px',
+                      height: '26px',
                       backgroundColor: '#db2777',
                       color: '#ffffff',
                       borderRadius: '50%',
@@ -273,13 +274,11 @@ export default function CommunityPage() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '13px',
+                      fontSize: '12px',
                       fontWeight: 'bold',
                       cursor: 'pointer',
-                      boxShadow: '0 4px 6px rgba(0,0,0,0.4)',
-                      zIndex: 999
+                      zIndex: 99999
                     }}
-                    title="Remove media"
                   >
                     ✕
                   </button>
@@ -296,18 +295,31 @@ export default function CommunityPage() {
                   Cancel
                 </button>
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={executePostSubmission}
                   disabled={uploadSuccess}
-                  className={`flex-1 py-3 font-bold rounded-xl transition-all text-xs cursor-pointer border flex items-center justify-center gap-1.5 ${
-                    uploadSuccess 
-                      ? 'bg-emerald-600 text-white border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.5)]' 
-                      : 'bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white shadow-[0_0_15px_rgba(236,72,153,0.5)] border-pink-400/40'
-                  }`}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    fontWeight: 'bold',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    backgroundColor: uploadSuccess ? '#059669' : '#db2777',
+                    color: '#ffffff',
+                    border: uploadSuccess ? '1px solid #34d399' : '1px solid rgba(244, 114, 182, 0.4)',
+                    boxShadow: uploadSuccess ? '0 0 15px rgba(16, 185, 129, 0.5)' : '0 0 15px rgba(236, 72, 153, 0.5)',
+                    transition: 'all 0.2s ease'
+                  }}
                 >
                   {uploadSuccess ? '✓ Success' : 'Post Now 🚀'}
                 </button>
               </div>
-            </form>
+            </div>
 
           </div>
         </div>
