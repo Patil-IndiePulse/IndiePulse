@@ -27,9 +27,10 @@ function CommunityContent() {
     });
 
     if (typeof window !== 'undefined') {
-      // मोबाईल आणि लॅपटॉपसाठी मागील पेज सुरक्षितपणे सेव्ह करणे
-      if (document.referrer && document.referrer.includes(window.location.origin) && !document.referrer.includes('/community')) {
-        sessionStorage.setItem('indiePulse_prev_page', document.referrer);
+      // Capture and store the exact previous page path before entering community
+      const storedPrev = localStorage.getItem('indiePulse_exact_prev_page');
+      if (!document.URL.includes('modal=true') && document.referrer && !document.referrer.includes('/community')) {
+        localStorage.setItem('indiePulse_exact_prev_page', document.referrer);
       }
 
       const savedCustomName = localStorage.getItem('indiePulse_name');
@@ -77,7 +78,7 @@ function CommunityContent() {
     return () => unsubscribe();
   }, []);
 
-  // URL तपासणी
+  // Check URL parameters on load
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -92,6 +93,13 @@ function CommunityContent() {
   const openModal = () => {
     setIsModalOpen(true);
     if (typeof window !== 'undefined') {
+      // Store the exact referrer page right before opening the modal
+      if (document.referrer && !document.referrer.includes('/community')) {
+        localStorage.setItem('indiePulse_exact_prev_page', document.referrer);
+      } else if (!localStorage.getItem('indiePulse_exact_prev_page')) {
+        localStorage.setItem('indiePulse_exact_prev_page', window.location.origin + '/');
+      }
+      
       const currentUrl = new URL(window.location.href);
       currentUrl.searchParams.set('modal', 'true');
       router.push(currentUrl.pathname + currentUrl.search);
@@ -128,14 +136,16 @@ function CommunityContent() {
     }
   };
 
-  // मोबाईल आणि लॅपटॉप दोघांसाठी १००% खात्रीशीर युनिव्हर्सल रिडायरेक्ट फंक्शन
-  const forceUniversalRedirect = () => {
+  // Universal precise redirection back to the exact previous page for both mobile and laptop
+  const redirectToExactPreviousPage = () => {
     if (typeof window !== 'undefined') {
-      const prevPage = sessionStorage.getItem('indiePulse_prev_page');
-      if (prevPage) {
-        window.location.href = prevPage;
+      const exactPrev = localStorage.getItem('indiePulse_exact_prev_page');
+      if (exactPrev && exactPrev !== window.location.href) {
+        window.location.href = exactPrev;
+      } else if (window.history.length > 2) {
+        router.back();
       } else {
-        window.location.href = '/';
+        router.push('/');
       }
     }
   };
@@ -151,7 +161,7 @@ function CommunityContent() {
     setMediaType(null);
     setIsSubmitting(false);
     
-    forceUniversalRedirect();
+    redirectToExactPreviousPage();
   };
 
   const executePostSubmission = (e: any) => {
@@ -189,7 +199,7 @@ function CommunityContent() {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
 
-    // मोबाईल आणि लॅपटॉपवर Success मेसेज आल्यावर अचूकपणे मागच्या पेजवर जाणे
+    // Redirect to the exact previous page after showing success message
     setTimeout(() => {
       setIsModalOpen(false);
       setNewPost("");
@@ -197,7 +207,7 @@ function CommunityContent() {
       setMediaType(null);
       setIsSubmitting(false);
 
-      forceUniversalRedirect();
+      redirectToExactPreviousPage();
     }, 800);
   };
 
