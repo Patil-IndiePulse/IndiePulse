@@ -29,7 +29,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v19');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v20');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,7 +62,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v19', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v20', JSON.stringify(initialPosts));
       }
     }
 
@@ -118,10 +118,10 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v19', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v20', JSON.stringify(updatedPosts));
     }
 
-    // Force Success state on mobile & laptop instantly
+    // Force success state instantly on both mobile & laptop
     setUploadSuccess(true);
 
     setTimeout(() => {
@@ -130,7 +130,7 @@ export default function CommunityPage() {
       setMediaType(null);
       setUploadSuccess(false);
       setIsModalOpen(false);
-    }, 900);
+    }, 800);
   };
 
   const handleLike = (id: string) => {
@@ -139,7 +139,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v19', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v20', JSON.stringify(updatedPosts));
     }
   };
 
@@ -257,31 +257,33 @@ export default function CommunityPage() {
                       <img src={mediaFile} alt="Preview" style={{ height: '100%', objectFit: 'contain' }} />
                     )}
                   </div>
-                  {/* Strict inline positioning for small corner X button */}
-                  <button 
-                    type="button" 
-                    onClick={() => { setMediaFile(null); setMediaType(null); }}
-                    style={{
-                      position: 'absolute',
-                      top: '8px',
-                      right: '8px',
-                      width: '26px',
-                      height: '26px',
-                      backgroundColor: '#db2777',
-                      color: '#ffffff',
-                      borderRadius: '50%',
-                      border: '1px solid #f472b6',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '12px',
-                      fontWeight: 'bold',
-                      cursor: 'pointer',
-                      zIndex: 99999
-                    }}
-                  >
-                    ✕
-                  </button>
+                  
+                  {/* Absolute positioning wrapper for small circular X button (Mobile & Desktop safe) */}
+                  <div style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 99999, width: '28px', height: '28px' }}>
+                    <button 
+                      type="button" 
+                      onClick={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
+                      onTouchEnd={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        backgroundColor: '#db2777',
+                        color: '#ffffff',
+                        borderRadius: '50%',
+                        border: '2px solid #f472b6',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '13px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        outline: 'none',
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.6)'
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -297,6 +299,7 @@ export default function CommunityPage() {
                 <button
                   type="button"
                   onClick={executePostSubmission}
+                  onTouchEnd={(e) => { e.preventDefault(); executePostSubmission(); }}
                   disabled={uploadSuccess}
                   style={{
                     flex: 1,
