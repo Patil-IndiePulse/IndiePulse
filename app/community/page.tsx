@@ -72,17 +72,17 @@ export default function CommunityPage() {
     return () => unsubscribe();
   }, []);
 
-  // मोठ्या कंपन्यांची पद्धत: मॉडेल ओपन झाल्यावर हिस्ट्री स्टॅकमध्ये नवीन स्टेट पुश करणे
+  // मोठ्या कंपन्यांची पद्धत: मॉडेल ओपन करताना URL मध्ये state जोडणे जेणेकरून history stack अचूक तयार होईल
   const openModal = () => {
     setIsModalOpen(true);
     if (typeof window !== 'undefined') {
-      window.history.pushState({ modalOpen: true }, '');
+      window.history.pushState({ modalOpen: true }, '', window.location.href);
     }
   };
 
   // Handle Android Back button and history popstate to close modal perfectly
   useEffect(() => {
-    const handlePopState = () => {
+    const handlePopState = (event: PopStateEvent) => {
       if (isModalOpen) {
         setIsModalOpen(false);
       }
@@ -118,11 +118,13 @@ export default function CommunityPage() {
     setMediaType(null);
     setIsSubmitting(false);
     
-    // मोठ्या कंपन्यांची पद्धत: जर मागील पेज उपलब्ध असेल तर तिथे जाणे, अन्यथा होम पेजवर जाणे
-    if (typeof window !== 'undefined' && window.history.length > 2) {
-      router.back();
-    } else {
-      router.push('/');
+    // मोठ्या कंपन्यांची पद्धत: कॅन्सल केल्यावर थेट मागील पेजवर जाणे
+    if (typeof window !== 'undefined') {
+      if (window.history.length > 2) {
+        router.back();
+      } else {
+        router.push('/');
+      }
     }
   };
 
@@ -162,7 +164,7 @@ export default function CommunityPage() {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
 
-    // मोठ्या कंपन्यांची १००% अचूक पद्धत: हिस्ट्रीवर अवलंबून न राहता थेट मागच्या पेजवर किंवा राऊटवर फोर्सफुली नेव्हिगेट करणे
+    // Success message दाखवल्यानंतर १००% खात्रीशीरपणे मागच्या पेजवर जाण्याची Big Tech पद्धत
     setTimeout(() => {
       setIsModalOpen(false);
       setNewPost("");
@@ -170,7 +172,6 @@ export default function CommunityPage() {
       setMediaType(null);
       setIsSubmitting(false);
 
-      // जर मागील युआरएल किंवा रेफरर उपलब्ध असेल तर तिथे पाठवणे, अन्यथा router.back() किंवा router.push('/') वापरणे
       if (typeof window !== 'undefined') {
         if (window.history.length > 2) {
           router.back();
