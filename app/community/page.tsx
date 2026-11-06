@@ -29,7 +29,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v22');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v23');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,7 +62,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v22', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v23', JSON.stringify(initialPosts));
       }
     }
 
@@ -122,10 +122,10 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v22', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v23', JSON.stringify(updatedPosts));
     }
 
-    // Force success state instantly on mobile & laptop
+    // Force success state instantly on both mobile & laptop
     setUploadSuccess(true);
 
     setTimeout(() => {
@@ -143,7 +143,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v22', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v23', JSON.stringify(updatedPosts));
     }
   };
 
@@ -265,8 +265,7 @@ export default function CommunityPage() {
                   <div style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 99999, width: '28px', height: '28px' }}>
                     <button 
                       type="button" 
-                      onClick={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
-                      onTouchEnd={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
+                      onPointerDown={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
                       style={{
                         width: '28px',
                         height: '28px',
@@ -301,7 +300,7 @@ export default function CommunityPage() {
                 </button>
                 <button
                   type="submit"
-                  onTouchEnd={(e) => handlePostSubmit(e)}
+                  onPointerDown={(e) => handlePostSubmit(e)}
                   disabled={uploadSuccess}
                   style={{
                     flex: 1,
