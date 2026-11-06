@@ -113,8 +113,10 @@ export default function CommunityPage() {
     setMediaType(null);
     setIsSubmitting(false);
     
-    // मोठ्या कंपन्यांप्रमाणे खात्रीशीररीत्या तंतोतंत मागील पेजवर (previous page) जाणे
-    if (window.history.length > 2) {
+    // मोठ्या कंपन्यांची पद्धत: sessionStorage वापरून मागील अचूक पेजवर जाणे किंवा router.back()
+    if (document.referrer && document.referrer.includes(window.location.origin)) {
+      window.location.href = document.referrer;
+    } else if (window.history.length > 2) {
       router.back();
     } else {
       router.push('/');
@@ -157,7 +159,7 @@ export default function CommunityPage() {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
 
-    // Success message दाखवल्यानंतर मोबाईल आणि लॅपटॉपवर प्रत्येक वेळी न चुकता तंतोतंत मागच्या पेजवर जाण्याची Big Tech पद्धत
+    // Success message दाखवल्यानंतर प्रत्येक वेळी न चुकता तंतोतंत मागच्या पेजवर (किंवा मागील डाक्यूमेंट्सवर) जाण्याची अचूक Big Tech पद्धत
     setTimeout(() => {
       setIsModalOpen(false);
       setNewPost("");
@@ -165,7 +167,9 @@ export default function CommunityPage() {
       setMediaType(null);
       setIsSubmitting(false);
 
-      if (window.history.length > 2) {
+      if (document.referrer && document.referrer.includes(window.location.origin)) {
+        window.location.href = document.referrer;
+      } else if (window.history.length > 2) {
         router.back();
       } else {
         router.push('/');
