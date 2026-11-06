@@ -72,7 +72,7 @@ function CommunityContent() {
     return () => unsubscribe();
   }, []);
 
-  // मोठ्या कंपन्यांची पद्धत: Vercel safe window.location checking
+  // मोठ्या कंपन्यांची पद्धत: URL मध्ये ?modal=true तपासणे
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -178,7 +178,7 @@ function CommunityContent() {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
 
-    // Success message दाखवल्यानंतर थेट मागच्या पेजवर जाण्याची पद्धत
+    // Success message दाखवल्यानंतर थेट मागच्या पेजवर जाण्याची Big Tech पद्धत (?modal=true सह)
     setTimeout(() => {
       setIsModalOpen(false);
       setNewPost("");
