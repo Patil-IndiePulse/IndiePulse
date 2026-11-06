@@ -29,7 +29,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v21');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v22');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,7 +62,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v21', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v22', JSON.stringify(initialPosts));
       }
     }
 
@@ -99,7 +99,7 @@ export default function CommunityPage() {
     }
   };
 
-  const executePostSubmission = (e?: any) => {
+  const handlePostSubmit = (e: any) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -122,10 +122,10 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v21', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v22', JSON.stringify(updatedPosts));
     }
 
-    // Force success state instantly on both mobile & laptop
+    // Force success state instantly on mobile & laptop
     setUploadSuccess(true);
 
     setTimeout(() => {
@@ -143,7 +143,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v21', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v22', JSON.stringify(updatedPosts));
     }
   };
 
@@ -232,7 +232,7 @@ export default function CommunityPage() {
               </h3>
             </div>
 
-            <div className="flex flex-col gap-4">
+            <form onSubmit={handlePostSubmit} className="flex flex-col gap-4">
               <textarea
                 value={newPost}
                 onChange={(e) => setNewPost(e.target.value)}
@@ -262,12 +262,11 @@ export default function CommunityPage() {
                     )}
                   </div>
                   
-                  {/* Perfect corner X button with touch start support */}
                   <div style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 99999, width: '28px', height: '28px' }}>
                     <button 
                       type="button" 
                       onClick={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
-                      onTouchStart={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
+                      onTouchEnd={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
                       style={{
                         width: '28px',
                         height: '28px',
@@ -301,9 +300,8 @@ export default function CommunityPage() {
                   Cancel
                 </button>
                 <button
-                  type="button"
-                  onClick={executePostSubmission}
-                  onTouchStart={(e) => executePostSubmission(e)}
+                  type="submit"
+                  onTouchEnd={(e) => handlePostSubmit(e)}
                   disabled={uploadSuccess}
                   style={{
                     flex: 1,
@@ -326,7 +324,7 @@ export default function CommunityPage() {
                   {uploadSuccess ? '✓ Success' : 'Post Now 🚀'}
                 </button>
               </div>
-            </div>
+            </form>
 
           </div>
         </div>
