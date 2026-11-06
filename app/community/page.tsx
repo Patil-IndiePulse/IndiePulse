@@ -29,7 +29,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v24');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v25');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,7 +62,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v24', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v25', JSON.stringify(initialPosts));
       }
     }
 
@@ -122,10 +122,10 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v24', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v25', JSON.stringify(updatedPosts));
     }
 
-    // Force success state instantly on mobile & laptop
+    // Force success state instantly on both mobile & laptop
     setUploadSuccess(true);
 
     setTimeout(() => {
@@ -143,7 +143,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v24', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v25', JSON.stringify(updatedPosts));
     }
   };
 
@@ -232,7 +232,7 @@ export default function CommunityPage() {
               </h3>
             </div>
 
-            <div className="flex flex-col gap-4">
+            <form onSubmit={handlePostSubmit} className="flex flex-col gap-4">
               <textarea
                 value={newPost}
                 onChange={(e) => setNewPost(e.target.value)}
@@ -266,7 +266,7 @@ export default function CommunityPage() {
                     <button 
                       type="button" 
                       onClick={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
-                      onTouchStart={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
+                      onTouchEnd={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
                       style={{
                         width: '28px',
                         height: '28px',
@@ -300,8 +300,7 @@ export default function CommunityPage() {
                   Cancel
                 </button>
                 <button
-                  type="button"
-                  onClick={(e) => handlePostSubmit(e)}
+                  type="submit"
                   onTouchStart={(e) => handlePostSubmit(e)}
                   disabled={uploadSuccess}
                   style={{
@@ -325,7 +324,7 @@ export default function CommunityPage() {
                   {uploadSuccess ? '✓ Success' : 'Post Now 🚀'}
                 </button>
               </div>
-            </div>
+            </form>
 
           </div>
         </div>
