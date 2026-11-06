@@ -13,7 +13,7 @@ export default function CommunityPage() {
   const [mediaType, setMediaType] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentName, setCurrentName] = useState('Bharat Patil');
-  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [postStatus, setPostStatus] = useState<'idle' | 'success'>('idle');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -29,7 +29,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v27');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v28');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,7 +62,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v27', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v28', JSON.stringify(initialPosts));
       }
     }
 
@@ -101,7 +101,7 @@ export default function CommunityPage() {
 
   const executePostSubmission = () => {
     if (!newPost.trim() && !mediaFile) return;
-    if (uploadSuccess) return;
+    if (postStatus === 'success') return;
 
     const newPostObj = {
       id: Date.now().toString(),
@@ -118,19 +118,20 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v27', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v28', JSON.stringify(updatedPosts));
     }
 
-    // Force success state instantly on both mobile & laptop
-    setUploadSuccess(true);
+    // Step 1: Force UI to render Success state immediately
+    setPostStatus('success');
 
+    // Step 2: Yield control to mobile browser paint cycle before unmounting
     setTimeout(() => {
+      setIsModalOpen(false);
       setNewPost("");
       setMediaFile(null);
       setMediaType(null);
-      setUploadSuccess(false);
-      setIsModalOpen(false);
-    }, 1000);
+      setPostStatus('idle');
+    }, 1200);
   };
 
   const handleLike = (id: string) => {
@@ -139,7 +140,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v27', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v28', JSON.stringify(updatedPosts));
     }
   };
 
@@ -289,7 +290,7 @@ export default function CommunityPage() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  disabled={uploadSuccess}
+                  disabled={postStatus === 'success'}
                   className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-xs cursor-pointer border border-slate-700"
                 >
                   Cancel
@@ -297,7 +298,7 @@ export default function CommunityPage() {
                 <button
                   type="button"
                   onClick={executePostSubmission}
-                  disabled={uploadSuccess}
+                  disabled={postStatus === 'success'}
                   style={{
                     flex: 1,
                     padding: '12px',
@@ -309,14 +310,14 @@ export default function CommunityPage() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '6px',
-                    backgroundColor: uploadSuccess ? '#059669' : '#db2777',
+                    backgroundColor: postStatus === 'success' ? '#059669' : '#db2777',
                     color: '#ffffff',
-                    border: uploadSuccess ? '1px solid #34d399' : '1px solid rgba(244, 114, 182, 0.4)',
-                    boxShadow: uploadSuccess ? '0 0 15px rgba(16, 185, 129, 0.5)' : '0 0 15px rgba(236, 72, 153, 0.5)',
+                    border: postStatus === 'success' ? '1px solid #34d399' : '1px solid rgba(244, 114, 182, 0.4)',
+                    boxShadow: postStatus === 'success' ? '0 0 15px rgba(16, 185, 129, 0.5)' : '0 0 15px rgba(236, 72, 153, 0.5)',
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  {uploadSuccess ? '✓ Success' : 'Post Now 🚀'}
+                  {postStatus === 'success' ? '✓ Success' : 'Post Now 🚀'}
                 </button>
               </div>
             </div>
