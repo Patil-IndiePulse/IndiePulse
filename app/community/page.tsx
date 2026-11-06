@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { auth } from "@/app/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
 export default function CommunityPage() {
+  const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [newPost, setNewPost] = useState("");
@@ -100,12 +102,18 @@ export default function CommunityPage() {
     }
   };
 
-  const handleCancel = () => {
+  const handleCancel = (e: any) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setIsModalOpen(false);
     setNewPost("");
     setMediaFile(null);
     setMediaType(null);
     setIsSubmitting(false);
+    // 빅테크 방식: थेट होम किंवा मागील पेजवर जाणे
+    router.push('/');
   };
 
   const executePostSubmission = (e: any) => {
@@ -144,7 +152,7 @@ export default function CommunityPage() {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
 
-    // Success message दाखवल्यानंतर लगेच मागच्या पेजवर (ऑटो-बॅक) जाण्यासाठी 800ms चा अचूक डिले
+    // Success message दाखवल्यानंतर लगेच मागच्या पेजवर (ऑटो-बॅक) जाण्याची खात्रीशीर यंत्रणा
     setTimeout(() => {
       setIsModalOpen(false);
       setNewPost("");
@@ -152,10 +160,8 @@ export default function CommunityPage() {
       setMediaType(null);
       setIsSubmitting(false);
       
-      // जर विंडो हिस्टरीत मागे जाणे शक्य असेल तर मागे जावे, अन्यथा मॉडेल बंद होईलच
-      if (window.history.length > 1) {
-        window.history.back();
-      }
+      // मोठ्या कंपन्यांप्रमाणे Next.js router वापरून खात्रीशीरपणे मागील पेजवर पाठवणे
+      router.push('/');
     }, 800);
   };
 
@@ -315,6 +321,7 @@ export default function CommunityPage() {
                 <button
                   type="button"
                   onClick={handleCancel}
+                  onTouchEnd={handleCancel}
                   disabled={isSubmitting}
                   className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-xs cursor-pointer border border-slate-700"
                 >
