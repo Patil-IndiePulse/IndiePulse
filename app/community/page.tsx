@@ -27,7 +27,7 @@ function CommunityContent() {
     });
 
     if (typeof window !== 'undefined') {
-      // मोठ्या कंपन्यांची पद्धत: युझर ज्या मागच्या पेजवरून आला आहे तो पाथ सेव्ह करून ठेवणे
+      // मोबाईल आणि लॅपटॉपसाठी अचूक मागच्या पेजचा पाथ सेव्ह करणे
       if (document.referrer && document.referrer.includes(window.location.origin) && !document.referrer.includes('/community')) {
         sessionStorage.setItem('indiePulse_prev_page', document.referrer);
       }
@@ -77,7 +77,7 @@ function CommunityContent() {
     return () => unsubscribe();
   }, []);
 
-  // मोठ्या कंपन्यांची पद्धत: URL मध्ये ?modal=true तपासणे
+  // URL तपासणी
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -98,7 +98,7 @@ function CommunityContent() {
     }
   };
 
-  // Handle Android Back button and history popstate perfectly
+  // Android Back button support
   useEffect(() => {
     const handlePopState = () => {
       if (typeof window !== 'undefined') {
@@ -128,16 +128,15 @@ function CommunityContent() {
     }
   };
 
-  // अचूक मागच्या पेजवर जाण्याची स्मार्ट फंक्शन पद्धत
-  const navigateToPreviousPage = () => {
+  // मोबाईल आणि लॅपटॉप दोघांसाठी १००% काम करणारे अचूक रिडायरेक्ट फंक्शन
+  const redirectToPreviousPage = () => {
     if (typeof window !== 'undefined') {
       const prevPage = sessionStorage.getItem('indiePulse_prev_page');
       if (prevPage) {
         window.location.href = prevPage;
-      } else if (window.history.length > 2) {
-        router.back();
       } else {
-        router.push('/');
+        // जर मागील पेज नसेल तर थेट होमपेजवर जाणे
+        window.location.href = '/';
       }
     }
   };
@@ -153,7 +152,7 @@ function CommunityContent() {
     setMediaType(null);
     setIsSubmitting(false);
     
-    navigateToPreviousPage();
+    redirectToPreviousPage();
   };
 
   const executePostSubmission = (e: any) => {
@@ -191,7 +190,7 @@ function CommunityContent() {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
 
-    // Success message दाखवल्यानंतर अचूकपणे मागील युझरच्या पेजवर जाणे
+    // मोबाईलवर सक्सेस मेसेज दाखवल्यानंतर अचूकपणे मागील पेजवर नेण्याची पद्धत
     setTimeout(() => {
       setIsModalOpen(false);
       setNewPost("");
@@ -199,7 +198,7 @@ function CommunityContent() {
       setMediaType(null);
       setIsSubmitting(false);
 
-      navigateToPreviousPage();
+      redirectToPreviousPage();
     }, 800);
   };
 
