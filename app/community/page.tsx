@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { auth } from "@/app/firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -14,6 +14,7 @@ export default function CommunityPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentName, setCurrentName] = useState('Bharat Patil');
   const [postStatus, setPostStatus] = useState<'idle' | 'success'>('idle');
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -29,7 +30,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v29');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v30');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,7 +63,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v29', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v30', JSON.stringify(initialPosts));
       }
     }
 
@@ -118,22 +119,27 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v29', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v30', JSON.stringify(updatedPosts));
     }
 
-    // Force success state instantly
+    // Force strict DOM and state update for mobile & laptop
     setPostStatus('success');
 
-    // Big Tech approach: Use requestAnimationFrame to guarantee mobile paint before unmounting
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        setIsModalOpen(false);
-        setNewPost("");
-        setMediaFile(null);
-        setMediaType(null);
-        setPostStatus('idle');
-      }, 1000);
-    });
+    if (submitButtonRef.current) {
+      submitButtonRef.current.style.backgroundColor = '#059669';
+      submitButtonRef.current.style.borderColor = '#34d399';
+      submitButtonRef.current.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.8)';
+      submitButtonRef.current.innerText = '✓ Success';
+    }
+
+    // Guaranteed safe timeout for auto-back
+    setTimeout(() => {
+      setIsModalOpen(false);
+      setNewPost("");
+      setMediaFile(null);
+      setMediaType(null);
+      setPostStatus('idle');
+    }, 1000);
   };
 
   const handleLike = (id: string) => {
@@ -142,7 +148,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v29', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v30', JSON.stringify(updatedPosts));
     }
   };
 
@@ -298,6 +304,7 @@ export default function CommunityPage() {
                   Cancel
                 </button>
                 <button
+                  ref={submitButtonRef}
                   type="button"
                   onClick={executePostSubmission}
                   disabled={postStatus === 'success'}
