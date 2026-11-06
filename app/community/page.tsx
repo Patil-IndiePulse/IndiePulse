@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { auth } from "@/app/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
 export default function CommunityPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [user, setUser] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [newPost, setNewPost] = useState("");
@@ -72,26 +73,39 @@ export default function CommunityPage() {
     return () => unsubscribe();
   }, []);
 
-  // मोठ्या कंपन्यांची पद्धत: मॉडेल ओपन करताना URL मध्ये state जोडणे जेणेकरून history stack अचूक तयार होईल
+  // मोठ्या कंपन्यांची खरी पद्धत: URL मध्ये ?modal=true सेट करणे जेणेकरून state आणि history १००% मॅच होईल
+  useEffect(() => {
+    const modalParam = searchParams.get('modal');
+    if (modalParam === 'true') {
+      setIsModalOpen(true);
+    } else {
+      setIsModalOpen(false);
+    }
+  }, [searchParams]);
+
   const openModal = () => {
-    setIsModalOpen(true);
     if (typeof window !== 'undefined') {
-      window.history.pushState({ modalOpen: true }, '', window.location.href);
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set('modal', 'true');
+      router.push(currentUrl.pathname + currentUrl.search);
     }
   };
 
-  // Handle Android Back button and history popstate to close modal perfectly
+  // Handle Android Back button and history popstate perfectly
   useEffect(() => {
-    const handlePopState = (event: PopStateEvent) => {
-      if (isModalOpen) {
-        setIsModalOpen(false);
+    const handlePopState = () => {
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('modal') !== 'true') {
+          setIsModalOpen(false);
+        }
       }
     };
     window.addEventListener('popstate', handlePopState);
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [isModalOpen]);
+  }, []);
 
   const currentEmail = user?.email || 'bharatrajupatil5200@gmail.com';
 
@@ -164,7 +178,7 @@ export default function CommunityPage() {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
 
-    // Success message दाखवल्यानंतर १००% खात्रीशीरपणे मागच्या पेजवर जाण्याची Big Tech पद्धत
+    // Success message दाखवल्यानंतर प्रत्येक वेळी न चुकता तंतोतंत मागच्या पेजवर जाण्याची Big Tech Query Parameter पद्धत
     setTimeout(() => {
       setIsModalOpen(false);
       setNewPost("");
