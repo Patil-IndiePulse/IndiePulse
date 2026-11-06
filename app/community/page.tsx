@@ -73,17 +73,20 @@ export default function CommunityPage() {
     return () => unsubscribe();
   }, []);
 
-  // मोठ्या कंपन्यांची खरी पद्धत: URL मध्ये ?modal=true सेट करणे जेणेकरून state आणि history १००% मॅच होईल
+  // मोठ्या कंपन्यांची पद्धत: window.location द्वारे safe query checking with ?modal=true
   useEffect(() => {
-    const modalParam = searchParams.get('modal');
-    if (modalParam === 'true') {
-      setIsModalOpen(true);
-    } else {
-      setIsModalOpen(false);
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('modal') === 'true') {
+        setIsModalOpen(true);
+      } else {
+        setIsModalOpen(false);
+      }
     }
   }, [searchParams]);
 
   const openModal = () => {
+    setIsModalOpen(true);
     if (typeof window !== 'undefined') {
       const currentUrl = new URL(window.location.href);
       currentUrl.searchParams.set('modal', 'true');
@@ -95,8 +98,8 @@ export default function CommunityPage() {
   useEffect(() => {
     const handlePopState = () => {
       if (typeof window !== 'undefined') {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('modal') !== 'true') {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('modal') !== 'true') {
           setIsModalOpen(false);
         }
       }
@@ -132,7 +135,6 @@ export default function CommunityPage() {
     setMediaType(null);
     setIsSubmitting(false);
     
-    // मोठ्या कंपन्यांची पद्धत: कॅन्सल केल्यावर थेट मागील पेजवर जाणे
     if (typeof window !== 'undefined') {
       if (window.history.length > 2) {
         router.back();
@@ -178,7 +180,7 @@ export default function CommunityPage() {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
 
-    // Success message दाखवल्यानंतर प्रत्येक वेळी न चुकता तंतोतंत मागच्या पेजवर जाण्याची Big Tech Query Parameter पद्धत
+    // Success message दाखवल्यानंतर ?modal=true काढून टाकून थेट आधीच्या पेजवर जाण्याची Big Tech पद्धत
     setTimeout(() => {
       setIsModalOpen(false);
       setNewPost("");
