@@ -27,7 +27,7 @@ function CommunityContent() {
     });
 
     if (typeof window !== 'undefined') {
-      // मोबाईल आणि लॅपटॉपसाठी अचूक मागच्या पेजचा पाथ सेव्ह करणे
+      // मोबाईल आणि लॅपटॉपसाठी मागील पेज रेकॉर्ड सुरक्षित ठेवणे
       if (document.referrer && document.referrer.includes(window.location.origin) && !document.referrer.includes('/community')) {
         sessionStorage.setItem('indiePulse_prev_page', document.referrer);
       }
@@ -128,15 +128,16 @@ function CommunityContent() {
     }
   };
 
-  // मोबाईल आणि लॅपटॉप दोघांसाठी १००% काम करणारे अचूक रिडायरेक्ट फंक्शन
-  const redirectToPreviousPage = () => {
+  // मोबाईल आणि लॅपटॉप दोघांसाठी अचूक मागच्या पेजवर नेणारी खात्रीशीर पद्धत
+  const handleSmartBack = () => {
     if (typeof window !== 'undefined') {
       const prevPage = sessionStorage.getItem('indiePulse_prev_page');
       if (prevPage) {
-        window.location.href = prevPage;
+        router.push(prevPage);
+      } else if (window.history.length > 2) {
+        router.back();
       } else {
-        // जर मागील पेज नसेल तर थेट होमपेजवर जाणे
-        window.location.href = '/';
+        router.push('/');
       }
     }
   };
@@ -152,7 +153,7 @@ function CommunityContent() {
     setMediaType(null);
     setIsSubmitting(false);
     
-    redirectToPreviousPage();
+    handleSmartBack();
   };
 
   const executePostSubmission = (e: any) => {
@@ -190,7 +191,7 @@ function CommunityContent() {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
 
-    // मोबाईलवर सक्सेस मेसेज दाखवल्यानंतर अचूकपणे मागील पेजवर नेण्याची पद्धत
+    // Success झाल्यावर मोबाईल आणि लॅपटॉपवर अचूकपणे मागच्या पेजवर जाणे
     setTimeout(() => {
       setIsModalOpen(false);
       setNewPost("");
@@ -198,7 +199,7 @@ function CommunityContent() {
       setMediaType(null);
       setIsSubmitting(false);
 
-      redirectToPreviousPage();
+      handleSmartBack();
     }, 800);
   };
 
