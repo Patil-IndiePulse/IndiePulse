@@ -13,8 +13,8 @@ export default function CommunityPage() {
   const [mediaType, setMediaType] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentName, setCurrentName] = useState('Bharat Patil');
-  const [postStatus, setPostStatus] = useState<'idle' | 'success'>('idle');
-  const submitButtonRef = useRef<HTMLButtonElement>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -30,7 +30,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v30');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v31');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -63,7 +63,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v30', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v31', JSON.stringify(initialPosts));
       }
     }
 
@@ -100,9 +100,23 @@ export default function CommunityPage() {
     }
   };
 
-  const executePostSubmission = () => {
+  const executePostSubmission = (e: any) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (!newPost.trim() && !mediaFile) return;
-    if (postStatus === 'success') return;
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+
+    // Force DOM styling instantly for mobile browsers without waiting for react state batching
+    if (submitBtnRef.current) {
+      submitBtnRef.current.style.backgroundColor = '#059669';
+      submitBtnRef.current.style.borderColor = '#34d399';
+      submitBtnRef.current.style.boxShadow = '0 0 25px rgba(16, 185, 129, 0.9)';
+      submitBtnRef.current.innerText = '✓ Success';
+    }
 
     const newPostObj = {
       id: Date.now().toString(),
@@ -119,26 +133,16 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v30', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v31', JSON.stringify(updatedPosts));
     }
 
-    // Force strict DOM and state update for mobile & laptop
-    setPostStatus('success');
-
-    if (submitButtonRef.current) {
-      submitButtonRef.current.style.backgroundColor = '#059669';
-      submitButtonRef.current.style.borderColor = '#34d399';
-      submitButtonRef.current.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.8)';
-      submitButtonRef.current.innerText = '✓ Success';
-    }
-
-    // Guaranteed safe timeout for auto-back
+    // Guaranteed delay to let mobile user experience the green success message before closing modal
     setTimeout(() => {
       setIsModalOpen(false);
       setNewPost("");
       setMediaFile(null);
       setMediaType(null);
-      setPostStatus('idle');
+      setIsSubmitting(false);
     }, 1000);
   };
 
@@ -148,7 +152,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v30', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v31', JSON.stringify(updatedPosts));
     }
   };
 
@@ -298,16 +302,17 @@ export default function CommunityPage() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  disabled={postStatus === 'success'}
+                  disabled={isSubmitting}
                   className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-xs cursor-pointer border border-slate-700"
                 >
                   Cancel
                 </button>
                 <button
-                  ref={submitButtonRef}
+                  ref={submitBtnRef}
                   type="button"
                   onClick={executePostSubmission}
-                  disabled={postStatus === 'success'}
+                  onTouchEnd={executePostSubmission}
+                  disabled={isSubmitting}
                   style={{
                     flex: 1,
                     padding: '12px',
@@ -319,14 +324,14 @@ export default function CommunityPage() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '6px',
-                    backgroundColor: postStatus === 'success' ? '#059669' : '#db2777',
+                    backgroundColor: '#db2777',
                     color: '#ffffff',
-                    border: postStatus === 'success' ? '1px solid #34d399' : '1px solid rgba(244, 114, 182, 0.4)',
-                    boxShadow: postStatus === 'success' ? '0 0 15px rgba(16, 185, 129, 0.5)' : '0 0 15px rgba(236, 72, 153, 0.5)',
+                    border: '1px solid rgba(244, 114, 182, 0.4)',
+                    boxShadow: '0 0 15px rgba(236, 72, 153, 0.5)',
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  {postStatus === 'success' ? '✓ Success' : 'Post Now 🚀'}
+                  Post Now 🚀
                 </button>
               </div>
             </div>
