@@ -29,7 +29,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v25');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v26');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,7 +62,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v25', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v26', JSON.stringify(initialPosts));
       }
     }
 
@@ -99,7 +99,7 @@ export default function CommunityPage() {
     }
   };
 
-  const handlePostSubmit = (e?: any) => {
+  const executePostSubmission = (e?: any) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -122,7 +122,7 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v25', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v26', JSON.stringify(updatedPosts));
     }
 
     // Force success state instantly on both mobile & laptop
@@ -134,7 +134,7 @@ export default function CommunityPage() {
       setMediaType(null);
       setUploadSuccess(false);
       setIsModalOpen(false);
-    }, 900);
+    }, 1000);
   };
 
   const handleLike = (id: string) => {
@@ -143,7 +143,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v25', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v26', JSON.stringify(updatedPosts));
     }
   };
 
@@ -232,7 +232,7 @@ export default function CommunityPage() {
               </h3>
             </div>
 
-            <form onSubmit={handlePostSubmit} className="flex flex-col gap-4">
+            <form onSubmit={executePostSubmission} className="flex flex-col gap-4">
               <textarea
                 value={newPost}
                 onChange={(e) => setNewPost(e.target.value)}
@@ -301,7 +301,8 @@ export default function CommunityPage() {
                 </button>
                 <button
                   type="submit"
-                  onTouchStart={(e) => handlePostSubmit(e)}
+                  onClick={(e) => executePostSubmission(e)}
+                  onTouchEnd={(e) => executePostSubmission(e)}
                   disabled={uploadSuccess}
                   style={{
                     flex: 1,
