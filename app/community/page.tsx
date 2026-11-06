@@ -29,7 +29,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v28');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v29');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,7 +62,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v28', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v29', JSON.stringify(initialPosts));
       }
     }
 
@@ -118,20 +118,22 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v28', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v29', JSON.stringify(updatedPosts));
     }
 
-    // Step 1: Force UI to render Success state immediately
+    // Force success state instantly
     setPostStatus('success');
 
-    // Step 2: Yield control to mobile browser paint cycle before unmounting
-    setTimeout(() => {
-      setIsModalOpen(false);
-      setNewPost("");
-      setMediaFile(null);
-      setMediaType(null);
-      setPostStatus('idle');
-    }, 1200);
+    // Big Tech approach: Use requestAnimationFrame to guarantee mobile paint before unmounting
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        setIsModalOpen(false);
+        setNewPost("");
+        setMediaFile(null);
+        setMediaType(null);
+        setPostStatus('idle');
+      }, 1000);
+    });
   };
 
   const handleLike = (id: string) => {
@@ -140,7 +142,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v28', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v29', JSON.stringify(updatedPosts));
     }
   };
 
