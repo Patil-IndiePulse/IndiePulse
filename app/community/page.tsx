@@ -1,14 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { auth } from "@/app/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
-export default function CommunityPage() {
+function CommunityContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [user, setUser] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [newPost, setNewPost] = useState("");
@@ -73,7 +72,7 @@ export default function CommunityPage() {
     return () => unsubscribe();
   }, []);
 
-  // मोठ्या कंपन्यांची पद्धत: window.location द्वारे safe query checking with ?modal=true
+  // मोठ्या कंपन्यांची पद्धत: Vercel safe window.location checking
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -83,7 +82,7 @@ export default function CommunityPage() {
         setIsModalOpen(false);
       }
     }
-  }, [searchParams]);
+  }, []);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -154,7 +153,6 @@ export default function CommunityPage() {
 
     setIsSubmitting(true);
 
-    // Force DOM styling instantly for mobile browsers
     if (submitBtnRef.current) {
       submitBtnRef.current.style.backgroundColor = '#059669';
       submitBtnRef.current.style.borderColor = '#34d399';
@@ -180,7 +178,7 @@ export default function CommunityPage() {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
 
-    // Success message दाखवल्यानंतर ?modal=true काढून टाकून थेट आधीच्या पेजवर जाण्याची Big Tech पद्धत
+    // Success message दाखवल्यानंतर थेट मागच्या पेजवर जाण्याची पद्धत
     setTimeout(() => {
       setIsModalOpen(false);
       setNewPost("");
@@ -394,5 +392,13 @@ export default function CommunityPage() {
       )}
 
     </main>
+  );
+}
+
+export default function CommunityPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">Loading...</div>}>
+      <CommunityContent />
+    </Suspense>
   );
 }
