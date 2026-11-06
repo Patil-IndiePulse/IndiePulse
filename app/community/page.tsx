@@ -72,17 +72,22 @@ export default function CommunityPage() {
     return () => unsubscribe();
   }, []);
 
-  // Handle Android Back button to close modal
+  // मोठ्या कंपन्यांची पद्धत: मॉडेल ओपन झाल्यावर हिस्ट्री स्टॅकमध्ये नवीन स्टेट पुश करणे
+  const openModal = () => {
+    setIsModalOpen(true);
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ modalOpen: true }, '');
+    }
+  };
+
+  // Handle Android Back button and history popstate to close modal perfectly
   useEffect(() => {
     const handlePopState = () => {
       if (isModalOpen) {
         setIsModalOpen(false);
       }
     };
-    if (isModalOpen) {
-      window.history.pushState({ modalOpen: true }, '');
-      window.addEventListener('popstate', handlePopState);
-    }
+    window.addEventListener('popstate', handlePopState);
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
@@ -113,10 +118,8 @@ export default function CommunityPage() {
     setMediaType(null);
     setIsSubmitting(false);
     
-    // मोठ्या कंपन्यांची पद्धत: sessionStorage वापरून मागील अचूक पेजवर जाणे किंवा router.back()
-    if (document.referrer && document.referrer.includes(window.location.origin)) {
-      window.location.href = document.referrer;
-    } else if (window.history.length > 2) {
+    // मोठ्या कंपन्यांप्रमाणे अचूक मागील पेजवर जाणे
+    if (window.history.length > 2) {
       router.back();
     } else {
       router.push('/');
@@ -159,7 +162,7 @@ export default function CommunityPage() {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
 
-    // Success message दाखवल्यानंतर प्रत्येक वेळी न चुकता तंतोतंत मागच्या पेजवर (किंवा मागील डाक्यूमेंट्सवर) जाण्याची अचूक Big Tech पद्धत
+    // Success message दाखवल्यानंतर प्रत्येक वेळी न चुकता तंतोतंत मागच्या पेजवर जाण्याची Big Tech पद्धत
     setTimeout(() => {
       setIsModalOpen(false);
       setNewPost("");
@@ -167,9 +170,7 @@ export default function CommunityPage() {
       setMediaType(null);
       setIsSubmitting(false);
 
-      if (document.referrer && document.referrer.includes(window.location.origin)) {
-        window.location.href = document.referrer;
-      } else if (window.history.length > 2) {
+      if (window.history.length > 2) {
         router.back();
       } else {
         router.push('/');
@@ -211,7 +212,7 @@ export default function CommunityPage() {
         
         <div className="mb-6">
           <button 
-            onClick={() => setIsModalOpen(true)}
+            onClick={openModal}
             className="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(236,72,153,0.4)] transition-all text-sm cursor-pointer border border-pink-400/40 flex items-center justify-center gap-2"
           >
             <span>+</span> Create Post
