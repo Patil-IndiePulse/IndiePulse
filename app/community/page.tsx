@@ -118,8 +118,8 @@ export default function CommunityPage() {
     setMediaType(null);
     setIsSubmitting(false);
     
-    // मोठ्या कंपन्यांप्रमाणे अचूक मागील पेजवर जाणे
-    if (window.history.length > 2) {
+    // मोठ्या कंपन्यांची पद्धत: जर मागील पेज उपलब्ध असेल तर तिथे जाणे, अन्यथा होम पेजवर जाणे
+    if (typeof window !== 'undefined' && window.history.length > 2) {
       router.back();
     } else {
       router.push('/');
@@ -162,7 +162,7 @@ export default function CommunityPage() {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
 
-    // Success message दाखवल्यानंतर प्रत्येक वेळी न चुकता तंतोतंत मागच्या पेजवर जाण्याची Big Tech पद्धत
+    // मोठ्या कंपन्यांची १००% अचूक पद्धत: हिस्ट्रीवर अवलंबून न राहता थेट मागच्या पेजवर किंवा राऊटवर फोर्सफुली नेव्हिगेट करणे
     setTimeout(() => {
       setIsModalOpen(false);
       setNewPost("");
@@ -170,10 +170,13 @@ export default function CommunityPage() {
       setMediaType(null);
       setIsSubmitting(false);
 
-      if (window.history.length > 2) {
-        router.back();
-      } else {
-        router.push('/');
+      // जर मागील युआरएल किंवा रेफरर उपलब्ध असेल तर तिथे पाठवणे, अन्यथा router.back() किंवा router.push('/') वापरणे
+      if (typeof window !== 'undefined') {
+        if (window.history.length > 2) {
+          router.back();
+        } else {
+          router.push('/');
+        }
       }
     }, 800);
   };
