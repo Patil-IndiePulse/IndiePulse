@@ -29,7 +29,7 @@ export default function CommunityPage() {
         setCurrentName(savedCustomName);
       }
 
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v20');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v21');
       if (savedPosts) {
         try {
           setPosts(JSON.parse(savedPosts));
@@ -62,7 +62,7 @@ export default function CommunityPage() {
           }
         ];
         setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v20', JSON.stringify(initialPosts));
+        localStorage.setItem('indiePulse_community_posts_v21', JSON.stringify(initialPosts));
       }
     }
 
@@ -99,7 +99,11 @@ export default function CommunityPage() {
     }
   };
 
-  const executePostSubmission = () => {
+  const executePostSubmission = (e?: any) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (!newPost.trim() && !mediaFile) return;
     if (uploadSuccess) return;
 
@@ -118,7 +122,7 @@ export default function CommunityPage() {
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v20', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v21', JSON.stringify(updatedPosts));
     }
 
     // Force success state instantly on both mobile & laptop
@@ -130,7 +134,7 @@ export default function CommunityPage() {
       setMediaType(null);
       setUploadSuccess(false);
       setIsModalOpen(false);
-    }, 800);
+    }, 900);
   };
 
   const handleLike = (id: string) => {
@@ -139,7 +143,7 @@ export default function CommunityPage() {
     );
     setPosts(updatedPosts);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v20', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_community_posts_v21', JSON.stringify(updatedPosts));
     }
   };
 
@@ -258,12 +262,12 @@ export default function CommunityPage() {
                     )}
                   </div>
                   
-                  {/* Absolute positioning wrapper for small circular X button (Mobile & Desktop safe) */}
+                  {/* Perfect corner X button with touch start support */}
                   <div style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 99999, width: '28px', height: '28px' }}>
                     <button 
                       type="button" 
                       onClick={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
-                      onTouchEnd={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
+                      onTouchStart={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
                       style={{
                         width: '28px',
                         height: '28px',
@@ -299,7 +303,7 @@ export default function CommunityPage() {
                 <button
                   type="button"
                   onClick={executePostSubmission}
-                  onTouchEnd={(e) => { e.preventDefault(); executePostSubmission(); }}
+                  onTouchStart={(e) => executePostSubmission(e)}
                   disabled={uploadSuccess}
                   style={{
                     flex: 1,
