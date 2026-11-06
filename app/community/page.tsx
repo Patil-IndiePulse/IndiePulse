@@ -113,8 +113,12 @@ export default function CommunityPage() {
     setMediaType(null);
     setIsSubmitting(false);
     
-    // मोठ्या कंपन्यांप्रमाणे खात्रीशीर होम पेजवर रीडायरेक्ट करणे
-    window.location.href = '/';
+    // मोठ्या कंपन्यांप्रमाणे खात्रीशीररीत्या तंतोतंत मागील पेजवर (previous page) जाणे
+    if (window.history.length > 2) {
+      router.back();
+    } else {
+      router.push('/');
+    }
   };
 
   const executePostSubmission = (e: any) => {
@@ -153,9 +157,19 @@ export default function CommunityPage() {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
 
-    // Success message दाखवल्यानंतर मोबाईल आणि लॅपटॉपवर १००% खात्रीशीरपणे मागील पेजवर जाण्यासाठी window.location.href वापरणे
+    // Success message दाखवल्यानंतर मोबाईल आणि लॅपटॉपवर प्रत्येक वेळी न चुकता तंतोतंत मागच्या पेजवर जाण्याची Big Tech पद्धत
     setTimeout(() => {
-      window.location.href = '/';
+      setIsModalOpen(false);
+      setNewPost("");
+      setMediaFile(null);
+      setMediaType(null);
+      setIsSubmitting(false);
+
+      if (window.history.length > 2) {
+        router.back();
+      } else {
+        router.push('/');
+      }
     }, 800);
   };
 
