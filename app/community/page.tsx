@@ -16,13 +16,19 @@ export default function CommunityPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentName, setCurrentName] = useState('Bharat Patil');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedMediaPost, setSelectedMediaPost] = useState<any>(null); // इंस्टाग्राम फुल-स्क्रीन व्ह्यूसाठी
+  
+  // Full-screen Viewer States
+  const [selectedMediaPost, setSelectedMediaPost] = useState<any>(null);
   const [commentText, setCommentText] = useState("");
-  const [postComments, setPostComments] = useState<{[key: string]: Array<{id: string, author: string, text: string, time: string}>}>({});
+  const [commentMediaFiles, setCommentMediaFiles] = useState<string[]>([]);
+  const [postComments, setPostComments] = useState<{[key: string]: Array<{id: string, author: string, text: string, media?: string[], time: string}>}>({});
   const [showCommentSheet, setShowCommentSheet] = useState(false);
+  const [userLikedPosts, setUserLikedPosts] = useState<{[key: string]: boolean}>({});
+  const [showRepostToast, setShowRepostToast] = useState(false);
 
   const submitBtnRef = useRef<HTMLButtonElement>(null);
   const commentInputRef = useRef<HTMLInputElement>(null);
+  const commentFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -76,13 +82,21 @@ export default function CommunityPage() {
         localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(initialPosts));
       }
 
-      // Load saved comments
       const savedComments = localStorage.getItem('indiePulse_comments_v1');
       if (savedComments) {
         try {
           setPostComments(JSON.parse(savedComments));
         } catch (e) {
           setPostComments({});
+        }
+      }
+
+      const savedLikes = localStorage.getItem('indiePulse_user_likes_v1');
+      if (savedLikes) {
+        try {
+          setUserLikedPosts(JSON.parse(savedLikes));
+        } catch (e) {
+          setUserLikedPosts({});
         }
       }
     }
@@ -104,7 +118,6 @@ export default function CommunityPage() {
     }
   };
 
-  // Handle Android Back button and history popstate to close modal/viewer seamlessly
   useEffect(() => {
     const handlePopState = () => {
       if (showCommentSheet) {
@@ -132,6 +145,25 @@ export default function CommunityPage() {
         setMediaType(file.type.startsWith('video') ? 'video' : 'image');
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCommentMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const newFiles: string[] = [];
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (reader.result) {
+            newFiles.push(reader.result as string);
+            if (newFiles.length === files.length) {
+              setCommentMediaFiles((prev) => [...prev, ...newFiles]);
+            }
+          }
+        };
+        reader.readAsDataURL(file);
+      });
     }
   };
 
@@ -204,17 +236,34 @@ export default function CommunityPage() {
     }, 800);
   };
 
+  // Instagram Style Single-Like Logic (Toggle Like/Unlike)
   const handleLike = (id: string, e?: any) => {
     if (e) e.stopPropagation();
-    const updatedPosts = posts.map((post) => 
-      post.id === id ? { ...post, likes: post.likes + 1 } : post
-    );
+    
+    const isCurrentlyLiked = !!userLikedPosts[id];
+    const newLikedState = !isCurrentlyLiked;
+    
+    const updatedLikedMap = { ...userLikedPosts, [id]: newLikedState };
+    setUserLikedPosts(updatedLikedMap);
+
+    const updatedPosts = posts.map((post) => {
+      if (post.id === id) {
+        const newLikesCount = newLikedState ? post.likes + 1 : Math.max(0, post.likes - 1);
+        return { ...post, likes: newLikesCount };
+      }
+      return post;
+    });
+
     setPosts(updatedPosts);
+
     if (selectedMediaPost && selectedMediaPost.id === id) {
-      setSelectedMediaPost({ ...selectedMediaPost, likes: selectedMediaPost.likes + 1 });
+      const newLikesCount = newLikedState ? selectedMediaPost.likes + 1 : Math.max(0, selectedMediaPost.likes - 1);
+      setSelectedMediaPost({ ...selectedMediaPost, likes: newLikesCount });
     }
+
     if (typeof window !== 'undefined') {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_user_likes_v1', JSON.stringify(updatedLikedMap));
     }
   };
 
@@ -227,6 +276,10 @@ export default function CommunityPage() {
     if (selectedMediaPost && selectedMediaPost.id === id) {
       setSelectedMediaPost({ ...selectedMediaPost, reposts: (selectedMediaPost.reposts || 0) + 1 });
     }
+    
+    setShowRepostToast(true);
+    setTimeout(() => setShowRepostToast(false), 3000);
+
     if (typeof window !== 'undefined') {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
@@ -247,12 +300,13 @@ export default function CommunityPage() {
   };
 
   const handleAddComment = (postId: string) => {
-    if (!commentText.trim()) return;
+    if (!commentText.trim() && commentMediaFiles.length === 0) return;
 
     const newCommentObj = {
       id: Date.now().toString(),
       author: currentName,
       text: commentText.trim(),
+      media: commentMediaFiles,
       time: "Just now"
     };
 
@@ -263,8 +317,8 @@ export default function CommunityPage() {
 
     setPostComments(updatedComments);
     setCommentText("");
+    setCommentMediaFiles([]);
 
-    // Update comment count on post
     const updatedPosts = posts.map((post) =>
       post.id === postId ? { ...post, comments: post.comments + 1 } : post
     );
@@ -315,6 +369,7 @@ export default function CommunityPage() {
           {posts.map((post) => {
             const isMyPost = post.authorEmail === currentEmail || post.authorName === currentName || post.authorName === 'Bharat Patil';
             const displayAuthor = isMyPost ? "You" : post.authorName;
+            const isLiked = !!userLikedPosts[post.id];
 
             return (
               <div 
@@ -349,9 +404,9 @@ export default function CommunityPage() {
                 <div className="flex items-center gap-4 text-xs text-slate-400 pt-2 border-t border-slate-700/40 mt-1">
                   <button 
                     onClick={(e) => handleLike(post.id, e)}
-                    className="flex items-center gap-1 hover:text-pink-400 transition-colors cursor-pointer"
+                    className={`flex items-center gap-1 transition-colors cursor-pointer ${isLiked ? 'text-red-500 font-bold' : 'hover:text-pink-400'}`}
                   >
-                    ❤️ {post.likes}
+                    {isLiked ? '❤️' : '🤍'} {post.likes}
                   </button>
                   <button 
                     onClick={() => openMediaViewer(post)}
@@ -378,11 +433,11 @@ export default function CommunityPage() {
         </div>
       </div>
 
-      {/* इंस्टाग्राम रील्स सारखा १००% पूर्ण स्क्रीन मीडिया व्ह्यूअर (100% Fullscreen Instagram Reels View) */}
+      {/* 100% Fullscreen Gaming Clips Media Viewer */}
       {selectedMediaPost && (
         <div className="fixed inset-0 bg-black z-50 flex flex-col justify-between overflow-hidden select-none">
           
-          {/* Full Screen Video / Photo Background */}
+          {/* Background Media */}
           <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-black">
             {selectedMediaPost.mediaType === 'video' ? (
               <video 
@@ -402,44 +457,37 @@ export default function CommunityPage() {
             )}
           </div>
 
-          {/* Gradient Overlay for Instagram feel */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80 pointer-events-none"></div>
 
-          {/* Top Bar - Instagram Clean look (No X/Back buttons) */}
+          {/* Top Gaming Platform Header */}
           <div className="relative z-10 p-4 flex items-center justify-between text-white drop-shadow-md">
-            <span className="text-xs font-bold tracking-widest text-pink-400">INDIEPULSE REELS</span>
+            <span className="text-xs font-black tracking-widest text-pink-400 flex items-center gap-1.5">
+              <span>🎮</span> INDIEPULSE CLIPS
+            </span>
           </div>
 
-          {/* Bottom Left Author Info & Caption + Right Side Action Buttons */}
+          {/* Bottom Left Caption + Right Action Buttons */}
           <div className="relative z-10 p-4 pb-8 flex items-end justify-between w-full">
             
-            {/* Author details & caption on Bottom-Left */}
+            {/* Bottom Caption */}
             <div className="flex flex-col gap-2 max-w-[75%] text-left">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-xs font-bold border border-pink-400">
-                  {selectedMediaPost.authorName.charAt(0)}
-                </div>
-                <span className="font-bold text-sm text-white drop-shadow">{selectedMediaPost.authorName}</span>
-                <span className="text-[10px] bg-pink-500/30 text-pink-300 border border-pink-500/40 px-2 py-0.5 rounded-full font-semibold">Follow</span>
-              </div>
-              
               {selectedMediaPost.content && (
-                <p className="text-xs text-slate-100 line-clamp-3 leading-relaxed drop-shadow-sm">
+                <p className="text-xs text-slate-100 line-clamp-3 leading-relaxed drop-shadow-sm font-medium">
                   {selectedMediaPost.content}
                 </p>
               )}
             </div>
 
-            {/* Right Side Vertical Instagram Action Buttons */}
+            {/* Right Side Action Buttons */}
             <div className="flex flex-col items-center gap-5 pb-2">
               
-              {/* Like Button */}
+              {/* Single Like Toggle */}
               <button 
                 onClick={(e) => handleLike(selectedMediaPost.id, e)}
-                className="flex flex-col items-center gap-1 text-white hover:text-pink-400 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
+                className="flex flex-col items-center gap-1 text-white active:scale-125 transition-all cursor-pointer drop-shadow-lg"
               >
-                <div className="p-3 bg-black/40 backdrop-blur-md rounded-full border border-white/20">
-                  <span className="text-2xl">❤️</span>
+                <div className={`p-3 rounded-full border transition-all ${userLikedPosts[selectedMediaPost.id] ? 'bg-red-600/80 border-red-400' : 'bg-black/40 border-white/20'}`}>
+                  <span className="text-2xl">{userLikedPosts[selectedMediaPost.id] ? '❤️' : '🤍'}</span>
                 </div>
                 <span className="text-xs font-bold drop-shadow">{selectedMediaPost.likes}</span>
               </button>
@@ -484,9 +532,24 @@ export default function CommunityPage() {
 
           </div>
 
-          {/* Instagram Comments Bottom Sheet (Real Working Comment Section) */}
+          {/* Instagram Repost Toast Popup */}
+          {showRepostToast && (
+            <div className="absolute bottom-6 left-4 right-4 z-50 bg-slate-900/95 border border-slate-700 text-white p-3.5 rounded-2xl flex items-center justify-between shadow-2xl backdrop-blur-md animate-bounce">
+              <div className="flex items-center gap-2 text-xs font-semibold">
+                <span>🔁</span> Reposted to your feed
+              </div>
+              <button 
+                onClick={() => setShowRepostToast(false)}
+                className="text-xs font-bold text-slate-400 hover:text-white"
+              >
+                Undo
+              </button>
+            </div>
+          )}
+
+          {/* Real Instagram Style Comment Bottom Sheet */}
           {showCommentSheet && (
-            <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/95 backdrop-blur-2xl border-t border-slate-700 rounded-t-3xl p-4 flex flex-col max-h-[60vh] transition-all">
+            <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/98 backdrop-blur-2xl border-t border-slate-700 rounded-t-3xl p-4 flex flex-col max-h-[70vh] transition-all shadow-2xl">
               
               <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                 <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto absolute left-1/2 -translate-x-1/2 top-2"></div>
@@ -499,44 +562,94 @@ export default function CommunityPage() {
                 </button>
               </div>
 
-              {/* Comment List */}
-              <div className="flex flex-col gap-3 my-3 overflow-y-auto max-h-48 pr-1 text-left">
+              {/* Comments List */}
+              <div className="flex flex-col gap-3 my-3 overflow-y-auto max-h-56 pr-1 text-left">
                 {(postComments[selectedMediaPost.id] || []).length === 0 ? (
-                  <p className="text-slate-500 text-xs text-center py-4">No comments yet. Be the first to comment!</p>
+                  <p className="text-slate-500 text-xs text-center py-6">No comments yet. Be the first to comment!</p>
                 ) : (
                   (postComments[selectedMediaPost.id] || []).map((c) => (
-                    <div key={c.id} className="bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/40">
-                      <div className="flex justify-between items-center mb-1">
+                    <div key={c.id} className="bg-slate-800/60 p-3 rounded-2xl border border-slate-700/40 flex flex-col gap-1.5">
+                      <div className="flex justify-between items-center">
                         <span className="font-bold text-pink-400 text-xs">{c.author}</span>
                         <span className="text-[10px] text-slate-400">{c.time}</span>
                       </div>
-                      <p className="text-slate-200 text-xs">{c.text}</p>
+                      {c.text && <p className="text-slate-200 text-xs leading-relaxed">{c.text}</p>}
+                      {c.media && c.media.length > 0 && (
+                        <div className="flex gap-2 flex-wrap mt-1">
+                          {c.media.map((img, idx) => (
+                            <img key={idx} src={img} alt="Comment media" className="w-16 h-16 object-cover rounded-lg border border-slate-700" />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))
                 )}
               </div>
 
-              {/* Real Mobile Input Keyboard Trigger */}
-              <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
+              {/* Media Preview in Comment Box */}
+              {commentMediaFiles.length > 0 && (
+                <div className="flex gap-2 mb-2 overflow-x-auto p-1 bg-slate-950 rounded-xl border border-slate-800">
+                  {commentMediaFiles.map((src, i) => (
+                    <div key={i} className="relative w-12 h-12 flex-shrink-0">
+                      <img src={src} className="w-full h-full object-cover rounded-lg" />
+                      <button 
+                        onClick={() => setCommentMediaFiles(commentMediaFiles.filter((_, index) => index !== i))}
+                        className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-4 h-4 text-[10px] flex items-center justify-center font-bold"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Real Instagram Comment Input Bar */}
+              <div className="flex items-center gap-2 pt-2 border-t border-slate-800 relative">
+                
                 <input 
-                  ref={commentInputRef}
-                  type="text"
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="Add a comment..."
-                  className="w-full bg-slate-950 border border-slate-700 rounded-full px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleAddComment(selectedMediaPost.id);
-                    }
-                  }}
+                  type="file" 
+                  ref={commentFileInputRef} 
+                  onChange={handleCommentMediaChange} 
+                  multiple 
+                  accept="image/*" 
+                  className="hidden" 
                 />
-                <button
-                  onClick={() => handleAddComment(selectedMediaPost.id)}
-                  className="px-4 py-2.5 bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs rounded-full cursor-pointer shadow-md"
-                >
-                  Post
-                </button>
+
+                <div className="relative flex-1 flex items-center">
+                  <input 
+                    ref={commentInputRef}
+                    type="text"
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    placeholder="Add a comment..."
+                    className="w-full bg-slate-950 border border-slate-700 rounded-full pl-4 pr-10 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleAddComment(selectedMediaPost.id);
+                      }
+                    }}
+                  />
+
+                  {/* Dynamic Right Button inside Input Box (Gallery Icon or Blue Send Arrow) */}
+                  {!commentText.trim() && commentMediaFiles.length === 0 ? (
+                    <button 
+                      type="button"
+                      onClick={() => commentFileInputRef.current?.click()}
+                      className="absolute right-3 text-slate-400 hover:text-white transition-colors cursor-pointer text-base"
+                    >
+                      🖼️
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleAddComment(selectedMediaPost.id)}
+                      className="absolute right-2.5 w-7 h-7 bg-blue-600 hover:bg-blue-500 text-white rounded-full flex items-center justify-center font-black text-sm shadow-md transition-all cursor-pointer"
+                    >
+                      ↑
+                    </button>
+                  )}
+                </div>
+
               </div>
 
             </div>
