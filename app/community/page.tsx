@@ -25,6 +25,7 @@ export default function CommunityPage() {
   const [showCommentSheet, setShowCommentSheet] = useState(false);
   const [userLikedPosts, setUserLikedPosts] = useState<{[key: string]: boolean}>({});
   const [userSharedPosts, setUserSharedPosts] = useState<{[key: string]: boolean}>({});
+  const [userRepostedPosts, setUserRepostedPosts] = useState<{[key: string]: boolean}>({});
   const [showRepostToast, setShowRepostToast] = useState(false);
 
   const submitBtnRef = useRef<HTMLButtonElement>(null);
@@ -76,8 +77,8 @@ export default function CommunityPage() {
             mediaType: null,
             likes: 617, 
             comments: 12, 
-            reposts: 2378,
-            shares: 83900,
+            reposts: 1,
+            shares: 1,
             time: "2 hours ago" 
           }
         ];
@@ -100,6 +101,15 @@ export default function CommunityPage() {
           setUserLikedPosts(JSON.parse(savedLikes));
         } catch (e) {
           setUserLikedPosts({});
+        }
+      }
+
+      const savedReposts = localStorage.getItem('indiePulse_user_reposts_v1');
+      if (savedReposts) {
+        try {
+          setUserRepostedPosts(JSON.parse(savedReposts));
+        } catch (e) {
+          setUserRepostedPosts({});
         }
       }
     }
@@ -158,7 +168,7 @@ export default function CommunityPage() {
     }
   };
 
-  // Select multiple photos without auto-sending (Instagram style preview)
+  // Select photo from gallery into input bar (Does NOT auto-send, allows text entry)
   const handleCommentMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
@@ -278,25 +288,43 @@ export default function CommunityPage() {
     }
   };
 
+  // Fixed Single Repost Logic per user (Instagram Style)
   const handleRepost = (id: string, e?: any) => {
     if (e) e.stopPropagation();
-    const updatedPosts = posts.map((post) => 
-      post.id === id ? { ...post, reposts: (post.reposts || 0) + 1 } : post
-    );
+
+    const isCurrentlyReposted = !!userRepostedPosts[id];
+    const newRepostState = !isCurrentlyReposted;
+
+    const updatedRepostMap = { ...userRepostedPosts, [id]: newRepostState };
+    setUserRepostedPosts(updatedRepostMap);
+
+    const updatedPosts = posts.map((post) => {
+      if (post.id === id) {
+        const newCount = newRepostState ? (post.reposts || 0) + 1 : Math.max(0, (post.reposts || 0) - 1);
+        return { ...post, reposts: newCount };
+      }
+      return post;
+    });
+
     setPosts(updatedPosts);
+
     if (selectedMediaPost && selectedMediaPost.id === id) {
-      setSelectedMediaPost({ ...selectedMediaPost, reposts: (selectedMediaPost.reposts || 0) + 1 });
+      const newCount = newRepostState ? (selectedMediaPost.reposts || 0) + 1 : Math.max(0, (selectedMediaPost.reposts || 0) - 1);
+      setSelectedMediaPost({ ...selectedMediaPost, reposts: newCount });
     }
-    
-    setShowRepostToast(true);
-    setTimeout(() => setShowRepostToast(false), 3000);
+
+    if (newRepostState) {
+      setShowRepostToast(true);
+      setTimeout(() => setShowRepostToast(false), 3000);
+    }
 
     if (typeof window !== 'undefined') {
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
+      localStorage.setItem('indiePulse_user_reposts_v1', JSON.stringify(updatedRepostMap));
     }
   };
 
-  // Fixed single share count logic per user (Instagram Style)
+  // Fixed single share count logic per user
   const handleShare = (post: any, e?: any) => {
     if (e) e.stopPropagation();
     
@@ -412,7 +440,7 @@ export default function CommunityPage() {
                 </div>
 
                 {post.content && (
-                  <p className="text-slate-300 text-sm leading-relaxed">{post.content}</p>
+                  <p className="text-slate-300 text-sm leading-relaxed text-left">{post.content}</p>
                 )}
 
                 {post.media && (
@@ -492,7 +520,6 @@ export default function CommunityPage() {
           </div>
 
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80 pointer-events-none"></div>
-
           {/* Top Gaming Platform Header */}
           <div className="relative z-10 p-4 flex items-center justify-between text-white drop-shadow-md">
             <span className="text-xs font-black tracking-widest text-pink-400 flex items-center gap-1.5">
@@ -506,14 +533,14 @@ export default function CommunityPage() {
             {/* Bottom Caption */}
             <div className="flex flex-col gap-2 max-w-[75%] text-left">
               {selectedMediaPost.content && (
-                <p className="text-xs text-slate-100 line-clamp-3 leading-relaxed drop-shadow-sm font-medium">
+                <p className="text-xs text-slate-100 line-clamp-3 leading-relaxed drop-shadow-sm font-medium text-left">
                   {selectedMediaPost.content}
                 </p>
               )}
             </div>
 
-            {/* Right Side Vertical Action Buttons - Instagram Spacing & Alignment */}
-            <div className="flex flex flex-col items-center gap-4 pb-2">
+            {/* Right Side Vertical Action Buttons */}
+            <div className="flex flex-col items-center gap-4 pb-2">
               
               {/* Like Button */}
               <button 
@@ -560,7 +587,7 @@ export default function CommunityPage() {
                 className="flex flex-col items-center justify-center gap-0.5 text-white hover:opacity-80 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
               >
                 <div className="p-1">
-                  <svg className="w-7 h-7 text-white fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
+                  <svg className={`w-7 h-7 fill-none stroke-current stroke-[2] ${userRepostedPosts[selectedMediaPost.id] ? 'text-green-400' : 'text-white'}`} viewBox="0 0 24 24">
                     <path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
                   </svg>
                 </div>
@@ -569,7 +596,7 @@ export default function CommunityPage() {
                 )}
               </button>
 
-              {/* Straight Paper-Airplane Share Button */}
+              {/* Share Button */}
               <button 
                 onClick={(e) => handleShare(selectedMediaPost, e)}
                 className="flex flex-col items-center justify-center gap-0.5 text-white hover:opacity-80 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
@@ -593,7 +620,7 @@ export default function CommunityPage() {
           {showRepostToast && (
             <div className="absolute bottom-6 left-4 right-4 z-50 bg-slate-900/95 border border-slate-700 text-white p-3.5 rounded-2xl flex items-center justify-between shadow-2xl backdrop-blur-md animate-bounce">
               <div className="flex items-center gap-2 text-xs font-semibold">
-                <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                <svg className="w-4 h-4 fill-none stroke-current stroke-2 text-green-400" viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
                 <span>Reposted to your feed</span>
               </div>
               <button 
@@ -605,27 +632,27 @@ export default function CommunityPage() {
             </div>
           )}
 
-          {/* Clean Instagram Comment Bottom Sheet (No Header Buttons) */}
+          {/* Clean Instagram Comment Bottom Sheet */}
           {showCommentSheet && (
             <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/98 backdrop-blur-2xl border-t border-slate-800 rounded-t-3xl p-4 flex flex-col max-h-[70vh] transition-all shadow-2xl">
               
               {/* Minimal Handle Pill Top */}
               <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto my-1"></div>
 
-              {/* Comments List */}
+              {/* Comments List - Left Aligned Text (Strict Instagram Alignment) */}
               <div className="flex flex-col gap-3 my-3 overflow-y-auto max-h-56 pr-1 text-left">
                 {(postComments[selectedMediaPost.id] || []).length === 0 ? (
                   <p className="text-slate-500 text-xs text-center py-6">No comments yet. Be the first to comment!</p>
                 ) : (
                   (postComments[selectedMediaPost.id] || []).map((c) => (
-                    <div key={c.id} className="bg-slate-800/60 p-3 rounded-2xl border border-slate-700/40 flex flex-col gap-1.5">
-                      <div className="flex justify-between items-center">
-                        <span className="font-bold text-pink-400 text-xs">{c.author}</span>
+                    <div key={c.id} className="bg-slate-800/60 p-3 rounded-2xl border border-slate-700/40 flex flex-col gap-1 text-left items-start">
+                      <div className="flex justify-between items-center w-full">
+                        <span className="font-bold text-pink-400 text-xs text-left">{c.author}</span>
                         <span className="text-[10px] text-slate-400">{c.time}</span>
                       </div>
-                      {c.text && <p className="text-slate-200 text-xs leading-relaxed">{c.text}</p>}
+                      {c.text && <p className="text-slate-200 text-xs leading-relaxed text-left w-full justify-start block">{c.text}</p>}
                       {c.media && c.media.length > 0 && (
-                        <div className="flex gap-2 flex-wrap mt-1">
+                        <div className="flex gap-2 flex-wrap mt-1 justify-start">
                           {c.media.map((img, idx) => (
                             <img key={idx} src={img} alt="Comment media" className="w-16 h-16 object-cover rounded-lg border border-slate-700" />
                           ))}
@@ -636,9 +663,9 @@ export default function CommunityPage() {
                 )}
               </div>
 
-              {/* Selected Media Preview in Comment Box before sending */}
+              {/* Input Box Media Attachment Preview Bar */}
               {commentMediaFiles.length > 0 && (
-                <div className="flex gap-2 mb-2 overflow-x-auto p-1.5 bg-slate-950 rounded-xl border border-slate-800">
+                <div className="flex gap-2 mb-2 overflow-x-auto p-1.5 bg-slate-950 rounded-xl border border-slate-800 items-center justify-start">
                   {commentMediaFiles.map((src, i) => (
                     <div key={i} className="relative w-14 h-14 flex-shrink-0">
                       <img src={src} className="w-full h-full object-cover rounded-lg border border-slate-700" />
@@ -653,7 +680,7 @@ export default function CommunityPage() {
                 </div>
               )}
 
-              {/* Instagram Input Bar (Unified Text + Photo Send Layout) */}
+              {/* Instagram Input Bar (Supports Image Preview + Text simultaneously before sending) */}
               <div className="w-full pt-2 border-t border-slate-800">
                 
                 <input 
@@ -672,7 +699,7 @@ export default function CommunityPage() {
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     placeholder="Add a comment..."
-                    className="w-full bg-slate-950 border border-slate-800 rounded-full pl-4 pr-12 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 shadow-inner"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-full pl-4 pr-12 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 shadow-inner text-left"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         handleAddComment(selectedMediaPost.id);
@@ -680,7 +707,7 @@ export default function CommunityPage() {
                     }}
                   />
 
-                  {/* Dynamic Action: Gallery Icon when empty -> Bold Upward Send Arrow when typing or photo attached */}
+                  {/* Right Button: Gallery Icon when empty -> Send Arrow when photo or text added */}
                   <div className="absolute right-3 flex items-center justify-center">
                     {!commentText.trim() && commentMediaFiles.length === 0 ? (
                       <button 
@@ -733,7 +760,7 @@ export default function CommunityPage() {
                 value={newPost}
                 onChange={(e) => setNewPost(e.target.value)}
                 placeholder="What's happening in your game dev journey?"
-                className="w-full bg-slate-950 border border-pink-500/30 rounded-2xl p-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-pink-400 resize-none h-28 shadow-inner"
+                className="w-full bg-slate-950 border border-pink-500/30 rounded-2xl p-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-pink-400 resize-none h-28 shadow-inner text-left"
               />
 
               <div className="flex flex-col gap-1.5">
