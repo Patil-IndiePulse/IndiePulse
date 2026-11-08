@@ -16,8 +16,13 @@ export default function CommunityPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentName, setCurrentName] = useState('Bharat Patil');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedMediaPost, setSelectedMediaPost] = useState<any>(null); // इन्स्टाग्राम/थ्रेड्स सारख्या फुल-स्क्रीन व्ह्यूसाठी
+  const [selectedMediaPost, setSelectedMediaPost] = useState<any>(null); // इंस्टाग्राम फुल-स्क्रीन व्ह्यूसाठी
+  const [commentText, setCommentText] = useState("");
+  const [postComments, setPostComments] = useState<{[key: string]: Array<{id: string, author: string, text: string, time: string}>}>({});
+  const [showCommentSheet, setShowCommentSheet] = useState(false);
+
   const submitBtnRef = useRef<HTMLButtonElement>(null);
+  const commentInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -70,6 +75,16 @@ export default function CommunityPage() {
         setPosts(initialPosts);
         localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(initialPosts));
       }
+
+      // Load saved comments
+      const savedComments = localStorage.getItem('indiePulse_comments_v1');
+      if (savedComments) {
+        try {
+          setPostComments(JSON.parse(savedComments));
+        } catch (e) {
+          setPostComments({});
+        }
+      }
     }
 
     return () => unsubscribe();
@@ -82,10 +97,19 @@ export default function CommunityPage() {
     }
   };
 
-  // Handle Android Back button and history popstate to close modal perfectly
+  const openMediaViewer = (post: any) => {
+    setSelectedMediaPost(post);
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ mediaViewerOpen: true }, '');
+    }
+  };
+
+  // Handle Android Back button and history popstate to close modal/viewer seamlessly
   useEffect(() => {
     const handlePopState = () => {
-      if (isModalOpen) {
+      if (showCommentSheet) {
+        setShowCommentSheet(false);
+      } else if (isModalOpen) {
         setIsModalOpen(false);
       } else if (selectedMediaPost) {
         setSelectedMediaPost(null);
@@ -95,7 +119,7 @@ export default function CommunityPage() {
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [isModalOpen, selectedMediaPost]);
+  }, [isModalOpen, selectedMediaPost, showCommentSheet]);
 
   const currentEmail = user?.email || 'bharatrajupatil5200@gmail.com';
 
@@ -139,7 +163,6 @@ export default function CommunityPage() {
 
     setIsSubmitting(true);
 
-    // Force DOM styling instantly for mobile browsers
     if (submitBtnRef.current) {
       submitBtnRef.current.style.backgroundColor = '#059669';
       submitBtnRef.current.style.borderColor = '#34d399';
@@ -223,6 +246,40 @@ export default function CommunityPage() {
     }
   };
 
+  const handleAddComment = (postId: string) => {
+    if (!commentText.trim()) return;
+
+    const newCommentObj = {
+      id: Date.now().toString(),
+      author: currentName,
+      text: commentText.trim(),
+      time: "Just now"
+    };
+
+    const updatedComments = {
+      ...postComments,
+      [postId]: [newCommentObj, ...(postComments[postId] || [])]
+    };
+
+    setPostComments(updatedComments);
+    setCommentText("");
+
+    // Update comment count on post
+    const updatedPosts = posts.map((post) =>
+      post.id === postId ? { ...post, comments: post.comments + 1 } : post
+    );
+    setPosts(updatedPosts);
+
+    if (selectedMediaPost && selectedMediaPost.id === postId) {
+      setSelectedMediaPost({ ...selectedMediaPost, comments: selectedMediaPost.comments + 1 });
+    }
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('indiePulse_comments_v1', JSON.stringify(updatedComments));
+      localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
+    }
+  };
+
   return (
     <main className="min-h-screen bg-slate-950 text-white flex flex-col px-4 py-6 max-w-xl mx-auto w-full relative overflow-x-hidden select-none">
       
@@ -275,7 +332,7 @@ export default function CommunityPage() {
 
                 {post.media && (
                   <div 
-                    onClick={() => setSelectedMediaPost(post)}
+                    onClick={() => openMediaViewer(post)}
                     className="rounded-xl overflow-hidden border border-slate-700 bg-slate-950 mt-1 cursor-pointer relative group"
                   >
                     {post.mediaType === 'video' ? (
@@ -297,7 +354,7 @@ export default function CommunityPage() {
                     ❤️ {post.likes}
                   </button>
                   <button 
-                    onClick={() => setSelectedMediaPost(post)}
+                    onClick={() => openMediaViewer(post)}
                     className="flex items-center gap-1 hover:text-pink-400 transition-colors cursor-pointer"
                   >
                     💬 {post.comments}
@@ -321,112 +378,169 @@ export default function CommunityPage() {
         </div>
       </div>
 
-      {/* इन्स्टाग्राम / थ्रेड्स सारखा फुल-स्क्रीन इमर्सिव्ह मीडिया व्ह्यूअर (Immersive Viewer Modal) */}
+      {/* इंस्टाग्राम रील्स सारखा १००% पूर्ण स्क्रीन मीडिया व्ह्यूअर (100% Fullscreen Instagram Reels View) */}
       {selectedMediaPost && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex flex-col md:flex-row items-center justify-center z-50 p-0 md:p-6 select-none">
+        <div className="fixed inset-0 bg-black z-50 flex flex-col justify-between overflow-hidden select-none">
           
-          {/* Close / Back Button */}
-          <button 
-            onClick={() => setSelectedMediaPost(null)}
-            className="absolute top-4 left-4 z-50 px-4 py-2 bg-slate-800/80 hover:bg-slate-700 text-white rounded-full text-xs font-bold border border-slate-700 cursor-pointer shadow-lg"
-          >
-            ✕ Back
-          </button>
-
-          {/* Media Container (Instagram/Threads Style Large View) */}
-          <div className="w-full md:w-3/5 h-full flex items-center justify-center bg-black relative overflow-hidden">
+          {/* Full Screen Video / Photo Background */}
+          <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-black">
             {selectedMediaPost.mediaType === 'video' ? (
-              <video src={selectedMediaPost.media} controls autoPlay playsInline className="max-h-screen w-full object-contain" />
+              <video 
+                src={selectedMediaPost.media} 
+                controls
+                autoPlay 
+                loop
+                playsInline 
+                className="w-full h-full object-cover" 
+              />
             ) : (
-              <img src={selectedMediaPost.media} alt="Full screen view" className="max-h-screen w-full object-contain" />
+              <img 
+                src={selectedMediaPost.media} 
+                alt="Full screen media" 
+                className="w-full h-full object-contain" 
+              />
             )}
           </div>
 
-          {/* Right Sidebar / Bottom Sheet (Instagram & Threads Engagement Panel) */}
-          <div className="w-full md:w-2/5 h-auto md:h-full bg-slate-900/90 border-t md:border-t-0 md:border-l border-slate-800 p-5 flex flex-col justify-between overflow-y-auto">
-            
-            <div className="flex flex-col gap-4">
-              {/* Author Info */}
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-pink-500 to-purple-600 flex items-center justify-center font-bold text-sm text-white">
-                    {selectedMediaPost.authorName.charAt(0)}
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-sm text-white">{selectedMediaPost.authorName}</h4>
-                    <span className="text-[11px] text-slate-400">{selectedMediaPost.time}</span>
-                  </div>
-                </div>
-              </div>
+          {/* Gradient Overlay for Instagram feel */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80 pointer-events-none"></div>
 
-              {/* Caption */}
+          {/* Top Bar - Instagram Clean look (No X/Back buttons) */}
+          <div className="relative z-10 p-4 flex items-center justify-between text-white drop-shadow-md">
+            <span className="text-xs font-bold tracking-widest text-pink-400">INDIEPULSE REELS</span>
+          </div>
+
+          {/* Bottom Left Author Info & Caption + Right Side Action Buttons */}
+          <div className="relative z-10 p-4 pb-8 flex items-end justify-between w-full">
+            
+            {/* Author details & caption on Bottom-Left */}
+            <div className="flex flex-col gap-2 max-w-[75%] text-left">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-xs font-bold border border-pink-400">
+                  {selectedMediaPost.authorName.charAt(0)}
+                </div>
+                <span className="font-bold text-sm text-white drop-shadow">{selectedMediaPost.authorName}</span>
+                <span className="text-[10px] bg-pink-500/30 text-pink-300 border border-pink-500/40 px-2 py-0.5 rounded-full font-semibold">Follow</span>
+              </div>
+              
               {selectedMediaPost.content && (
-                <p className="text-slate-200 text-sm leading-relaxed">{selectedMediaPost.content}</p>
+                <p className="text-xs text-slate-100 line-clamp-3 leading-relaxed drop-shadow-sm">
+                  {selectedMediaPost.content}
+                </p>
               )}
             </div>
 
-            {/* Instagram Style Interaction Actions & Bottom Bar */}
-            <div className="flex flex-col gap-4 pt-4 mt-4 border-t border-slate-800">
+            {/* Right Side Vertical Instagram Action Buttons */}
+            <div className="flex flex-col items-center gap-5 pb-2">
               
-              {/* Four Action Buttons (Like, Comment, Repost, Share) */}
-              <div className="flex items-center justify-around py-2 bg-slate-950/60 rounded-2xl border border-slate-800">
-                
-                {/* Like Button */}
-                <button 
-                  onClick={() => handleLike(selectedMediaPost.id)}
-                  className="flex flex-col items-center gap-1 text-slate-300 hover:text-pink-500 transition-colors cursor-pointer p-2"
-                >
-                  <span className="text-xl">❤️</span>
-                  <span className="text-xs font-bold">{selectedMediaPost.likes}</span>
-                </button>
+              {/* Like Button */}
+              <button 
+                onClick={(e) => handleLike(selectedMediaPost.id, e)}
+                className="flex flex-col items-center gap-1 text-white hover:text-pink-400 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
+              >
+                <div className="p-3 bg-black/40 backdrop-blur-md rounded-full border border-white/20">
+                  <span className="text-2xl">❤️</span>
+                </div>
+                <span className="text-xs font-bold drop-shadow">{selectedMediaPost.likes}</span>
+              </button>
 
-                {/* Comment Button */}
-                <button 
-                  onClick={() => alert('Comment section coming up next!')}
-                  className="flex flex-col items-center gap-1 text-slate-300 hover:text-blue-400 transition-colors cursor-pointer p-2"
-                >
-                  <span className="text-xl">💬</span>
-                  <span className="text-xs font-bold">{selectedMediaPost.comments}</span>
-                </button>
+              {/* Comment Button */}
+              <button 
+                onClick={() => {
+                  setShowCommentSheet(true);
+                  setTimeout(() => commentInputRef.current?.focus(), 200);
+                }}
+                className="flex flex-col items-center gap-1 text-white hover:text-blue-400 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
+              >
+                <div className="p-3 bg-black/40 backdrop-blur-md rounded-full border border-white/20">
+                  <span className="text-2xl">💬</span>
+                </div>
+                <span className="text-xs font-bold drop-shadow">{selectedMediaPost.comments}</span>
+              </button>
 
-                {/* Repost Button */}
-                <button 
-                  onClick={() => handleRepost(selectedMediaPost.id)}
-                  className="flex flex-col items-center gap-1 text-slate-300 hover:text-green-400 transition-colors cursor-pointer p-2"
-                >
-                  <span className="text-xl">🔁</span>
-                  <span className="text-xs font-bold">{selectedMediaPost.reposts || 0}</span>
-                </button>
+              {/* Repost Button */}
+              <button 
+                onClick={(e) => handleRepost(selectedMediaPost.id, e)}
+                className="flex flex-col items-center gap-1 text-white hover:text-green-400 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
+              >
+                <div className="p-3 bg-black/40 backdrop-blur-md rounded-full border border-white/20">
+                  <span className="text-2xl">🔁</span>
+                </div>
+                <span className="text-xs font-bold drop-shadow">{selectedMediaPost.reposts || 0}</span>
+              </button>
 
-                {/* Share Button */}
-                <button 
-                  onClick={() => handleShare(selectedMediaPost)}
-                  className="flex flex-col items-center gap-1 text-slate-300 hover:text-purple-400 transition-colors cursor-pointer p-2"
-                >
-                  <span className="text-xl">↗️</span>
-                  <span className="text-xs font-bold">Share</span>
-                </button>
-
-              </div>
-
-              {/* Instagram Style Comment Input */}
-              <div className="flex items-center gap-2">
-                <input 
-                  type="text" 
-                  placeholder="Add a comment..."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && (e.target as HTMLInputElement).value.trim()) {
-                      alert('Comment added successfully!');
-                      (e.target as HTMLInputElement).value = '';
-                    }
-                  }}
-                />
-              </div>
+              {/* Share Button */}
+              <button 
+                onClick={(e) => handleShare(selectedMediaPost, e)}
+                className="flex flex-col items-center gap-1 text-white hover:text-purple-400 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
+              >
+                <div className="p-3 bg-black/40 backdrop-blur-md rounded-full border border-white/20">
+                  <span className="text-2xl">↗️</span>
+                </div>
+                <span className="text-xs font-bold drop-shadow">Share</span>
+              </button>
 
             </div>
 
           </div>
+
+          {/* Instagram Comments Bottom Sheet (Real Working Comment Section) */}
+          {showCommentSheet && (
+            <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/95 backdrop-blur-2xl border-t border-slate-700 rounded-t-3xl p-4 flex flex-col max-h-[60vh] transition-all">
+              
+              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto absolute left-1/2 -translate-x-1/2 top-2"></div>
+                <h4 className="text-xs font-bold text-slate-300 mt-2">Comments ({selectedMediaPost.comments})</h4>
+                <button 
+                  onClick={() => setShowCommentSheet(false)}
+                  className="text-slate-400 hover:text-white text-xs font-bold px-2 py-1"
+                >
+                  Close
+                </button>
+              </div>
+
+              {/* Comment List */}
+              <div className="flex flex-col gap-3 my-3 overflow-y-auto max-h-48 pr-1 text-left">
+                {(postComments[selectedMediaPost.id] || []).length === 0 ? (
+                  <p className="text-slate-500 text-xs text-center py-4">No comments yet. Be the first to comment!</p>
+                ) : (
+                  (postComments[selectedMediaPost.id] || []).map((c) => (
+                    <div key={c.id} className="bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/40">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="font-bold text-pink-400 text-xs">{c.author}</span>
+                        <span className="text-[10px] text-slate-400">{c.time}</span>
+                      </div>
+                      <p className="text-slate-200 text-xs">{c.text}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Real Mobile Input Keyboard Trigger */}
+              <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
+                <input 
+                  ref={commentInputRef}
+                  type="text"
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  placeholder="Add a comment..."
+                  className="w-full bg-slate-950 border border-slate-700 rounded-full px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleAddComment(selectedMediaPost.id);
+                    }
+                  }}
+                />
+                <button
+                  onClick={() => handleAddComment(selectedMediaPost.id)}
+                  className="px-4 py-2.5 bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs rounded-full cursor-pointer shadow-md"
+                >
+                  Post
+                </button>
+              </div>
+
+            </div>
+          )}
 
         </div>
       )}
