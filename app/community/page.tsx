@@ -425,9 +425,29 @@ export default function CommunityPage() {
     }
   };
 
-  const handleCommentLike = (commentId: string) => {
+  const handleCommentLike = (commentId: string, postId: string) => {
     const isLiked = !!commentLikedState[commentId];
-    setCommentLikedState({ ...commentLikedState, [commentId]: !isLiked });
+    const newLikedState = !isLiked;
+    
+    setCommentLikedState((prev) => ({ ...prev, [commentId]: newLikedState }));
+
+    // Update Comment Like Counter
+    if (postComments[postId]) {
+      const updatedCommentsList = postComments[postId].map((c) => {
+        if (c.id === commentId) {
+          const currentLikes = c.likes || 0;
+          return { ...c, likes: newLikedState ? currentLikes + 1 : Math.max(0, currentLikes - 1) };
+        }
+        return c;
+      });
+
+      const updatedMap = { ...postComments, [postId]: updatedCommentsList };
+      setPostComments(updatedMap);
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('indiePulse_comments_v1', JSON.stringify(updatedMap));
+      }
+    }
   };
 
   return (
@@ -671,42 +691,44 @@ export default function CommunityPage() {
             </div>
           )}
 
-          {/* Clean Instagram Comment Bottom Sheet */}
+          {/* Clean Instagram Comment Bottom Sheet (Exact 2-Column CSS Grid Layout) */}
           {showCommentSheet && (
             <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/98 backdrop-blur-2xl border-t border-slate-800 rounded-t-3xl p-4 flex flex-col max-h-[70vh] transition-all shadow-2xl">
               
               {/* Minimal Handle Pill Top */}
               <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto my-1"></div>
 
-              {/* Comments List (Instagram Layout using CSS Grid for 100% stable Left Alignment & Right-side Like Button) */}
+              {/* Comments List (CSS Grid: Col 1 = Entire Content Left-aligned, Col 2 = Like Button & Counter Right-aligned) */}
               <div className="flex flex-col gap-4 my-3 overflow-y-auto max-h-56 pr-1 text-left w-full">
                 {(postComments[selectedMediaPost.id] || []).length === 0 ? (
                   <p className="text-slate-500 text-xs text-center py-6">No comments yet. Be the first to comment!</p>
                 ) : (
                   (postComments[selectedMediaPost.id] || []).map((c) => {
                     const isCommentLiked = !!commentLikedState[c.id];
+                    const commentLikesCount = c.likes || 0;
+                    
                     return (
                       <div key={c.id} className="grid grid-cols-[1fr_auto] items-start gap-3 w-full py-2.5 border-b border-slate-800/40 last:border-0 text-left">
                         
-                        {/* Left Side Content Area (Strictly Left Aligned) */}
-                        <div className="flex flex-col gap-1 items-start text-left w-full min-w-0">
+                        {/* LEFT COLUMN: Entire Comment Container (Name, Time, Text, Image - All Strictly 100% Left Aligned) */}
+                        <div className="flex flex-col items-start justify-start text-left w-full min-w-0 gap-1">
                           
-                          {/* Row 1: Author & Time on 1 single line */}
-                          <div className="flex items-center gap-2 w-full flex-nowrap text-left">
+                          {/* Row 1: Author Name & Time */}
+                          <div className="flex items-center justify-start gap-2 w-full text-left">
                             <span className="font-bold text-pink-400 text-xs text-left truncate">{c.author}</span>
-                            <span className="text-[11px] text-slate-400 flex-shrink-0">{c.time}</span>
+                            <span className="text-[11px] text-slate-400 flex-shrink-0 text-left">{c.time}</span>
                           </div>
                           
-                          {/* Row 2: Comment Text (Strict Left Alignment) */}
+                          {/* Row 2: Comment Text (Strictly Left Aligned) */}
                           {c.text && (
-                            <p className="text-slate-200 text-xs leading-relaxed text-left w-full m-0 break-words whitespace-normal">
+                            <p className="text-slate-200 text-xs leading-relaxed text-left justify-start w-full m-0 break-words whitespace-normal self-start">
                               {c.text}
                             </p>
                           )}
                           
-                          {/* Row 3: Attached Image / Media (Left Aligned) */}
+                          {/* Row 3: Attached Image / Media (Strictly Left Aligned) */}
                           {c.media && c.media.length > 0 && (
-                            <div className="flex gap-2 flex-wrap mt-1.5 justify-start w-full">
+                            <div className="flex gap-2 flex-wrap mt-1.5 justify-start items-start w-full">
                               {c.media.map((img, idx) => (
                                 <img 
                                   key={idx} 
@@ -719,11 +741,11 @@ export default function CommunityPage() {
                           )}
                         </div>
 
-                        {/* Right Side Column: Like Button (Grid Column 2 - Extreme Right Corner) */}
-                        <div className="flex items-start justify-end pt-0.5">
+                        {/* RIGHT COLUMN: Like Button + Live Counter (Instagram Style Right Corner) */}
+                        <div className="flex flex-col items-center justify-center pt-0.5 min-w-[28px]">
                           <button 
                             type="button"
-                            onClick={() => handleCommentLike(c.id)}
+                            onClick={() => handleCommentLike(c.id, selectedMediaPost.id)}
                             className="text-slate-400 hover:text-red-500 transition-colors p-1 cursor-pointer flex-shrink-0"
                             title="Like Comment"
                           >
@@ -737,6 +759,13 @@ export default function CommunityPage() {
                               </svg>
                             )}
                           </button>
+                          
+                          {/* Live Comment Like Counter (1, 2, 3...) */}
+                          {commentLikesCount > 0 && (
+                            <span className="text-[10px] text-slate-400 font-semibold -mt-0.5">
+                              {commentLikesCount}
+                            </span>
+                          )}
                         </div>
 
                       </div>
