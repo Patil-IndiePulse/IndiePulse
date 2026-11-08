@@ -60,9 +60,10 @@ export default function CommunityPage() {
             content: "Working on a new indie platform using Next.js and Tailwind CSS! Excited to share soon. 🚀", 
             media: null,
             mediaType: null,
-            likes: 24, 
-            comments: 5, 
-            reposts: 3,
+            likes: 0, 
+            comments: 0, 
+            reposts: 0,
+            shares: 0,
             time: "Just now" 
           },
           { 
@@ -72,9 +73,10 @@ export default function CommunityPage() {
             content: "Just released an update for Cyber Neon Runner. Check out the new levels! 🎮✨", 
             media: null,
             mediaType: null,
-            likes: 42, 
+            likes: 617, 
             comments: 12, 
-            reposts: 7,
+            reposts: 2378,
+            shares: 83900,
             time: "2 hours ago" 
           }
         ];
@@ -103,6 +105,13 @@ export default function CommunityPage() {
 
     return () => unsubscribe();
   }, []);
+
+  const formatCount = (num: number) => {
+    if (!num || num === 0) return '';
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num.toString();
+  };
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -209,9 +218,10 @@ export default function CommunityPage() {
       content: newPost,
       media: mediaFile,
       mediaType: mediaType,
-      likes: 1,
+      likes: 0,
       comments: 0,
       reposts: 0,
+      shares: 0,
       time: "Just now"
     };
 
@@ -236,7 +246,6 @@ export default function CommunityPage() {
     }, 800);
   };
 
-  // Instagram Style Single-Like Logic (Toggle Like/Unlike)
   const handleLike = (id: string, e?: any) => {
     if (e) e.stopPropagation();
     
@@ -287,15 +296,28 @@ export default function CommunityPage() {
 
   const handleShare = (post: any, e?: any) => {
     if (e) e.stopPropagation();
+    
+    const updatedPosts = posts.map((p) => 
+      p.id === post.id ? { ...p, shares: (p.shares || 0) + 1 } : p
+    );
+    setPosts(updatedPosts);
+    if (selectedMediaPost && selectedMediaPost.id === post.id) {
+      setSelectedMediaPost({ ...selectedMediaPost, shares: (selectedMediaPost.shares || 0) + 1 });
+    }
+
     if (navigator.share) {
       navigator.share({
-        title: 'IndiePulse Post',
-        text: post.content || 'Check out this post on IndiePulse!',
+        title: 'IndiePulse Clips',
+        text: post.content || 'Check out this clip on IndiePulse!',
         url: window.location.href,
       }).catch(() => {});
     } else {
       navigator.clipboard.writeText(window.location.href);
       alert('Link copied to clipboard!');
+    }
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
   };
 
@@ -401,30 +423,34 @@ export default function CommunityPage() {
                   </div>
                 )}
 
-                <div className="flex items-center gap-4 text-xs text-slate-400 pt-2 border-t border-slate-700/40 mt-1">
+                <div className="flex items-center gap-5 text-xs text-slate-400 pt-2 border-t border-slate-700/40 mt-1">
                   <button 
                     onClick={(e) => handleLike(post.id, e)}
-                    className={`flex items-center gap-1 transition-colors cursor-pointer ${isLiked ? 'text-red-500 font-bold' : 'hover:text-pink-400'}`}
+                    className={`flex items-center gap-1.5 transition-colors cursor-pointer ${isLiked ? 'text-red-500 font-bold' : 'hover:text-pink-400'}`}
                   >
-                    {isLiked ? '❤️' : '🤍'} {post.likes}
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    <span>{formatCount(post.likes)}</span>
                   </button>
                   <button 
                     onClick={() => openMediaViewer(post)}
-                    className="flex items-center gap-1 hover:text-pink-400 transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 hover:text-pink-400 transition-colors cursor-pointer"
                   >
-                    💬 {post.comments}
+                    <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                    <span>{formatCount(post.comments)}</span>
                   </button>
                   <button 
                     onClick={(e) => handleRepost(post.id, e)}
-                    className="flex items-center gap-1 hover:text-pink-400 transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 hover:text-pink-400 transition-colors cursor-pointer"
                   >
-                    🔁 {post.reposts || 0}
+                    <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                    <span>{formatCount(post.reposts)}</span>
                   </button>
                   <button 
                     onClick={(e) => handleShare(post, e)}
-                    className="flex items-center gap-1 hover:text-pink-400 transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 hover:text-pink-400 transition-colors cursor-pointer"
                   >
-                    ↗️ Share
+                    <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                    <span>{formatCount(post.shares)}</span>
                   </button>
                 </div>
               </div>
@@ -478,18 +504,28 @@ export default function CommunityPage() {
               )}
             </div>
 
-            {/* Right Side Action Buttons */}
-            <div className="flex flex-col items-center gap-5 pb-2">
+            {/* Right Side Authentic Instagram SVG Action Buttons */}
+            <div className="flex flex-col items-center gap-6 pb-2">
               
-              {/* Single Like Toggle */}
+              {/* Like Button */}
               <button 
                 onClick={(e) => handleLike(selectedMediaPost.id, e)}
                 className="flex flex-col items-center gap-1 text-white active:scale-125 transition-all cursor-pointer drop-shadow-lg"
               >
-                <div className={`p-3 rounded-full border transition-all ${userLikedPosts[selectedMediaPost.id] ? 'bg-red-600/80 border-red-400' : 'bg-black/40 border-white/20'}`}>
-                  <span className="text-2xl">{userLikedPosts[selectedMediaPost.id] ? '❤️' : '🤍'}</span>
+                <div className="p-1">
+                  {userLikedPosts[selectedMediaPost.id] ? (
+                    <svg className="w-8 h-8 text-red-500 fill-current drop-shadow-md" viewBox="0 0 24 24">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                  ) : (
+                    <svg className="w-8 h-8 text-white fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                  )}
                 </div>
-                <span className="text-xs font-bold drop-shadow">{selectedMediaPost.likes}</span>
+                {formatCount(selectedMediaPost.likes) && (
+                  <span className="text-xs font-bold drop-shadow">{formatCount(selectedMediaPost.likes)}</span>
+                )}
               </button>
 
               {/* Comment Button */}
@@ -498,34 +534,47 @@ export default function CommunityPage() {
                   setShowCommentSheet(true);
                   setTimeout(() => commentInputRef.current?.focus(), 200);
                 }}
-                className="flex flex-col items-center gap-1 text-white hover:text-blue-400 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
+                className="flex flex-col items-center gap-1 text-white hover:opacity-80 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
               >
-                <div className="p-3 bg-black/40 backdrop-blur-md rounded-full border border-white/20">
-                  <span className="text-2xl">💬</span>
+                <div className="p-1">
+                  <svg className="w-8 h-8 text-white fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                  </svg>
                 </div>
-                <span className="text-xs font-bold drop-shadow">{selectedMediaPost.comments}</span>
+                {formatCount(selectedMediaPost.comments) && (
+                  <span className="text-xs font-bold drop-shadow">{formatCount(selectedMediaPost.comments)}</span>
+                )}
               </button>
 
               {/* Repost Button */}
               <button 
                 onClick={(e) => handleRepost(selectedMediaPost.id, e)}
-                className="flex flex-col items-center gap-1 text-white hover:text-green-400 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
+                className="flex flex-col items-center gap-1 text-white hover:opacity-80 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
               >
-                <div className="p-3 bg-black/40 backdrop-blur-md rounded-full border border-white/20">
-                  <span className="text-2xl">🔁</span>
+                <div className="p-1">
+                  <svg className="w-8 h-8 text-white fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
+                    <path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                  </svg>
                 </div>
-                <span className="text-xs font-bold drop-shadow">{selectedMediaPost.reposts || 0}</span>
+                {formatCount(selectedMediaPost.reposts) && (
+                  <span className="text-xs font-bold drop-shadow">{formatCount(selectedMediaPost.reposts)}</span>
+                )}
               </button>
 
               {/* Share Button */}
               <button 
                 onClick={(e) => handleShare(selectedMediaPost, e)}
-                className="flex flex-col items-center gap-1 text-white hover:text-purple-400 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
+                className="flex flex-col items-center gap-1 text-white hover:opacity-80 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
               >
-                <div className="p-3 bg-black/40 backdrop-blur-md rounded-full border border-white/20">
-                  <span className="text-2xl">↗️</span>
+                <div className="p-1">
+                  <svg className="w-8 h-8 text-white fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                  </svg>
                 </div>
-                <span className="text-xs font-bold drop-shadow">Share</span>
+                {formatCount(selectedMediaPost.shares) && (
+                  <span className="text-xs font-bold drop-shadow">{formatCount(selectedMediaPost.shares)}</span>
+                )}
               </button>
 
             </div>
@@ -536,7 +585,8 @@ export default function CommunityPage() {
           {showRepostToast && (
             <div className="absolute bottom-6 left-4 right-4 z-50 bg-slate-900/95 border border-slate-700 text-white p-3.5 rounded-2xl flex items-center justify-between shadow-2xl backdrop-blur-md animate-bounce">
               <div className="flex items-center gap-2 text-xs font-semibold">
-                <span>🔁</span> Reposted to your feed
+                <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                <span>Reposted to your feed</span>
               </div>
               <button 
                 onClick={() => setShowRepostToast(false)}
@@ -549,7 +599,7 @@ export default function CommunityPage() {
 
           {/* Real Instagram Style Comment Bottom Sheet */}
           {showCommentSheet && (
-            <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/98 backdrop-blur-2xl border-t border-slate-700 rounded-t-3xl p-4 flex flex-col max-h-[70vh] transition-all shadow-2xl">
+            <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/98 backdrop-blur-2xl border-t border-slate-800 rounded-t-3xl p-4 flex flex-col max-h-[70vh] transition-all shadow-2xl">
               
               <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                 <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto absolute left-1/2 -translate-x-1/2 top-2"></div>
@@ -603,8 +653,8 @@ export default function CommunityPage() {
                 </div>
               )}
 
-              {/* Real Instagram Comment Input Bar */}
-              <div className="flex items-center gap-2 pt-2 border-t border-slate-800 relative">
+              {/* Instagram Style Precise Input Bar (Grid/Flex Layout - Fixed Stretch) */}
+              <div className="w-full pt-2 border-t border-slate-800">
                 
                 <input 
                   type="file" 
@@ -615,14 +665,14 @@ export default function CommunityPage() {
                   className="hidden" 
                 />
 
-                <div className="relative flex-1 flex items-center">
+                <div className="relative w-full flex items-center">
                   <input 
                     ref={commentInputRef}
                     type="text"
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
-                    placeholder="Add a comment..."
-                    className="w-full bg-slate-950 border border-slate-700 rounded-full pl-4 pr-10 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500"
+                    placeholder="What do you think of this?"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-full pl-4 pr-12 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 shadow-inner"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         handleAddComment(selectedMediaPost.id);
@@ -630,24 +680,36 @@ export default function CommunityPage() {
                     }}
                   />
 
-                  {/* Dynamic Right Button inside Input Box (Gallery Icon or Blue Send Arrow) */}
-                  {!commentText.trim() && commentMediaFiles.length === 0 ? (
-                    <button 
-                      type="button"
-                      onClick={() => commentFileInputRef.current?.click()}
-                      className="absolute right-3 text-slate-400 hover:text-white transition-colors cursor-pointer text-base"
-                    >
-                      🖼️
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => handleAddComment(selectedMediaPost.id)}
-                      className="absolute right-2.5 w-7 h-7 bg-blue-600 hover:bg-blue-500 text-white rounded-full flex items-center justify-center font-black text-sm shadow-md transition-all cursor-pointer"
-                    >
-                      ↑
-                    </button>
-                  )}
+                  {/* Dynamic Right Action (Gallery SVG vs Bold Up-Arrow Send) */}
+                  <div className="absolute right-3 flex items-center justify-center">
+                    {!commentText.trim() && commentMediaFiles.length === 0 ? (
+                      <button 
+                        type="button"
+                        onClick={() => commentFileInputRef.current?.click()}
+                        className="text-slate-400 hover:text-white transition-colors cursor-pointer p-1"
+                        title="Attach Gallery Photo"
+                      >
+                        {/* Authentic Instagram Gallery SVG Icon */}
+                        <svg className="w-5 h-5 fill-none stroke-current stroke-[1.8]" viewBox="0 0 24 24">
+                          <rect x="3" y="3" width="18" height="18" rx="4" ry="4"/>
+                          <circle cx="8.5" cy="8.5" r="1.5"/>
+                          <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleAddComment(selectedMediaPost.id)}
+                        className="w-7 h-7 bg-blue-600 hover:bg-blue-500 text-white rounded-full flex items-center justify-center font-black transition-all cursor-pointer shadow-md flex-shrink-0"
+                        title="Send Comment"
+                      >
+                        {/* Thick Upward Send Arrow */}
+                        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                          <path d="M12 4l-7 7h4v8h6v-8h4z"/>
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                 </div>
 
               </div>
