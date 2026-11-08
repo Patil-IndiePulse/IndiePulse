@@ -157,33 +157,61 @@ export default function CommunityPage() {
 
   const currentEmail = user?.email || 'bharatrajupatil5200@gmail.com';
 
+  // Industry Standard Photo Compressor Solution (Used by Instagram)
+  const compressImage = (file: File, callback: (compressedDataUrl: string) => void) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 600;
+        const scaleFactor = MAX_WIDTH / img.width;
+        
+        if (img.width > MAX_WIDTH) {
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleFactor;
+        } else {
+          canvas.width = img.width;
+          canvas.height = img.height;
+        }
+
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const compressedUrl = canvas.toDataURL('image/jpeg', 0.7);
+        callback(compressedUrl);
+      };
+    };
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setMediaFile(reader.result as string);
-        setMediaType(file.type.startsWith('video') ? 'video' : 'image');
-      };
-      reader.readAsDataURL(file);
+      if (file.type.startsWith('image')) {
+        compressImage(file, (compressedBase64) => {
+          setMediaFile(compressedBase64);
+          setMediaType('image');
+        });
+      } else {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setMediaFile(reader.result as string);
+          setMediaType('video');
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
+  // Safe Compressed Photo Handler for Comments
   const handleCommentMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      const newFiles: string[] = [];
       Array.from(files).forEach((file) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          if (reader.result) {
-            newFiles.push(reader.result as string);
-            if (newFiles.length === files.length) {
-              setCommentMediaFiles((prev) => [...prev, ...newFiles]);
-            }
-          }
-        };
-        reader.readAsDataURL(file);
+        compressImage(file, (compressedBase64) => {
+          setCommentMediaFiles((prev) => [...prev, compressedBase64]);
+        });
       });
     }
   };
@@ -386,8 +414,12 @@ export default function CommunityPage() {
     }
 
     if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_comments_v1', JSON.stringify(updatedComments));
-      localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
+      try {
+        localStorage.setItem('indiePulse_comments_v1', JSON.stringify(updatedComments));
+        localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
+      } catch(err) {
+        console.error("Storage limit reached:", err);
+      }
     }
   };
 
@@ -644,33 +676,33 @@ export default function CommunityPage() {
               {/* Minimal Handle Pill Top */}
               <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto my-1"></div>
 
-              {/* Comments List (Instagram Layout: Name + Time in 1 Row, Content Left Aligned, Like Button Right End) */}
-              <div className="flex flex-col gap-4 my-3 overflow-y-auto max-h-56 pr-1 text-left">
+              {/* Comments List (Instagram Layout) */}
+              <div className="flex flex-col gap-4 my-3 overflow-y-auto max-h-56 pr-1 text-left w-full">
                 {(postComments[selectedMediaPost.id] || []).length === 0 ? (
                   <p className="text-slate-500 text-xs text-center py-6">No comments yet. Be the first to comment!</p>
                 ) : (
                   (postComments[selectedMediaPost.id] || []).map((c) => {
                     const isCommentLiked = !!commentLikedState[c.id];
                     return (
-                      <div key={c.id} className="flex items-start justify-between gap-3 text-left w-full py-1 border-b border-slate-800/40 last:border-0">
+                      <div key={c.id} className="flex items-start justify-between gap-2 text-left w-full py-1 border-b border-slate-800/40 last:border-0">
                         
-                        {/* Left Side: Author, Time, Text & Instagram Sized Attached Image */}
+                        {/* Left Side: Author, Time, Text & Instagram Sized Image */}
                         <div className="flex flex-col gap-1 items-start text-left flex-1 min-w-0">
                           
-                          {/* Row 1: Bharat Patil  Just now */}
-                          <div className="flex items-center gap-2 w-full">
-                            <span className="font-bold text-pink-400 text-xs text-left truncate">{c.author}</span>
-                            <span className="text-[11px] text-slate-400 flex-shrink-0">{c.time}</span>
+                          {/* Row 1: Author & Time on 1 Single Line */}
+                          <div className="flex items-center gap-2 whitespace-nowrap">
+                            <span className="font-bold text-pink-400 text-xs text-left">{c.author}</span>
+                            <span className="text-[11px] text-slate-400">{c.time}</span>
                           </div>
                           
-                          {/* Row 2: Left-aligned Text */}
+                          {/* Row 2: Left-aligned Text Comment */}
                           {c.text && (
                             <p className="text-slate-200 text-xs leading-relaxed text-left w-full m-0 break-words">
                               {c.text}
                             </p>
                           )}
                           
-                          {/* Row 3: Instagram Sized Comment Image (Strict Dimensions) */}
+                          {/* Row 3: Instagram Sized Comment Image (Safe Base64 Compressed) */}
                           {c.media && c.media.length > 0 && (
                             <div className="flex gap-2 flex-wrap mt-1.5 justify-start w-full">
                               {c.media.map((img, idx) => (
@@ -678,14 +710,14 @@ export default function CommunityPage() {
                                   key={idx} 
                                   src={img} 
                                   alt="Comment media" 
-                                  className="w-48 h-56 object-cover rounded-2xl border border-slate-800 shadow-md" 
+                                  className="w-52 h-60 object-cover rounded-2xl border border-slate-800 shadow-md" 
                                 />
                               ))}
                             </div>
                           )}
                         </div>
 
-                        {/* Right Far Corner: Comment Like Button (Instagram Style) */}
+                        {/* Right Far Corner: Instagram Heart Button */}
                         <button 
                           onClick={() => handleCommentLike(c.id)}
                           className="text-slate-400 hover:text-red-500 transition-colors p-1 flex-shrink-0 cursor-pointer ml-auto self-start mt-0.5"
