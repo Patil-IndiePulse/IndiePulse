@@ -678,7 +678,7 @@ export default function CommunityPage() {
               {/* Minimal Handle Pill Top */}
               <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto my-1"></div>
 
-              {/* Comments List (Instagram Layout: Name + Time left side, Like button explicitly absolute right-0) */}
+              {/* Comments List (Instagram Layout using CSS Grid for 100% stable Left Alignment & Right-side Like Button) */}
               <div className="flex flex-col gap-4 my-3 overflow-y-auto max-h-56 pr-1 text-left w-full">
                 {(postComments[selectedMediaPost.id] || []).length === 0 ? (
                   <p className="text-slate-500 text-xs text-center py-6">No comments yet. Be the first to comment!</p>
@@ -686,25 +686,25 @@ export default function CommunityPage() {
                   (postComments[selectedMediaPost.id] || []).map((c) => {
                     const isCommentLiked = !!commentLikedState[c.id];
                     return (
-                      <div key={c.id} className="relative flex items-start w-full py-2.5 pr-8 border-b border-slate-800/40 last:border-0">
+                      <div key={c.id} className="grid grid-cols-[1fr_auto] items-start gap-3 w-full py-2.5 border-b border-slate-800/40 last:border-0 text-left">
                         
-                        {/* Left Content Area (Name + Time row, Left-aligned Text, Left-aligned Media) */}
-                        <div className="flex flex-col gap-1 items-start text-left w-full">
+                        {/* Left Side Content Area (Strictly Left Aligned) */}
+                        <div className="flex flex-col gap-1 items-start text-left w-full min-w-0">
                           
-                          {/* Row 1: Name & Time strictly in one single horizontal line */}
-                          <div className="flex items-center gap-2 w-full flex-nowrap">
-                            <span className="font-bold text-pink-400 text-xs text-left">{c.author}</span>
-                            <span className="text-[11px] text-slate-400">{c.time}</span>
+                          {/* Row 1: Author & Time on 1 single line */}
+                          <div className="flex items-center gap-2 w-full flex-nowrap text-left">
+                            <span className="font-bold text-pink-400 text-xs text-left truncate">{c.author}</span>
+                            <span className="text-[11px] text-slate-400 flex-shrink-0">{c.time}</span>
                           </div>
                           
-                          {/* Row 2: Comment Text (Strictly Left Aligned) */}
+                          {/* Row 2: Comment Text (Strict Left Alignment) */}
                           {c.text && (
                             <p className="text-slate-200 text-xs leading-relaxed text-left w-full m-0 break-words whitespace-normal">
                               {c.text}
                             </p>
                           )}
                           
-                          {/* Row 3: Attached Image / Media (Strictly Left Aligned Instagram Style) */}
+                          {/* Row 3: Attached Image / Media (Left Aligned) */}
                           {c.media && c.media.length > 0 && (
                             <div className="flex gap-2 flex-wrap mt-1.5 justify-start w-full">
                               {c.media.map((img, idx) => (
@@ -719,22 +719,25 @@ export default function CommunityPage() {
                           )}
                         </div>
 
-                        {/* Extreme Right Corner Like Button (Instagram Fixed Position - Absolute Right) */}
-                        <button 
-                          onClick={() => handleCommentLike(c.id)}
-                          className="absolute right-0 top-3 text-slate-400 hover:text-red-500 transition-colors p-1 cursor-pointer flex-shrink-0"
-                          title="Like Comment"
-                        >
-                          {isCommentLiked ? (
-                            <svg className="w-4 h-4 text-red-500 fill-current" viewBox="0 0 24 24">
-                              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                            </svg>
-                          ) : (
-                            <svg className="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
-                              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                            </svg>
-                          )}
-                        </button>
+                        {/* Right Side Column: Like Button (Grid Column 2 - Extreme Right Corner) */}
+                        <div className="flex items-start justify-end pt-0.5">
+                          <button 
+                            type="button"
+                            onClick={() => handleCommentLike(c.id)}
+                            className="text-slate-400 hover:text-red-500 transition-colors p-1 cursor-pointer flex-shrink-0"
+                            title="Like Comment"
+                          >
+                            {isCommentLiked ? (
+                              <svg className="w-4 h-4 text-red-500 fill-current" viewBox="0 0 24 24">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                              </svg>
+                            ) : (
+                              <svg className="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                              </svg>
+                            )}
+                          </button>
+                        </div>
 
                       </div>
                     );
