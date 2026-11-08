@@ -21,7 +21,8 @@ export default function CommunityPage() {
   const [selectedMediaPost, setSelectedMediaPost] = useState<any>(null);
   const [commentText, setCommentText] = useState("");
   const [commentMediaFiles, setCommentMediaFiles] = useState<string[]>([]);
-  const [postComments, setPostComments] = useState<{[key: string]: Array<{id: string, author: string, text: string, media?: string[], time: string}>}>({});
+  const [postComments, setPostComments] = useState<{[key: string]: Array<{id: string, author: string, text: string, media?: string[], time: string, likes?: number}>}>({});
+  const [commentLikedState, setCommentLikedState] = useState<{[key: string]: boolean}>({});
   const [showCommentSheet, setShowCommentSheet] = useState(false);
   const [userLikedPosts, setUserLikedPosts] = useState<{[key: string]: boolean}>({});
   const [userSharedPosts, setUserSharedPosts] = useState<{[key: string]: boolean}>({});
@@ -168,7 +169,7 @@ export default function CommunityPage() {
     }
   };
 
-  // Select photo from gallery into input bar (Does NOT auto-send, allows text entry)
+  // Select photo into typing bar preview (No auto-send)
   const handleCommentMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
@@ -288,7 +289,7 @@ export default function CommunityPage() {
     }
   };
 
-  // Fixed Single Repost Logic per user (Instagram Style)
+  // Single Repost Logic
   const handleRepost = (id: string, e?: any) => {
     if (e) e.stopPropagation();
 
@@ -324,7 +325,7 @@ export default function CommunityPage() {
     }
   };
 
-  // Fixed single share count logic per user
+  // Single Share Count Logic
   const handleShare = (post: any, e?: any) => {
     if (e) e.stopPropagation();
     
@@ -357,6 +358,7 @@ export default function CommunityPage() {
     }
   };
 
+  // Add Comment (Sends Text + Image Together)
   const handleAddComment = (postId: string) => {
     if (!commentText.trim() && commentMediaFiles.length === 0) return;
 
@@ -365,7 +367,8 @@ export default function CommunityPage() {
       author: currentName,
       text: commentText.trim(),
       media: commentMediaFiles,
-      time: "Just now"
+      time: "Just now",
+      likes: 0
     };
 
     const updatedComments = {
@@ -390,6 +393,12 @@ export default function CommunityPage() {
       localStorage.setItem('indiePulse_comments_v1', JSON.stringify(updatedComments));
       localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
     }
+  };
+
+  // Single Like Logic for Individual Comment
+  const handleCommentLike = (commentId: string) => {
+    const isLiked = !!commentLikedState[commentId];
+    setCommentLikedState({ ...commentLikedState, [commentId]: !isLiked });
   };
 
   return (
@@ -520,6 +529,7 @@ export default function CommunityPage() {
           </div>
 
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80 pointer-events-none"></div>
+
           {/* Top Gaming Platform Header */}
           <div className="relative z-10 p-4 flex items-center justify-between text-white drop-shadow-md">
             <span className="text-xs font-black tracking-widest text-pink-400 flex items-center gap-1.5">
@@ -639,48 +649,56 @@ export default function CommunityPage() {
               {/* Minimal Handle Pill Top */}
               <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto my-1"></div>
 
-              {/* Comments List - Left Aligned Text (Strict Instagram Alignment) */}
+              {/* Comments List */}
               <div className="flex flex-col gap-3 my-3 overflow-y-auto max-h-56 pr-1 text-left">
                 {(postComments[selectedMediaPost.id] || []).length === 0 ? (
                   <p className="text-slate-500 text-xs text-center py-6">No comments yet. Be the first to comment!</p>
                 ) : (
-                  (postComments[selectedMediaPost.id] || []).map((c) => (
-                    <div key={c.id} className="bg-slate-800/60 p-3 rounded-2xl border border-slate-700/40 flex flex-col gap-1 text-left items-start">
-                      <div className="flex justify-between items-center w-full">
-                        <span className="font-bold text-pink-400 text-xs text-left">{c.author}</span>
-                        <span className="text-[10px] text-slate-400">{c.time}</span>
-                      </div>
-                      {c.text && <p className="text-slate-200 text-xs leading-relaxed text-left w-full justify-start block">{c.text}</p>}
-                      {c.media && c.media.length > 0 && (
-                        <div className="flex gap-2 flex-wrap mt-1 justify-start">
-                          {c.media.map((img, idx) => (
-                            <img key={idx} src={img} alt="Comment media" className="w-16 h-16 object-cover rounded-lg border border-slate-700" />
-                          ))}
+                  (postComments[selectedMediaPost.id] || []).map((c) => {
+                    const isCommentLiked = !!commentLikedState[c.id];
+                    return (
+                      <div key={c.id} className="bg-slate-800/60 p-3 rounded-2xl border border-slate-700/40 flex items-start justify-between gap-2 text-left w-full">
+                        
+                        <div className="flex flex-col gap-1 items-start text-left flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-pink-400 text-xs text-left">{c.author}</span>
+                            <span className="text-[10px] text-slate-400">{c.time}</span>
+                          </div>
+                          
+                          {c.text && <p className="text-slate-200 text-xs leading-relaxed text-left w-full m-0">{c.text}</p>}
+                          
+                          {c.media && c.media.length > 0 && (
+                            <div className="flex gap-2 flex-wrap mt-1 justify-start">
+                              {c.media.map((img, idx) => (
+                                <img key={idx} src={img} alt="Comment media" className="w-16 h-16 object-cover rounded-lg border border-slate-700" />
+                              ))}
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  ))
+
+                        {/* Comment Like Button */}
+                        <button 
+                          onClick={() => handleCommentLike(c.id)}
+                          className="text-slate-400 hover:text-red-500 transition-colors p-1 flex-shrink-0 cursor-pointer"
+                        >
+                          {isCommentLiked ? (
+                            <svg className="w-4 h-4 text-red-500 fill-current" viewBox="0 0 24 24">
+                              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                          ) : (
+                            <svg className="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
+                              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                          )}
+                        </button>
+
+                      </div>
+                    );
+                  })
                 )}
               </div>
 
-              {/* Input Box Media Attachment Preview Bar */}
-              {commentMediaFiles.length > 0 && (
-                <div className="flex gap-2 mb-2 overflow-x-auto p-1.5 bg-slate-950 rounded-xl border border-slate-800 items-center justify-start">
-                  {commentMediaFiles.map((src, i) => (
-                    <div key={i} className="relative w-14 h-14 flex-shrink-0">
-                      <img src={src} className="w-full h-full object-cover rounded-lg border border-slate-700" />
-                      <button 
-                        onClick={() => setCommentMediaFiles(commentMediaFiles.filter((_, index) => index !== i))}
-                        className="absolute -top-1.5 -right-1.5 bg-pink-600 text-white rounded-full w-5 h-5 text-[10px] flex items-center justify-center font-black border border-pink-400 shadow-md"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Instagram Input Bar (Supports Image Preview + Text simultaneously before sending) */}
+              {/* Instagram Input Container */}
               <div className="w-full pt-2 border-t border-slate-800">
                 
                 <input 
@@ -692,49 +710,69 @@ export default function CommunityPage() {
                   className="hidden" 
                 />
 
-                <div className="relative w-full flex items-center">
-                  <input 
-                    ref={commentInputRef}
-                    type="text"
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    placeholder="Add a comment..."
-                    className="w-full bg-slate-950 border border-slate-800 rounded-full pl-4 pr-12 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 shadow-inner text-left"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        handleAddComment(selectedMediaPost.id);
-                      }
-                    }}
-                  />
+                <div className="bg-slate-950 border border-slate-800 rounded-3xl p-3 flex flex-col gap-2 w-full relative shadow-inner">
+                  
+                  {commentMediaFiles.length > 0 && (
+                    <div className="flex gap-2 overflow-x-auto pb-1 items-center justify-start">
+                      {commentMediaFiles.map((src, i) => (
+                        <div key={i} className="relative w-12 h-12 flex-shrink-0">
+                          <img src={src} className="w-full h-full object-cover rounded-xl border border-slate-700" />
+                          <button 
+                            type="button"
+                            onClick={() => setCommentMediaFiles(commentMediaFiles.filter((_, index) => index !== i))}
+                            className="absolute -top-1 -right-1 bg-slate-800 text-white rounded-full w-4 h-4 text-[9px] flex items-center justify-center font-black border border-slate-600 cursor-pointer"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
-                  {/* Right Button: Gallery Icon when empty -> Send Arrow when photo or text added */}
-                  <div className="absolute right-3 flex items-center justify-center">
-                    {!commentText.trim() && commentMediaFiles.length === 0 ? (
-                      <button 
-                        type="button"
-                        onClick={() => commentFileInputRef.current?.click()}
-                        className="text-slate-400 hover:text-white transition-colors cursor-pointer p-1"
-                        title="Attach Gallery Photo"
-                      >
-                        <svg className="w-5 h-5 fill-none stroke-current stroke-[1.8]" viewBox="0 0 24 24">
-                          <rect x="3" y="3" width="18" height="18" rx="4" ry="4"/>
-                          <circle cx="8.5" cy="8.5" r="1.5"/>
-                          <polyline points="21 15 16 10 5 21"/>
-                        </svg>
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => handleAddComment(selectedMediaPost.id)}
-                        className="w-7 h-7 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white rounded-full flex items-center justify-center font-black transition-all cursor-pointer shadow-md flex-shrink-0"
-                        title="Send Comment"
-                      >
-                        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                          <path d="M12 4l-7 7h4v8h6v-8h4z"/>
-                        </svg>
-                      </button>
-                    )}
+                  <div className="flex items-center justify-between w-full gap-2">
+                    <input 
+                      ref={commentInputRef}
+                      type="text"
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      placeholder="Add a comment..."
+                      className="w-full bg-transparent border-0 text-xs text-white placeholder-slate-500 focus:outline-none text-left px-1"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleAddComment(selectedMediaPost.id);
+                        }
+                      }}
+                    />
+
+                    <div className="flex items-center justify-center flex-shrink-0">
+                      {!commentText.trim() && commentMediaFiles.length === 0 ? (
+                        <button 
+                          type="button"
+                          onClick={() => commentFileInputRef.current?.click()}
+                          className="text-slate-400 hover:text-white transition-colors cursor-pointer p-1"
+                          title="Attach Gallery Photo"
+                        >
+                          <svg className="w-5 h-5 fill-none stroke-current stroke-[1.8]" viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="18" height="18" rx="4" ry="4"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                          </svg>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleAddComment(selectedMediaPost.id)}
+                          className="w-7 h-7 bg-blue-600 hover:bg-blue-500 text-white rounded-full flex items-center justify-center font-black transition-all cursor-pointer shadow-md flex-shrink-0"
+                          title="Send Comment"
+                        >
+                          <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                            <path d="M12 4l-7 7h4v8h6v-8h4z"/>
+                          </svg>
+                        </button>
+                      )}
+                    </div>
                   </div>
+
                 </div>
 
               </div>
@@ -776,35 +814,20 @@ export default function CommunityPage() {
               </div>
 
               {mediaFile && (
-                <div style={{ position: 'relative', width: '100%', height: '140px', backgroundColor: '#020617', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(236, 72, 153, 0.3)' }}>
-                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="relative w-full h-[140px] bg-slate-950 rounded-xl overflow-hidden border border-pink-500/30">
+                  <div className="w-full h-full flex items-center justify-center">
                     {mediaType === 'video' ? (
-                      <span style={{ fontSize: '12px', color: '#34d399' }}>📹 Video attached successfully</span>
+                      <span className="text-xs text-emerald-400">📹 Video attached successfully</span>
                     ) : (
-                      <img src={mediaFile} alt="Preview" style={{ height: '100%', objectFit: 'contain' }} />
+                      <img src={mediaFile} alt="Preview" className="h-full object-contain" />
                     )}
                   </div>
 
-                  <div style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 99999, width: '28px', height: '28px' }}>
+                  <div className="absolute top-2 right-2 z-50 w-7 h-7">
                     <button 
                       type="button" 
                       onClick={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
-                      style={{
-                        width: '28px',
-                        height: '28px',
-                        backgroundColor: '#db2777',
-                        color: '#ffffff',
-                        borderRadius: '50%',
-                        border: '2px solid #f472b6',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '13px',
-                        fontWeight: 'bold',
-                        cursor: 'pointer',
-                        outline: 'none',
-                        boxShadow: '0 4px 8px rgba(0,0,0,0.6)'
-                      }}
+                      className="w-7 h-7 bg-pink-600 text-white rounded-full border-2 border-pink-400 flex items-center justify-center text-xs font-bold cursor-pointer outline-none shadow-md"
                     >
                       ✕
                     </button>
@@ -828,23 +851,7 @@ export default function CommunityPage() {
                   onClick={executePostSubmission}
                   onTouchEnd={executePostSubmission}
                   disabled={isSubmitting}
-                  style={{
-                    flex: 1,
-                    padding: '12px',
-                    fontWeight: 'bold',
-                    borderRadius: '12px',
-                    fontSize: '12px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    backgroundColor: '#db2777',
-                    color: '#ffffff',
-                    border: '1px solid rgba(244, 114, 182, 0.4)',
-                    boxShadow: '0 0 15px rgba(236, 72, 153, 0.5)',
-                    transition: 'all 0.2s ease'
-                  }}
+                  className="flex-1 py-3 font-bold rounded-xl text-xs cursor-pointer flex items-center justify-center gap-1.5 bg-pink-600 text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all"
                 >
                   Post Now 🚀
                 </button>
