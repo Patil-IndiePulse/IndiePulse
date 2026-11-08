@@ -169,7 +169,6 @@ export default function CommunityPage() {
     }
   };
 
-  // Select photo into typing bar preview (No auto-send)
   const handleCommentMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
@@ -289,7 +288,6 @@ export default function CommunityPage() {
     }
   };
 
-  // Single Repost Logic
   const handleRepost = (id: string, e?: any) => {
     if (e) e.stopPropagation();
 
@@ -325,7 +323,6 @@ export default function CommunityPage() {
     }
   };
 
-  // Single Share Count Logic
   const handleShare = (post: any, e?: any) => {
     if (e) e.stopPropagation();
     
@@ -358,7 +355,6 @@ export default function CommunityPage() {
     }
   };
 
-  // Add Comment (Sends Text + Image Together)
   const handleAddComment = (postId: string) => {
     if (!commentText.trim() && commentMediaFiles.length === 0) return;
 
@@ -395,7 +391,6 @@ export default function CommunityPage() {
     }
   };
 
-  // Single Like Logic for Individual Comment
   const handleCommentLike = (commentId: string) => {
     const isLiked = !!commentLikedState[commentId];
     setCommentLikedState({ ...commentLikedState, [commentId]: !isLiked });
@@ -649,37 +644,52 @@ export default function CommunityPage() {
               {/* Minimal Handle Pill Top */}
               <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto my-1"></div>
 
-              {/* Comments List */}
-              <div className="flex flex-col gap-3 my-3 overflow-y-auto max-h-56 pr-1 text-left">
+              {/* Comments List (Instagram Layout: Name + Time in 1 Row, Content Left Aligned, Like Button Right End) */}
+              <div className="flex flex-col gap-4 my-3 overflow-y-auto max-h-56 pr-1 text-left">
                 {(postComments[selectedMediaPost.id] || []).length === 0 ? (
                   <p className="text-slate-500 text-xs text-center py-6">No comments yet. Be the first to comment!</p>
                 ) : (
                   (postComments[selectedMediaPost.id] || []).map((c) => {
                     const isCommentLiked = !!commentLikedState[c.id];
                     return (
-                      <div key={c.id} className="bg-slate-800/60 p-3 rounded-2xl border border-slate-700/40 flex items-start justify-between gap-2 text-left w-full">
+                      <div key={c.id} className="flex items-start justify-between gap-3 text-left w-full py-1 border-b border-slate-800/40 last:border-0">
                         
-                        <div className="flex flex-col gap-1 items-start text-left flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-pink-400 text-xs text-left">{c.author}</span>
-                            <span className="text-[10px] text-slate-400">{c.time}</span>
+                        {/* Left Side: Author, Time, Text & Instagram Sized Attached Image */}
+                        <div className="flex flex-col gap-1 items-start text-left flex-1 min-w-0">
+                          
+                          {/* Row 1: Bharat Patil  Just now */}
+                          <div className="flex items-center gap-2 w-full">
+                            <span className="font-bold text-pink-400 text-xs text-left truncate">{c.author}</span>
+                            <span className="text-[11px] text-slate-400 flex-shrink-0">{c.time}</span>
                           </div>
                           
-                          {c.text && <p className="text-slate-200 text-xs leading-relaxed text-left w-full m-0">{c.text}</p>}
+                          {/* Row 2: Left-aligned Text */}
+                          {c.text && (
+                            <p className="text-slate-200 text-xs leading-relaxed text-left w-full m-0 break-words">
+                              {c.text}
+                            </p>
+                          )}
                           
+                          {/* Row 3: Instagram Sized Comment Image (Strict Dimensions) */}
                           {c.media && c.media.length > 0 && (
-                            <div className="flex gap-2 flex-wrap mt-1 justify-start">
+                            <div className="flex gap-2 flex-wrap mt-1.5 justify-start w-full">
                               {c.media.map((img, idx) => (
-                                <img key={idx} src={img} alt="Comment media" className="w-16 h-16 object-cover rounded-lg border border-slate-700" />
+                                <img 
+                                  key={idx} 
+                                  src={img} 
+                                  alt="Comment media" 
+                                  className="w-48 h-56 object-cover rounded-2xl border border-slate-800 shadow-md" 
+                                />
                               ))}
                             </div>
                           )}
                         </div>
 
-                        {/* Comment Like Button */}
+                        {/* Right Far Corner: Comment Like Button (Instagram Style) */}
                         <button 
                           onClick={() => handleCommentLike(c.id)}
-                          className="text-slate-400 hover:text-red-500 transition-colors p-1 flex-shrink-0 cursor-pointer"
+                          className="text-slate-400 hover:text-red-500 transition-colors p-1 flex-shrink-0 cursor-pointer ml-auto self-start mt-0.5"
+                          title="Like Comment"
                         >
                           {isCommentLiked ? (
                             <svg className="w-4 h-4 text-red-500 fill-current" viewBox="0 0 24 24">
@@ -698,7 +708,7 @@ export default function CommunityPage() {
                 )}
               </div>
 
-              {/* Instagram Input Container */}
+              {/* Instagram Input Container (Unified Photo Preview + Text Entry) */}
               <div className="w-full pt-2 border-t border-slate-800">
                 
                 <input 
