@@ -157,7 +157,6 @@ export default function CommunityPage() {
 
   const currentEmail = user?.email || 'bharatrajupatil5200@gmail.com';
 
-  // Ultra-compressed image function to prevent LocalStorage quota overflow & vanishing images
   const compressImage = (file: File, callback: (compressedDataUrl: string) => void) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -166,7 +165,7 @@ export default function CommunityPage() {
       img.src = event.target?.result as string;
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 400; // Small size to ensure storage safety
+        const MAX_WIDTH = 400;
         const scaleFactor = MAX_WIDTH / img.width;
         
         if (img.width > MAX_WIDTH) {
@@ -679,7 +678,7 @@ export default function CommunityPage() {
               {/* Minimal Handle Pill Top */}
               <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto my-1"></div>
 
-              {/* Comments List (Instagram Layout: Name + Time in single line flex row, text and media left aligned, like button on extreme right) */}
+              {/* Comments List (Instagram Layout: Name + Time left side, Like button explicitly absolute right-0) */}
               <div className="flex flex-col gap-4 my-3 overflow-y-auto max-h-56 pr-1 text-left w-full">
                 {(postComments[selectedMediaPost.id] || []).length === 0 ? (
                   <p className="text-slate-500 text-xs text-center py-6">No comments yet. Be the first to comment!</p>
@@ -687,25 +686,25 @@ export default function CommunityPage() {
                   (postComments[selectedMediaPost.id] || []).map((c) => {
                     const isCommentLiked = !!commentLikedState[c.id];
                     return (
-                      <div key={c.id} className="relative flex items-start justify-between gap-2 text-left w-full py-2 border-b border-slate-800/40 last:border-0">
+                      <div key={c.id} className="relative flex items-start w-full py-2.5 pr-8 border-b border-slate-800/40 last:border-0">
                         
-                        {/* Left Content Area (Name + Time single horizontal line, Text, Image) */}
-                        <div className="flex flex-col gap-1 items-start text-left flex-1 pr-8 min-w-0">
+                        {/* Left Content Area (Name + Time row, Left-aligned Text, Left-aligned Media) */}
+                        <div className="flex flex-col gap-1 items-start text-left w-full">
                           
                           {/* Row 1: Name & Time strictly in one single horizontal line */}
-                          <div className="flex items-center gap-2 w-full flex-nowrap overflow-hidden">
-                            <span className="font-bold text-pink-400 text-xs truncate flex-shrink-0">{c.author}</span>
-                            <span className="text-[11px] text-slate-400 flex-shrink-0">{c.time}</span>
+                          <div className="flex items-center gap-2 w-full flex-nowrap">
+                            <span className="font-bold text-pink-400 text-xs text-left">{c.author}</span>
+                            <span className="text-[11px] text-slate-400">{c.time}</span>
                           </div>
                           
-                          {/* Row 2: Comment Text (Ensuring normal word wrapping instead of vertical letters) */}
+                          {/* Row 2: Comment Text (Strictly Left Aligned) */}
                           {c.text && (
                             <p className="text-slate-200 text-xs leading-relaxed text-left w-full m-0 break-words whitespace-normal">
                               {c.text}
                             </p>
                           )}
                           
-                          {/* Row 3: Attached Image / Media (Instagram Style, compact or clear grid) */}
+                          {/* Row 3: Attached Image / Media (Strictly Left Aligned Instagram Style) */}
                           {c.media && c.media.length > 0 && (
                             <div className="flex gap-2 flex-wrap mt-1.5 justify-start w-full">
                               {c.media.map((img, idx) => (
@@ -720,10 +719,10 @@ export default function CommunityPage() {
                           )}
                         </div>
 
-                        {/* Extreme Right Corner Like Button (Instagram Fixed Position) */}
+                        {/* Extreme Right Corner Like Button (Instagram Fixed Position - Absolute Right) */}
                         <button 
                           onClick={() => handleCommentLike(c.id)}
-                          className="absolute right-0 top-2 text-slate-400 hover:text-red-500 transition-colors p-1 cursor-pointer flex-shrink-0"
+                          className="absolute right-0 top-3 text-slate-400 hover:text-red-500 transition-colors p-1 cursor-pointer flex-shrink-0"
                           title="Like Comment"
                         >
                           {isCommentLiked ? (
