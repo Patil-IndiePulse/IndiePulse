@@ -139,16 +139,26 @@ export default function CommunityPage() {
     }
   };
 
+  const openCommentSheet = () => {
+    setShowCommentSheet(true);
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ commentSheetOpen: true }, '');
+    }
+    setTimeout(() => commentInputRef.current?.focus(), 200);
+  };
+
+  // Strong Physical Back Button Handler with History State Trapping
   useEffect(() => {
-    const handlePopState = () => {
+    const handlePopState = (e: PopStateEvent) => {
       if (showCommentSheet) {
         setShowCommentSheet(false);
-      } else if (isModalOpen) {
-        setIsModalOpen(false);
       } else if (selectedMediaPost) {
         setSelectedMediaPost(null);
+      } else if (isModalOpen) {
+        setIsModalOpen(false);
       }
     };
+
     window.addEventListener('popstate', handlePopState);
     return () => {
       window.removeEventListener('popstate', handlePopState);
@@ -480,7 +490,8 @@ export default function CommunityPage() {
           </button>
         </div>
 
-        <div className="flex flex-col gap-4 mb-2 text-left max-h-[420px] overflow-y-auto pr-1">
+        {/* Community Posts Feed (Strict Left Alignment for Content text) */}
+        <div className="flex flex-col gap-4 mb-2 text-left max-h-[420px] overflow-y-auto pr-1 items-start justify-start w-full">
           {posts.map((post) => {
             const isMyPost = post.authorEmail === currentEmail || post.authorName === currentName || post.authorName === 'Bharat Patil';
             const displayAuthor = isMyPost ? "You" : post.authorName;
@@ -489,21 +500,24 @@ export default function CommunityPage() {
             return (
               <div 
                 key={post.id} 
-                className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 transition-all flex flex-col gap-2.5"
+                className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 transition-all flex flex-col items-start justify-start text-left gap-2.5 w-full"
               >
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-pink-400 text-sm">{displayAuthor}</span>
+                <div className="flex justify-between items-center w-full">
+                  <span className="font-bold text-pink-400 text-sm text-left">{displayAuthor}</span>
                   <span className="text-xs text-slate-400">{post.time}</span>
                 </div>
 
+                {/* Main Content Paragraph Forced Left-Aligned */}
                 {post.content && (
-                  <p className="text-slate-300 text-sm leading-relaxed text-left">{post.content}</p>
+                  <p className="text-slate-300 text-sm leading-relaxed text-left block w-full m-0 break-words whitespace-normal font-normal" style={{ textAlign: 'left' }}>
+                    {post.content}
+                  </p>
                 )}
 
                 {post.media && (
                   <div 
                     onClick={() => openMediaViewer(post)}
-                    className="rounded-xl overflow-hidden border border-slate-700 bg-slate-950 mt-1 cursor-pointer relative group"
+                    className="rounded-xl overflow-hidden border border-slate-700 bg-slate-950 mt-1 cursor-pointer relative group w-full"
                   >
                     {post.mediaType === 'video' ? (
                       <video src={post.media} className="w-full max-h-64 object-cover pointer-events-none" />
@@ -516,7 +530,7 @@ export default function CommunityPage() {
                   </div>
                 )}
 
-                <div className="flex items-center gap-5 text-xs text-slate-400 pt-2 border-t border-slate-700/40 mt-1">
+                <div className="flex items-center gap-5 text-xs text-slate-400 pt-2 border-t border-slate-700/40 mt-1 w-full justify-start">
                   <button 
                     onClick={(e) => handleLike(post.id, e)}
                     className={`flex items-center gap-1.5 transition-colors cursor-pointer ${isLiked ? 'text-red-500 font-bold' : 'hover:text-pink-400'}`}
@@ -576,29 +590,25 @@ export default function CommunityPage() {
             )}
           </div>
 
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80 pointer-events-none"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80 pointer-events-none"></div>
 
-          {/* Top Gaming Platform Header */}
-          <div className="relative z-10 p-4 flex items-center justify-between text-white drop-shadow-md">
-            <span className="text-xs font-black tracking-widest text-pink-400 flex items-center gap-1.5">
+          {/* Top Gaming Platform Header (High-Contrast Shadow & Outline for INDIEPULSE CLIPS) */}
+          <div className="relative z-10 p-4 flex items-center justify-between text-white">
+            <span className="text-sm font-black tracking-widest text-pink-500 flex items-center gap-1.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] bg-black/30 px-3 py-1 rounded-full border border-pink-500/30 backdrop-blur-md">
               <span>🎮</span> INDIEPULSE CLIPS
             </span>
           </div>
 
-          {/* Bottom Left Caption + Right Action Buttons */}
+          {/* Bottom Left Caption Hidden as Requested + Right Action Buttons */}
           <div className="relative z-10 p-4 pb-8 flex items-end justify-between w-full">
             
-            {/* Bottom Caption */}
-            <div className="flex flex-col gap-2 max-w-[75%] text-left">
-              {selectedMediaPost.content && (
-                <p className="text-xs text-slate-100 line-clamp-3 leading-relaxed drop-shadow-sm font-medium text-left">
-                  {selectedMediaPost.content}
-                </p>
-              )}
+            {/* Bottom Caption Container (Text Hidden as per instruction) */}
+            <div className="flex flex-col gap-2 max-w-[75%] text-left pointer-events-none opacity-0">
+              {/* Post Text is hidden inside fullscreen video view */}
             </div>
 
             {/* Right Side Vertical Action Buttons */}
-            <div className="flex flex-col items-center gap-4 pb-2">
+            <div className="flex flex-col items-center gap-4 pb-2 ml-auto">
               
               {/* Like Button */}
               <button 
@@ -623,10 +633,7 @@ export default function CommunityPage() {
 
               {/* Comment Button */}
               <button 
-                onClick={() => {
-                  setShowCommentSheet(true);
-                  setTimeout(() => commentInputRef.current?.focus(), 200);
-                }}
+                onClick={openCommentSheet}
                 className="flex flex-col items-center justify-center gap-0.5 text-white hover:opacity-80 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
               >
                 <div className="p-1">
@@ -690,7 +697,7 @@ export default function CommunityPage() {
             </div>
           )}
 
-          {/* Clean Instagram Comment Bottom Sheet (Fixed Instagram Standard Layout) */}
+          {/* Clean Instagram Comment Bottom Sheet (No back button inside, pure physical mobile back button support) */}
           {showCommentSheet && (
             <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/98 backdrop-blur-2xl border-t border-slate-800 rounded-t-3xl p-4 flex flex-col max-h-[70vh] transition-all shadow-2xl text-left items-start">
               
@@ -893,7 +900,7 @@ export default function CommunityPage() {
                 <div className="relative w-full h-[140px] bg-slate-950 rounded-xl overflow-hidden border border-pink-500/30">
                   <div className="w-full h-full flex items-center justify-center">
                     {mediaType === 'video' ? (
-                      <span className="text-xs text-emerald-400">📹 Video attached successfully</span>
+                     <span className="text-xs text-emerald-400">📹 Video attached successfully</span>
                     ) : (
                       <img src={mediaFile} alt="Preview" className="h-full object-contain" />
                     )}
@@ -905,7 +912,7 @@ export default function CommunityPage() {
                       onClick={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
                       className="w-7 h-7 bg-pink-600 text-white rounded-full border-2 border-pink-400 flex items-center justify-center text-xs font-bold cursor-pointer outline-none shadow-md"
                     >
-                     ✕
+                      ✕
                     </button>
                   </div>
                 </div>
