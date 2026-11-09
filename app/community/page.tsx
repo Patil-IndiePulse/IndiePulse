@@ -690,39 +690,41 @@ export default function CommunityPage() {
             </div>
           )}
 
-          {/* Clean Instagram Comment Bottom Sheet (Strict Left Alignment Fix) */}
+          {/* Clean Instagram Comment Bottom Sheet (Fixed Instagram Standard Layout) */}
           {showCommentSheet && (
-            <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/98 backdrop-blur-2xl border-t border-slate-800 rounded-t-3xl p-4 flex flex-col max-h-[70vh] transition-all shadow-2xl">
+            <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/98 backdrop-blur-2xl border-t border-slate-800 rounded-t-3xl p-4 flex flex-col max-h-[70vh] transition-all shadow-2xl text-left items-start">
               
               {/* Minimal Handle Pill Top */}
-              <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto my-1"></div>
+              <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto my-1 self-center"></div>
 
-              {/* Comments List (Strictly Left Aligned using w-full text-left and removal of parent centering classes) */}
-              <div className="flex flex-col gap-4 my-3 overflow-y-auto max-h-56 pr-1 text-left w-full">
+              {/* Comments List */}
+              <div className="flex flex-col gap-4 my-3 overflow-y-auto max-h-56 pr-1 text-left items-start justify-start w-full">
                 {(postComments[selectedMediaPost.id] || []).length === 0 ? (
-                  <p className="text-slate-500 text-xs text-center py-6">No comments yet. Be the first to comment!</p>
+                  <p className="text-slate-500 text-xs text-center py-6 w-full">No comments yet. Be the first to comment!</p>
                 ) : (
                   (postComments[selectedMediaPost.id] || []).map((c) => {
                     const isCommentLiked = !!commentLikedState[c.id];
                     const commentLikesCount = c.likes || 0;
                     
                     return (
-                      <div key={c.id} className="grid grid-cols-[1fr_auto] items-start gap-3 w-full py-2.5 border-b border-slate-800/40 last:border-0 text-left">
+                      <div key={c.id} className="grid grid-cols-[1fr_auto] items-start justify-between gap-3 w-full py-2.5 border-b border-slate-800/40 last:border-0 text-left">
                         
-                        {/* LEFT COLUMN: Entire Comment Container (Forced 100% Left Aligned) */}
-                        <div className="flex flex-col items-start justify-start text-left w-full min-w-0 gap-1">
+                        {/* LEFT COLUMN: Entire Comment Content Stack (Author + Time, Text, Media) */}
+                        <div className="flex flex-col items-start justify-start text-left w-full min-w-0 gap-1" style={{ textAlign: 'left' }}>
                           
                           {/* Row 1: Author Name & Time */}
-                          <div className="flex items-center justify-start gap-2 w-full text-left">
-                            <span className="font-bold text-pink-400 text-xs text-left truncate">{c.author}</span>
+                          <div className="flex items-center justify-start gap-2 w-full text-left" style={{ textAlign: 'left' }}>
+                            <span className="font-bold text-pink-400 text-xs text-left truncate block">{c.author}</span>
                             <span className="text-[11px] text-slate-400 flex-shrink-0 text-left">{c.time}</span>
                           </div>
                           
-                          {/* Row 2: Comment Text (Strictly Left Aligned without any center interference) */}
+                          {/* Row 2: Comment Text (Strictly Left Aligned) */}
                           {c.text && (
-                            <p className="text-slate-200 text-xs leading-relaxed text-left justify-start w-full m-0 break-words whitespace-normal">
-                              {c.text}
-                            </p>
+                            <div className="w-full text-left flex justify-start items-start">
+                              <p className="text-slate-200 text-xs leading-relaxed text-left block w-full m-0 break-words whitespace-normal" style={{ textAlign: 'left' }}>
+                                {c.text}
+                              </p>
+                            </div>
                           )}
                           
                           {/* Row 3: Attached Image / Media (Left Aligned) */}
@@ -741,7 +743,7 @@ export default function CommunityPage() {
                         </div>
 
                         {/* RIGHT COLUMN: Like Button + Live Counter */}
-                        <div className="flex flex-col items-center justify-center pt-0.5 min-w-[28px]">
+                        <div className="flex flex-col items-center justify-center pt-0.5 min-w-[28px] flex-shrink-0">
                           <button 
                             type="button"
                             onClick={() => handleCommentLike(c.id, selectedMediaPost.id)}
@@ -903,7 +905,7 @@ export default function CommunityPage() {
                       onClick={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
                       className="w-7 h-7 bg-pink-600 text-white rounded-full border-2 border-pink-400 flex items-center justify-center text-xs font-bold cursor-pointer outline-none shadow-md"
                     >
-                      ✕
+                     ✕
                     </button>
                   </div>
                 </div>
@@ -938,4 +940,4 @@ export default function CommunityPage() {
 
     </main>
   );
-}
+} 
