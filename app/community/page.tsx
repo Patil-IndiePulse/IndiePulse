@@ -431,7 +431,6 @@ export default function CommunityPage() {
     
     setCommentLikedState((prev) => ({ ...prev, [commentId]: newLikedState }));
 
-    // Update Comment Like Counter
     if (postComments[postId]) {
       const updatedCommentsList = postComments[postId].map((c) => {
         if (c.id === commentId) {
@@ -691,14 +690,14 @@ export default function CommunityPage() {
             </div>
           )}
 
-          {/* Clean Instagram Comment Bottom Sheet (Exact 2-Column CSS Grid Layout) */}
+          {/* Clean Instagram Comment Bottom Sheet (Strict Left Alignment Fix) */}
           {showCommentSheet && (
             <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/98 backdrop-blur-2xl border-t border-slate-800 rounded-t-3xl p-4 flex flex-col max-h-[70vh] transition-all shadow-2xl">
               
               {/* Minimal Handle Pill Top */}
               <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto my-1"></div>
 
-              {/* Comments List (CSS Grid: Col 1 = Entire Content Left-aligned, Col 2 = Like Button & Counter Right-aligned) */}
+              {/* Comments List (Strictly Left Aligned using w-full text-left and removal of parent centering classes) */}
               <div className="flex flex-col gap-4 my-3 overflow-y-auto max-h-56 pr-1 text-left w-full">
                 {(postComments[selectedMediaPost.id] || []).length === 0 ? (
                   <p className="text-slate-500 text-xs text-center py-6">No comments yet. Be the first to comment!</p>
@@ -710,7 +709,7 @@ export default function CommunityPage() {
                     return (
                       <div key={c.id} className="grid grid-cols-[1fr_auto] items-start gap-3 w-full py-2.5 border-b border-slate-800/40 last:border-0 text-left">
                         
-                        {/* LEFT COLUMN: Entire Comment Container (Name, Time, Text, Image - All Strictly 100% Left Aligned) */}
+                        {/* LEFT COLUMN: Entire Comment Container (Forced 100% Left Aligned) */}
                         <div className="flex flex-col items-start justify-start text-left w-full min-w-0 gap-1">
                           
                           {/* Row 1: Author Name & Time */}
@@ -719,14 +718,14 @@ export default function CommunityPage() {
                             <span className="text-[11px] text-slate-400 flex-shrink-0 text-left">{c.time}</span>
                           </div>
                           
-                          {/* Row 2: Comment Text (Strictly Left Aligned) */}
+                          {/* Row 2: Comment Text (Strictly Left Aligned without any center interference) */}
                           {c.text && (
-                            <p className="text-slate-200 text-xs leading-relaxed text-left justify-start w-full m-0 break-words whitespace-normal self-start">
+                            <p className="text-slate-200 text-xs leading-relaxed text-left justify-start w-full m-0 break-words whitespace-normal">
                               {c.text}
                             </p>
                           )}
                           
-                          {/* Row 3: Attached Image / Media (Strictly Left Aligned) */}
+                          {/* Row 3: Attached Image / Media (Left Aligned) */}
                           {c.media && c.media.length > 0 && (
                             <div className="flex gap-2 flex-wrap mt-1.5 justify-start items-start w-full">
                               {c.media.map((img, idx) => (
@@ -741,7 +740,7 @@ export default function CommunityPage() {
                           )}
                         </div>
 
-                        {/* RIGHT COLUMN: Like Button + Live Counter (Instagram Style Right Corner) */}
+                        {/* RIGHT COLUMN: Like Button + Live Counter */}
                         <div className="flex flex-col items-center justify-center pt-0.5 min-w-[28px]">
                           <button 
                             type="button"
@@ -760,7 +759,6 @@ export default function CommunityPage() {
                             )}
                           </button>
                           
-                          {/* Live Comment Like Counter (1, 2, 3...) */}
                           {commentLikesCount > 0 && (
                             <span className="text-[10px] text-slate-400 font-semibold -mt-0.5">
                               {commentLikesCount}
