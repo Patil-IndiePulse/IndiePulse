@@ -14,7 +14,7 @@ export default function CommunityPage() {
   const [mediaFile, setMediaFile] = useState<string | null>(null);
   const [mediaType, setMediaType] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentName, setCurrentName] = useState('Bharat Patil');
+  const [currentName, setCurrentName] = useState('Jayvaant Patil');
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -34,28 +34,41 @@ export default function CommunityPage() {
   const commentInputRef = useRef<HTMLInputElement>(null);
   const commentFileInputRef = useRef<HTMLInputElement>(null);
 
+  // Function to sync profile name & avatar live from localStorage / auth
+  const syncProfileData = () => {
+    if (typeof window !== 'undefined') {
+      const savedName = localStorage.getItem('indiePulse_name');
+      if (savedName) {
+        setCurrentName(savedName);
+      } else if (auth.currentUser?.displayName) {
+        setCurrentName(auth.currentUser.displayName);
+      }
+
+      const savedAvatar = localStorage.getItem('indiePulse_user_avatar');
+      if (savedAvatar) {
+        setUserAvatar(savedAvatar);
+      } else if (auth.currentUser?.photoURL) {
+        setUserAvatar(auth.currentUser.photoURL);
+      }
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      if (currentUser?.displayName) {
-        setCurrentName(currentUser.displayName);
-      }
-      if (currentUser?.photoURL) {
-        setUserAvatar(currentUser.photoURL);
-      }
+      syncProfileData();
     });
 
+    syncProfileData();
+
+    // Listen to storage & focus changes for real-time live sync across pages
+    const handleStorageChange = () => {
+      syncProfileData();
+    };
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('focus', handleStorageChange);
+
     if (typeof window !== 'undefined') {
-      const savedCustomName = localStorage.getItem('indiePulse_name');
-      if (savedCustomName) {
-        setCurrentName(savedCustomName);
-      }
-
-      const savedCustomAvatar = localStorage.getItem('indiePulse_user_avatar');
-      if (savedCustomAvatar) {
-        setUserAvatar(savedCustomAvatar);
-      }
-
       const savedPosts = localStorage.getItem('indiePulse_community_posts_v32');
       if (savedPosts) {
         try {
@@ -67,9 +80,9 @@ export default function CommunityPage() {
         const initialPosts = [
           { 
             id: '1', 
-            authorName: "Bharat Patil", 
+            authorName: "Jayvaant Patil", 
             authorEmail: "bharatrajupatil5200@gmail.com", 
-            authorAvatar: savedCustomAvatar || null,
+            authorAvatar: localStorage.getItem('indiePulse_user_avatar'),
             content: "Working on a new indie platform using Next.js and Tailwind CSS! Excited to share soon. 🚀", 
             media: null,
             mediaType: null,
@@ -126,7 +139,11 @@ export default function CommunityPage() {
       }
     }
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('focus', handleStorageChange);
+    };
   }, []);
 
   const formatCount = (num: number) => {
@@ -137,6 +154,7 @@ export default function CommunityPage() {
   };
 
   const openModal = () => {
+    syncProfileData();
     setIsModalOpen(true);
     if (typeof window !== 'undefined') {
       window.history.pushState({ modalOpen: true }, '');
@@ -151,6 +169,7 @@ export default function CommunityPage() {
   };
 
   const openCommentSheet = () => {
+    syncProfileData();
     setShowCommentSheet(true);
     if (typeof window !== 'undefined') {
       window.history.pushState({ commentSheetOpen: true }, '');
@@ -261,6 +280,7 @@ export default function CommunityPage() {
     if (!newPost.trim() && !mediaFile) return;
     if (isSubmitting) return;
 
+    syncProfileData();
     setIsSubmitting(true);
 
     if (submitBtnRef.current) {
@@ -410,6 +430,8 @@ export default function CommunityPage() {
   const handleAddComment = (postId: string) => {
     if (!commentText.trim() && commentMediaFiles.length === 0) return;
 
+    syncProfileData();
+
     const newCommentObj = {
       id: Date.now().toString(),
       author: currentName,
@@ -472,9 +494,10 @@ export default function CommunityPage() {
     }
   };
 
-  // Helper Avatar Renderer (Instagram Style Gradient Border)
+  // Helper Avatar Renderer (Instagram Style Gradient Border with Live Profile Fallback)
   const renderAvatar = (avatarUrl?: string | null, name?: string, sizeClass: string = "w-9 h-9") => {
-    const displayAvatar = avatarUrl || (name === currentName || name === 'You' ? userAvatar : null);
+    const isMyAuthor = name === currentName || name === 'You' || !name || name === 'Bharat Patil' || name === 'Jayvaant Patil';
+    const displayAvatar = isMyAuthor ? (userAvatar || avatarUrl) : avatarUrl;
     
     if (displayAvatar) {
       return (
@@ -488,7 +511,8 @@ export default function CommunityPage() {
       );
     }
 
-    const initial = (name || 'U').charAt(0).toUpperCase();
+    const displayName = isMyAuthor ? currentName : (name || 'U');
+    const initial = displayName.charAt(0).toUpperCase();
     return (
       <div className={`rounded-full p-[1.5px] bg-gradient-to-tr from-pink-500 to-purple-500 flex-shrink-0 ${sizeClass}`}>
         <div className="w-full h-full bg-slate-800 text-pink-400 font-bold flex items-center justify-center rounded-full text-xs border border-slate-900">
@@ -529,10 +553,10 @@ export default function CommunityPage() {
           </button>
         </div>
 
-        {/* Community Posts Feed (Strict Left Alignment for Content text + Instagram Avatar DP) */}
+        {/* Community Posts Feed (Strict Left Alignment for Content text + Live Instagram Avatar DP) */}
         <div className="flex flex-col gap-4 mb-2 text-left max-h-[420px] overflow-y-auto pr-1 items-start justify-start w-full">
           {posts.map((post) => {
-            const isMyPost = post.authorEmail === currentEmail || post.authorName === currentName || post.authorName === 'Bharat Patil';
+            const isMyPost = post.authorEmail === currentEmail || post.authorName === currentName || post.authorName === 'Bharat Patil' || post.authorName === 'Jayvaant Patil';
             const displayAuthor = isMyPost ? "You" : post.authorName;
             const isLiked = !!userLikedPosts[post.id];
 
@@ -541,10 +565,10 @@ export default function CommunityPage() {
                 key={post.id} 
                 className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 transition-all flex flex-col items-start justify-start text-left gap-2.5 w-full"
               >
-                {/* Post Author Row with DP */}
+                {/* Post Author Row with Live DP */}
                 <div className="flex justify-between items-center w-full">
                   <div className="flex items-center gap-2.5">
-                    {renderAvatar(post.authorAvatar, displayAuthor, "w-8 h-8")}
+                    {renderAvatar(isMyPost ? userAvatar : post.authorAvatar, displayAuthor, "w-8 h-8")}
                     <span className="font-bold text-pink-400 text-sm text-left">{displayAuthor}</span>
                   </div>
                   <span className="text-xs text-slate-400">{post.time}</span>
@@ -635,21 +659,17 @@ export default function CommunityPage() {
 
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80 pointer-events-none"></div>
 
-          {/* Top Gaming Platform Header (High-Contrast Shadow & Outline for INDIEPULSE CLIPS) */}
+          {/* Top Gaming Platform Header */}
           <div className="relative z-10 p-4 flex items-center justify-between text-white">
             <span className="text-sm font-black tracking-widest text-pink-500 flex items-center gap-1.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] bg-black/30 px-3 py-1 rounded-full border border-pink-500/30 backdrop-blur-md">
               <span>🎮</span> INDIEPULSE CLIPS
             </span>
           </div>
 
-          {/* Bottom Left Caption Hidden + Right Action Buttons */}
+          {/* Right Side Vertical Action Buttons */}
           <div className="relative z-10 p-4 pb-8 flex items-end justify-between w-full">
-            
-            <div className="flex flex-col gap-2 max-w-[75%] text-left pointer-events-none opacity-0">
-              {/* Text hidden inside fullscreen viewer as per design instruction */}
-            </div>
+            <div className="flex flex-col gap-2 max-w-[75%] text-left pointer-events-none opacity-0"></div>
 
-            {/* Right Side Vertical Action Buttons */}
             <div className="flex flex-col items-center gap-4 pb-2 ml-auto">
               
               {/* Like Button */}
@@ -720,7 +740,6 @@ export default function CommunityPage() {
               </button>
 
             </div>
-
           </div>
 
           {/* Instagram Repost Toast Popup */}
@@ -739,11 +758,10 @@ export default function CommunityPage() {
             </div>
           )}
 
-          {/* Clean Instagram Comment Bottom Sheet (With Instagram DP for Author & Current User Input) */}
+          {/* Clean Instagram Comment Bottom Sheet with Live DP */}
           {showCommentSheet && (
             <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/98 backdrop-blur-2xl border-t border-slate-800 rounded-t-3xl p-4 flex flex-col max-h-[70vh] transition-all shadow-2xl text-left items-start">
               
-              {/* Minimal Handle Pill Top */}
               <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto my-1 self-center"></div>
 
               {/* Comments List */}
@@ -754,24 +772,20 @@ export default function CommunityPage() {
                   (postComments[selectedMediaPost.id] || []).map((c) => {
                     const isCommentLiked = !!commentLikedState[c.id];
                     const commentLikesCount = c.likes || 0;
+                    const isMyComment = c.author === currentName || c.author === 'Bharat Patil' || c.author === 'Jayvaant Patil';
                     
                     return (
                       <div key={c.id} className="grid grid-cols-[1fr_auto] items-start justify-between gap-3 w-full py-2.5 border-b border-slate-800/40 last:border-0 text-left">
                         
-                        {/* LEFT COLUMN: DP Avatar + Entire Comment Content Stack */}
                         <div className="flex items-start justify-start text-left w-full min-w-0 gap-3" style={{ textAlign: 'left' }}>
-                          
-                          {/* Instagram Commenter Avatar DP */}
-                          {renderAvatar(c.authorAvatar, c.author, "w-8 h-8 mt-0.5")}
+                          {renderAvatar(isMyComment ? userAvatar : c.authorAvatar, c.author, "w-8 h-8 mt-0.5")}
 
                           <div className="flex flex-col items-start justify-start text-left w-full min-w-0 gap-1">
-                            {/* Row 1: Author Name & Time */}
                             <div className="flex items-center justify-start gap-2 w-full text-left" style={{ textAlign: 'left' }}>
-                              <span className="font-bold text-pink-400 text-xs text-left truncate block">{c.author}</span>
+                              <span className="font-bold text-pink-400 text-xs text-left truncate block">{isMyComment ? currentName : c.author}</span>
                               <span className="text-[11px] text-slate-400 flex-shrink-0 text-left">{c.time}</span>
                             </div>
                             
-                            {/* Row 2: Comment Text (Strictly Left Aligned) */}
                             {c.text && (
                               <div className="w-full text-left flex justify-start items-start">
                                 <p className="text-slate-200 text-xs leading-relaxed text-left block w-full m-0 break-words whitespace-normal" style={{ textAlign: 'left' }}>
@@ -780,7 +794,6 @@ export default function CommunityPage() {
                               </div>
                             )}
                             
-                            {/* Row 3: Attached Image / Media (Left Aligned) */}
                             {c.media && c.media.length > 0 && (
                               <div className="flex gap-2 flex-wrap mt-1.5 justify-start items-start w-full">
                                 {c.media.map((img, idx) => (
@@ -796,7 +809,6 @@ export default function CommunityPage() {
                           </div>
                         </div>
 
-                        {/* RIGHT COLUMN: Like Button + Live Counter */}
                         <div className="flex flex-col items-center justify-center pt-0.5 min-w-[28px] flex-shrink-0">
                           <button 
                             type="button"
@@ -828,9 +840,8 @@ export default function CommunityPage() {
                 )}
               </div>
 
-              {/* Instagram Input Container with User DP */}
+              {/* Instagram Input Container with Live User DP */}
               <div className="w-full pt-2 border-t border-slate-800">
-                
                 <input 
                   type="file" 
                   ref={commentFileInputRef} 
@@ -860,7 +871,6 @@ export default function CommunityPage() {
                   )}
 
                   <div className="flex items-center justify-between w-full gap-2">
-                    {/* Logged in User Instagram Avatar DP on Input Row */}
                     {renderAvatar(userAvatar, currentName, "w-7 h-7")}
 
                     <input 
