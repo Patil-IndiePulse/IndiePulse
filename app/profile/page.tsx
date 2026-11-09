@@ -16,9 +16,9 @@ export default function ProfilePage() {
 
   // Load saved profile data from localStorage when page opens
   useEffect(() => {
-    const savedName = localStorage.getItem('indiePulse_name');
+    const savedName = localStorage.getItem('indiePulse_name') || localStorage.getItem('indiePulse_community_name');
     const savedBio = localStorage.getItem('indiePulse_bio');
-    const savedPic = localStorage.getItem('indiePulse_pic');
+    const savedPic = localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar');
     const savedGenres = localStorage.getItem('indiePulse_genres');
 
     if (savedName) setName(savedName);
@@ -34,7 +34,10 @@ export default function ProfilePage() {
         if (uploadEvent.target?.result) {
           const base64Img = uploadEvent.target.result as string;
           setProfilePic(base64Img);
-          localStorage.setItem('indiePulse_pic', base64Img); // Save instantly
+          // Save instantly to BOTH keys so Community & Profile sync 100%
+          localStorage.setItem('indiePulse_pic', base64Img);
+          localStorage.setItem('indiePulse_user_avatar', base64Img);
+          window.dispatchEvent(new Event('storage'));
         }
       };
       reader.readAsDataURL(e.target.files[0]);
@@ -54,11 +57,15 @@ export default function ProfilePage() {
 
   const handleSaveProfile = () => {
     if (isEditing) {
-      // Save all data to localStorage when clicking "Save Profile"
+      // Save all data to localStorage across ALL synchronized keys
       localStorage.setItem('indiePulse_name', name);
       localStorage.setItem('indiePulse_bio', bio);
-      if (profilePic) localStorage.setItem('indiePulse_pic', profilePic);
+      if (profilePic) {
+        localStorage.setItem('indiePulse_pic', profilePic);
+        localStorage.setItem('indiePulse_user_avatar', profilePic);
+      }
       localStorage.setItem('indiePulse_genres', JSON.stringify(selectedGenres));
+      window.dispatchEvent(new Event('storage'));
     }
     setIsEditing(!isEditing);
   };
