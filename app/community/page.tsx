@@ -37,14 +37,14 @@ export default function CommunityPage() {
   // Function to sync profile name & avatar live from localStorage / Auth
   const syncProfileData = () => {
     if (typeof window !== 'undefined') {
-      const savedName = localStorage.getItem('indiePulse_name');
+      const savedName = localStorage.getItem('indiePulse_name') || localStorage.getItem('indiePulse_community_name');
       if (savedName) {
         setCurrentName(savedName);
       } else if (auth.currentUser?.displayName) {
         setCurrentName(auth.currentUser.displayName);
       }
 
-      const savedAvatar = localStorage.getItem('indiePulse_user_avatar');
+      const savedAvatar = localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar');
       if (savedAvatar) {
         setUserAvatar(savedAvatar);
       } else if (auth.currentUser?.photoURL) {
@@ -81,7 +81,7 @@ export default function CommunityPage() {
             id: '1', 
             authorName: localStorage.getItem('indiePulse_name') || "Jayvaant Patil", 
             authorEmail: "bharatrajupatil5200@gmail.com", 
-            authorAvatar: localStorage.getItem('indiePulse_user_avatar'),
+            authorAvatar: localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar'),
             content: "Working on a new indie platform using Next.js and Tailwind CSS! Excited to share soon. 🚀", 
             media: null,
             mediaType: null,
@@ -288,7 +288,7 @@ export default function CommunityPage() {
       submitBtnRef.current.innerText = '✓ Success';
     }
 
-    const currentLatestAvatar = typeof window !== 'undefined' ? localStorage.getItem('indiePulse_user_avatar') : userAvatar;
+    const currentLatestAvatar = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : userAvatar;
     const currentLatestName = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_name') || currentName) : currentName;
 
     const newPostObj = {
@@ -432,7 +432,7 @@ export default function CommunityPage() {
     if (!commentText.trim() && commentMediaFiles.length === 0) return;
 
     syncProfileData();
-    const currentLatestAvatar = typeof window !== 'undefined' ? localStorage.getItem('indiePulse_user_avatar') : userAvatar;
+    const currentLatestAvatar = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : userAvatar;
     const currentLatestName = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_name') || currentName) : currentName;
 
     const newCommentObj = {
@@ -497,10 +497,10 @@ export default function CommunityPage() {
     }
   };
 
-  // Helper Avatar Renderer (Direct LocalStorage Overriding for User Posts and Comments)
+  // Helper Avatar Renderer (Forces live profile picture for current user's posts & comments)
   const renderAvatar = (avatarUrl?: string | null, name?: string, sizeClass: string = "w-9 h-9") => {
-    const liveAvatarFromStorage = typeof window !== 'undefined' ? localStorage.getItem('indiePulse_user_avatar') : null;
-    const liveNameFromStorage = typeof window !== 'undefined' ? localStorage.getItem('indiePulse_name') : null;
+    const liveAvatarFromStorage = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : null;
+    const liveNameFromStorage = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_name') || currentName) : currentName;
     
     const activeCurrentName = liveNameFromStorage || currentName;
     const isMyAuthor = name === activeCurrentName || name === 'You' || !name || name === 'Bharat Patil' || name === 'Jayvaant Patil' || name === 'Saily';
@@ -577,7 +577,7 @@ export default function CommunityPage() {
                 {/* Post Author Row with Live DP */}
                 <div className="flex justify-between items-center w-full">
                   <div className="flex items-center gap-2.5">
-                    {renderAvatar(isMyPost ? (userAvatar || (typeof window !== 'undefined' ? localStorage.getItem('indiePulse_user_avatar') : null)) : post.authorAvatar, displayAuthor, "w-8 h-8")}
+                    {renderAvatar(isMyPost ? (userAvatar || (typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : null)) : post.authorAvatar, displayAuthor, "w-8 h-8")}
                     <span className="font-bold text-pink-400 text-sm text-left">{displayAuthor}</span>
                   </div>
                   <span className="text-xs text-slate-400">{post.time}</span>
@@ -779,7 +779,7 @@ export default function CommunityPage() {
                       <div key={c.id} className="grid grid-cols-[1fr_auto] items-start justify-between gap-3 w-full py-2.5 border-b border-slate-800/40 last:border-0 text-left">
                         
                         <div className="flex items-start justify-start text-left w-full min-w-0 gap-3" style={{ textAlign: 'left' }}>
-                          {renderAvatar(isMyComment ? (userAvatar || (typeof window !== 'undefined' ? localStorage.getItem('indiePulse_user_avatar') : null)) : c.authorAvatar, c.author, "w-8 h-8 mt-0.5")}
+                          {renderAvatar(isMyComment ? (userAvatar || (typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : null)) : c.authorAvatar, c.author, "w-8 h-8 mt-0.5")}
 
                           <div className="flex flex-col items-start justify-start text-left w-full min-w-0 gap-1">
                             <div className="flex items-center justify-start gap-2 w-full text-left" style={{ textAlign: 'left' }}>
@@ -872,7 +872,7 @@ export default function CommunityPage() {
                   )}
 
                   <div className="flex items-center justify-between w-full gap-2">
-                    {renderAvatar(userAvatar || (typeof window !== 'undefined' ? localStorage.getItem('indiePulse_user_avatar') : null), currentName, "w-7 h-7")}
+                    {renderAvatar(userAvatar || (typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : null), currentName, "w-7 h-7")}
 
                     <input 
                       ref={commentInputRef}
@@ -933,7 +933,7 @@ export default function CommunityPage() {
             
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
-                {renderAvatar(userAvatar || (typeof window !== 'undefined' ? localStorage.getItem('indiePulse_user_avatar') : null), currentName, "w-8 h-8")}
+                {renderAvatar(userAvatar || (typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : null), currentName, "w-8 h-8")}
                 <h3 className="text-base font-bold text-white flex items-center gap-2 whitespace-nowrap">
                   <span>✨</span> Create New Post
                 </h3>
