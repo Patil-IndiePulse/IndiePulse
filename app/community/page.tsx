@@ -34,7 +34,7 @@ export default function CommunityPage() {
   const commentInputRef = useRef<HTMLInputElement>(null);
   const commentFileInputRef = useRef<HTMLInputElement>(null);
 
-  // Function to sync profile name & avatar live from localStorage / auth
+  // Function to sync profile name & avatar live from localStorage
   const syncProfileData = () => {
     if (typeof window !== 'undefined') {
       const savedName = localStorage.getItem('indiePulse_name');
@@ -61,7 +61,6 @@ export default function CommunityPage() {
 
     syncProfileData();
 
-    // Listen to storage & focus changes for real-time live sync across pages
     const handleStorageChange = () => {
       syncProfileData();
     };
@@ -177,7 +176,6 @@ export default function CommunityPage() {
     setTimeout(() => commentInputRef.current?.focus(), 200);
   };
 
-  // Strong Physical Back Button Handler with History State Trapping
   useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
       if (showCommentSheet) {
@@ -290,11 +288,13 @@ export default function CommunityPage() {
       submitBtnRef.current.innerText = '✓ Success';
     }
 
+    const currentLatestAvatar = typeof window !== 'undefined' ? localStorage.getItem('indiePulse_user_avatar') : userAvatar;
+
     const newPostObj = {
       id: Date.now().toString(),
       authorName: currentName,
       authorEmail: currentEmail,
-      authorAvatar: userAvatar,
+      authorAvatar: currentLatestAvatar,
       content: newPost,
       media: mediaFile,
       mediaType: mediaType,
@@ -431,11 +431,12 @@ export default function CommunityPage() {
     if (!commentText.trim() && commentMediaFiles.length === 0) return;
 
     syncProfileData();
+    const currentLatestAvatar = typeof window !== 'undefined' ? localStorage.getItem('indiePulse_user_avatar') : userAvatar;
 
     const newCommentObj = {
       id: Date.now().toString(),
       author: currentName,
-      authorAvatar: userAvatar || undefined,
+      authorAvatar: currentLatestAvatar || undefined,
       text: commentText.trim(),
       media: commentMediaFiles,
       time: "Just now",
@@ -494,10 +495,11 @@ export default function CommunityPage() {
     }
   };
 
-  // Helper Avatar Renderer (Instagram Style Gradient Border with Live Profile Fallback)
+  // Helper Avatar Renderer (Guaranteed Live Profile Picture from localStorage)
   const renderAvatar = (avatarUrl?: string | null, name?: string, sizeClass: string = "w-9 h-9") => {
+    const liveAvatarFromStorage = typeof window !== 'undefined' ? localStorage.getItem('indiePulse_user_avatar') : null;
     const isMyAuthor = name === currentName || name === 'You' || !name || name === 'Bharat Patil' || name === 'Jayvaant Patil';
-    const displayAvatar = isMyAuthor ? (userAvatar || avatarUrl) : avatarUrl;
+    const displayAvatar = isMyAuthor ? (liveAvatarFromStorage || userAvatar || avatarUrl) : (avatarUrl || liveAvatarFromStorage);
     
     if (displayAvatar) {
       return (
@@ -553,7 +555,7 @@ export default function CommunityPage() {
           </button>
         </div>
 
-        {/* Community Posts Feed (Strict Left Alignment for Content text + Live Instagram Avatar DP) */}
+        {/* Community Posts Feed */}
         <div className="flex flex-col gap-4 mb-2 text-left max-h-[420px] overflow-y-auto pr-1 items-start justify-start w-full">
           {posts.map((post) => {
             const isMyPost = post.authorEmail === currentEmail || post.authorName === currentName || post.authorName === 'Bharat Patil' || post.authorName === 'Jayvaant Patil';
@@ -568,13 +570,13 @@ export default function CommunityPage() {
                 {/* Post Author Row with Live DP */}
                 <div className="flex justify-between items-center w-full">
                   <div className="flex items-center gap-2.5">
-                    {renderAvatar(isMyPost ? userAvatar : post.authorAvatar, displayAuthor, "w-8 h-8")}
+                    {renderAvatar(isMyPost ? (userAvatar || localStorage.getItem('indiePulse_user_avatar')) : post.authorAvatar, displayAuthor, "w-8 h-8")}
                     <span className="font-bold text-pink-400 text-sm text-left">{displayAuthor}</span>
                   </div>
                   <span className="text-xs text-slate-400">{post.time}</span>
                 </div>
 
-                {/* Main Content Paragraph Forced Left-Aligned */}
+                {/* Main Content Paragraph */}
                 {post.content && (
                   <p className="text-slate-300 text-sm leading-relaxed text-left block w-full m-0 break-words whitespace-normal font-normal" style={{ textAlign: 'left' }}>
                     {post.content}
@@ -637,7 +639,6 @@ export default function CommunityPage() {
       {selectedMediaPost && (
         <div className="fixed inset-0 bg-black z-50 flex flex-col justify-between overflow-hidden select-none">
           
-          {/* Background Media */}
           <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-black">
             {selectedMediaPost.mediaType === 'video' ? (
               <video 
@@ -659,20 +660,17 @@ export default function CommunityPage() {
 
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80 pointer-events-none"></div>
 
-          {/* Top Gaming Platform Header */}
           <div className="relative z-10 p-4 flex items-center justify-between text-white">
             <span className="text-sm font-black tracking-widest text-pink-500 flex items-center gap-1.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] bg-black/30 px-3 py-1 rounded-full border border-pink-500/30 backdrop-blur-md">
               <span>🎮</span> INDIEPULSE CLIPS
             </span>
           </div>
 
-          {/* Right Side Vertical Action Buttons */}
           <div className="relative z-10 p-4 pb-8 flex items-end justify-between w-full">
             <div className="flex flex-col gap-2 max-w-[75%] text-left pointer-events-none opacity-0"></div>
 
             <div className="flex flex-col items-center gap-4 pb-2 ml-auto">
               
-              {/* Like Button */}
               <button 
                 onClick={(e) => handleLike(selectedMediaPost.id, e)}
                 className="flex flex-col items-center justify-center gap-0.5 text-white active:scale-125 transition-all cursor-pointer drop-shadow-lg"
@@ -693,7 +691,6 @@ export default function CommunityPage() {
                 )}
               </button>
 
-              {/* Comment Button */}
               <button 
                 onClick={openCommentSheet}
                 className="flex flex-col items-center justify-center gap-0.5 text-white hover:opacity-80 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
@@ -708,7 +705,6 @@ export default function CommunityPage() {
                 )}
               </button>
 
-              {/* Repost Button */}
               <button 
                 onClick={(e) => handleRepost(selectedMediaPost.id, e)}
                 className="flex flex-col items-center justify-center gap-0.5 text-white hover:opacity-80 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
@@ -723,7 +719,6 @@ export default function CommunityPage() {
                 )}
               </button>
 
-              {/* Share Button */}
               <button 
                 onClick={(e) => handleShare(selectedMediaPost, e)}
                 className="flex flex-col items-center justify-center gap-0.5 text-white hover:opacity-80 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
@@ -742,7 +737,6 @@ export default function CommunityPage() {
             </div>
           </div>
 
-          {/* Instagram Repost Toast Popup */}
           {showRepostToast && (
             <div className="absolute bottom-6 left-4 right-4 z-50 bg-slate-900/95 border border-slate-700 text-white p-3.5 rounded-2xl flex items-center justify-between shadow-2xl backdrop-blur-md animate-bounce">
               <div className="flex items-center gap-2 text-xs font-semibold">
@@ -758,13 +752,12 @@ export default function CommunityPage() {
             </div>
           )}
 
-          {/* Clean Instagram Comment Bottom Sheet with Live DP */}
+          {/* Comment Sheet with Live DP */}
           {showCommentSheet && (
             <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/98 backdrop-blur-2xl border-t border-slate-800 rounded-t-3xl p-4 flex flex-col max-h-[70vh] transition-all shadow-2xl text-left items-start">
               
               <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto my-1 self-center"></div>
 
-              {/* Comments List */}
               <div className="flex flex-col gap-4 my-3 overflow-y-auto max-h-56 pr-1 text-left items-start justify-start w-full">
                 {(postComments[selectedMediaPost.id] || []).length === 0 ? (
                   <p className="text-slate-500 text-xs text-center py-6 w-full">No comments yet. Be the first to comment!</p>
@@ -778,7 +771,7 @@ export default function CommunityPage() {
                       <div key={c.id} className="grid grid-cols-[1fr_auto] items-start justify-between gap-3 w-full py-2.5 border-b border-slate-800/40 last:border-0 text-left">
                         
                         <div className="flex items-start justify-start text-left w-full min-w-0 gap-3" style={{ textAlign: 'left' }}>
-                          {renderAvatar(isMyComment ? userAvatar : c.authorAvatar, c.author, "w-8 h-8 mt-0.5")}
+                          {renderAvatar(isMyComment ? (userAvatar || localStorage.getItem('indiePulse_user_avatar')) : c.authorAvatar, c.author, "w-8 h-8 mt-0.5")}
 
                           <div className="flex flex-col items-start justify-start text-left w-full min-w-0 gap-1">
                             <div className="flex items-center justify-start gap-2 w-full text-left" style={{ textAlign: 'left' }}>
@@ -840,7 +833,7 @@ export default function CommunityPage() {
                 )}
               </div>
 
-              {/* Instagram Input Container with Live User DP */}
+              {/* Input Container with Live DP */}
               <div className="w-full pt-2 border-t border-slate-800">
                 <input 
                   type="file" 
@@ -871,7 +864,7 @@ export default function CommunityPage() {
                   )}
 
                   <div className="flex items-center justify-between w-full gap-2">
-                    {renderAvatar(userAvatar, currentName, "w-7 h-7")}
+                    {renderAvatar(userAvatar || localStorage.getItem('indiePulse_user_avatar'), currentName, "w-7 h-7")}
 
                     <input 
                       ref={commentInputRef}
@@ -932,7 +925,7 @@ export default function CommunityPage() {
             
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
-                {renderAvatar(userAvatar, currentName, "w-8 h-8")}
+                {renderAvatar(userAvatar || localStorage.getItem('indiePulse_user_avatar'), currentName, "w-8 h-8")}
                 <h3 className="text-base font-bold text-white flex items-center gap-2 whitespace-nowrap">
                   <span>✨</span> Create New Post
                 </h3>
