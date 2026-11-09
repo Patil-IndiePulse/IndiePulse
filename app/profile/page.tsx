@@ -29,18 +29,36 @@ export default function ProfilePage() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
       const reader = new FileReader();
       reader.onload = (uploadEvent) => {
-        if (uploadEvent.target?.result) {
-          const base64Img = uploadEvent.target.result as string;
-          setProfilePic(base64Img);
-          // Save instantly to BOTH keys so Community & Profile sync 100%
-          localStorage.setItem('indiePulse_pic', base64Img);
-          localStorage.setItem('indiePulse_user_avatar', base64Img);
-          window.dispatchEvent(new Event('storage'));
-        }
+        const img = new Image();
+        img.src = uploadEvent.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 300; // Perfect dimension for avatar storage
+          const scaleFactor = MAX_WIDTH / img.width;
+          
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height > MAX_WIDTH ? img.height * scaleFactor : img.height;
+
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+          
+          // Compress image to JPEG format with 0.5 quality to avoid localStorage quota limits
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.5);
+          
+          setProfilePic(compressedBase64);
+          try {
+            localStorage.setItem('indiePulse_pic', compressedBase64);
+            localStorage.setItem('indiePulse_user_avatar', compressedBase64);
+            window.dispatchEvent(new Event('storage'));
+          } catch (err) {
+            alert('Storage limit reached! Please use a slightly smaller image.');
+          }
+        };
       };
-      reader.readAsDataURL(e.target.files[0]);
+      reader.readAsDataURL(file);
     }
   };
 
