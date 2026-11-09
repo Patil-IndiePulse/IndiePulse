@@ -15,13 +15,14 @@ export default function CommunityPage() {
   const [mediaType, setMediaType] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentName, setCurrentName] = useState('Bharat Patil');
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Full-screen Viewer States
   const [selectedMediaPost, setSelectedMediaPost] = useState<any>(null);
   const [commentText, setCommentText] = useState("");
   const [commentMediaFiles, setCommentMediaFiles] = useState<string[]>([]);
-  const [postComments, setPostComments] = useState<{[key: string]: Array<{id: string, author: string, text: string, media?: string[], time: string, likes?: number}>}>({});
+  const [postComments, setPostComments] = useState<{[key: string]: Array<{id: string, author: string, authorAvatar?: string, text: string, media?: string[], time: string, likes?: number}>}>({});
   const [commentLikedState, setCommentLikedState] = useState<{[key: string]: boolean}>({});
   const [showCommentSheet, setShowCommentSheet] = useState(false);
   const [userLikedPosts, setUserLikedPosts] = useState<{[key: string]: boolean}>({});
@@ -39,12 +40,20 @@ export default function CommunityPage() {
       if (currentUser?.displayName) {
         setCurrentName(currentUser.displayName);
       }
+      if (currentUser?.photoURL) {
+        setUserAvatar(currentUser.photoURL);
+      }
     });
 
     if (typeof window !== 'undefined') {
       const savedCustomName = localStorage.getItem('indiePulse_name');
       if (savedCustomName) {
         setCurrentName(savedCustomName);
+      }
+
+      const savedCustomAvatar = localStorage.getItem('indiePulse_user_avatar');
+      if (savedCustomAvatar) {
+        setUserAvatar(savedCustomAvatar);
       }
 
       const savedPosts = localStorage.getItem('indiePulse_community_posts_v32');
@@ -60,6 +69,7 @@ export default function CommunityPage() {
             id: '1', 
             authorName: "Bharat Patil", 
             authorEmail: "bharatrajupatil5200@gmail.com", 
+            authorAvatar: savedCustomAvatar || null,
             content: "Working on a new indie platform using Next.js and Tailwind CSS! Excited to share soon. 🚀", 
             media: null,
             mediaType: null,
@@ -73,6 +83,7 @@ export default function CommunityPage() {
             id: '2', 
             authorName: "Aarav Dev", 
             authorEmail: "aarav@gmail.com", 
+            authorAvatar: null,
             content: "Just released an update for Cyber Neon Runner. Check out the new levels! 🎮✨", 
             media: null,
             mediaType: null,
@@ -263,6 +274,7 @@ export default function CommunityPage() {
       id: Date.now().toString(),
       authorName: currentName,
       authorEmail: currentEmail,
+      authorAvatar: userAvatar,
       content: newPost,
       media: mediaFile,
       mediaType: mediaType,
@@ -401,6 +413,7 @@ export default function CommunityPage() {
     const newCommentObj = {
       id: Date.now().toString(),
       author: currentName,
+      authorAvatar: userAvatar || undefined,
       text: commentText.trim(),
       media: commentMediaFiles,
       time: "Just now",
@@ -459,6 +472,32 @@ export default function CommunityPage() {
     }
   };
 
+  // Helper Avatar Renderer (Instagram Style Gradient Border)
+  const renderAvatar = (avatarUrl?: string | null, name?: string, sizeClass: string = "w-9 h-9") => {
+    const displayAvatar = avatarUrl || (name === currentName || name === 'You' ? userAvatar : null);
+    
+    if (displayAvatar) {
+      return (
+        <div className={`rounded-full p-[1.5px] bg-gradient-to-tr from-pink-500 to-purple-500 flex-shrink-0 ${sizeClass}`}>
+          <img 
+            src={displayAvatar} 
+            alt="Profile Avatar" 
+            className="w-full h-full object-cover rounded-full border border-slate-900" 
+          />
+        </div>
+      );
+    }
+
+    const initial = (name || 'U').charAt(0).toUpperCase();
+    return (
+      <div className={`rounded-full p-[1.5px] bg-gradient-to-tr from-pink-500 to-purple-500 flex-shrink-0 ${sizeClass}`}>
+        <div className="w-full h-full bg-slate-800 text-pink-400 font-bold flex items-center justify-center rounded-full text-xs border border-slate-900">
+          {initial}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <main className="min-h-screen bg-slate-950 text-white flex flex-col px-4 py-6 max-w-xl mx-auto w-full relative overflow-x-hidden select-none">
       
@@ -490,7 +529,7 @@ export default function CommunityPage() {
           </button>
         </div>
 
-        {/* Community Posts Feed (Strict Left Alignment for Content text) */}
+        {/* Community Posts Feed (Strict Left Alignment for Content text + Instagram Avatar DP) */}
         <div className="flex flex-col gap-4 mb-2 text-left max-h-[420px] overflow-y-auto pr-1 items-start justify-start w-full">
           {posts.map((post) => {
             const isMyPost = post.authorEmail === currentEmail || post.authorName === currentName || post.authorName === 'Bharat Patil';
@@ -502,8 +541,12 @@ export default function CommunityPage() {
                 key={post.id} 
                 className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 transition-all flex flex-col items-start justify-start text-left gap-2.5 w-full"
               >
+                {/* Post Author Row with DP */}
                 <div className="flex justify-between items-center w-full">
-                  <span className="font-bold text-pink-400 text-sm text-left">{displayAuthor}</span>
+                  <div className="flex items-center gap-2.5">
+                    {renderAvatar(post.authorAvatar, displayAuthor, "w-8 h-8")}
+                    <span className="font-bold text-pink-400 text-sm text-left">{displayAuthor}</span>
+                  </div>
                   <span className="text-xs text-slate-400">{post.time}</span>
                 </div>
 
@@ -599,12 +642,11 @@ export default function CommunityPage() {
             </span>
           </div>
 
-          {/* Bottom Left Caption Hidden as Requested + Right Action Buttons */}
+          {/* Bottom Left Caption Hidden + Right Action Buttons */}
           <div className="relative z-10 p-4 pb-8 flex items-end justify-between w-full">
             
-            {/* Bottom Caption Container (Text Hidden as per instruction) */}
             <div className="flex flex-col gap-2 max-w-[75%] text-left pointer-events-none opacity-0">
-              {/* Post Text is hidden inside fullscreen video view */}
+              {/* Text hidden inside fullscreen viewer as per design instruction */}
             </div>
 
             {/* Right Side Vertical Action Buttons */}
@@ -697,7 +739,7 @@ export default function CommunityPage() {
             </div>
           )}
 
-          {/* Clean Instagram Comment Bottom Sheet (No back button inside, pure physical mobile back button support) */}
+          {/* Clean Instagram Comment Bottom Sheet (With Instagram DP for Author & Current User Input) */}
           {showCommentSheet && (
             <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/98 backdrop-blur-2xl border-t border-slate-800 rounded-t-3xl p-4 flex flex-col max-h-[70vh] transition-all shadow-2xl text-left items-start">
               
@@ -716,37 +758,42 @@ export default function CommunityPage() {
                     return (
                       <div key={c.id} className="grid grid-cols-[1fr_auto] items-start justify-between gap-3 w-full py-2.5 border-b border-slate-800/40 last:border-0 text-left">
                         
-                        {/* LEFT COLUMN: Entire Comment Content Stack (Author + Time, Text, Media) */}
-                        <div className="flex flex-col items-start justify-start text-left w-full min-w-0 gap-1" style={{ textAlign: 'left' }}>
+                        {/* LEFT COLUMN: DP Avatar + Entire Comment Content Stack */}
+                        <div className="flex items-start justify-start text-left w-full min-w-0 gap-3" style={{ textAlign: 'left' }}>
                           
-                          {/* Row 1: Author Name & Time */}
-                          <div className="flex items-center justify-start gap-2 w-full text-left" style={{ textAlign: 'left' }}>
-                            <span className="font-bold text-pink-400 text-xs text-left truncate block">{c.author}</span>
-                            <span className="text-[11px] text-slate-400 flex-shrink-0 text-left">{c.time}</span>
+                          {/* Instagram Commenter Avatar DP */}
+                          {renderAvatar(c.authorAvatar, c.author, "w-8 h-8 mt-0.5")}
+
+                          <div className="flex flex-col items-start justify-start text-left w-full min-w-0 gap-1">
+                            {/* Row 1: Author Name & Time */}
+                            <div className="flex items-center justify-start gap-2 w-full text-left" style={{ textAlign: 'left' }}>
+                              <span className="font-bold text-pink-400 text-xs text-left truncate block">{c.author}</span>
+                              <span className="text-[11px] text-slate-400 flex-shrink-0 text-left">{c.time}</span>
+                            </div>
+                            
+                            {/* Row 2: Comment Text (Strictly Left Aligned) */}
+                            {c.text && (
+                              <div className="w-full text-left flex justify-start items-start">
+                                <p className="text-slate-200 text-xs leading-relaxed text-left block w-full m-0 break-words whitespace-normal" style={{ textAlign: 'left' }}>
+                                  {c.text}
+                                </p>
+                              </div>
+                            )}
+                            
+                            {/* Row 3: Attached Image / Media (Left Aligned) */}
+                            {c.media && c.media.length > 0 && (
+                              <div className="flex gap-2 flex-wrap mt-1.5 justify-start items-start w-full">
+                                {c.media.map((img, idx) => (
+                                  <img 
+                                    key={idx} 
+                                    src={img} 
+                                    alt="Comment media" 
+                                    className="w-40 h-48 object-cover rounded-2xl border border-slate-800 shadow-md" 
+                                  />
+                                ))}
+                              </div>
+                            )}
                           </div>
-                          
-                          {/* Row 2: Comment Text (Strictly Left Aligned) */}
-                          {c.text && (
-                            <div className="w-full text-left flex justify-start items-start">
-                              <p className="text-slate-200 text-xs leading-relaxed text-left block w-full m-0 break-words whitespace-normal" style={{ textAlign: 'left' }}>
-                                {c.text}
-                              </p>
-                            </div>
-                          )}
-                          
-                          {/* Row 3: Attached Image / Media (Left Aligned) */}
-                          {c.media && c.media.length > 0 && (
-                            <div className="flex gap-2 flex-wrap mt-1.5 justify-start items-start w-full">
-                              {c.media.map((img, idx) => (
-                                <img 
-                                  key={idx} 
-                                  src={img} 
-                                  alt="Comment media" 
-                                  className="w-40 h-48 object-cover rounded-2xl border border-slate-800 shadow-md" 
-                                />
-                              ))}
-                            </div>
-                          )}
                         </div>
 
                         {/* RIGHT COLUMN: Like Button + Live Counter */}
@@ -781,7 +828,7 @@ export default function CommunityPage() {
                 )}
               </div>
 
-              {/* Instagram Input Container */}
+              {/* Instagram Input Container with User DP */}
               <div className="w-full pt-2 border-t border-slate-800">
                 
                 <input 
@@ -813,6 +860,9 @@ export default function CommunityPage() {
                   )}
 
                   <div className="flex items-center justify-between w-full gap-2">
+                    {/* Logged in User Instagram Avatar DP on Input Row */}
+                    {renderAvatar(userAvatar, currentName, "w-7 h-7")}
+
                     <input 
                       ref={commentInputRef}
                       type="text"
@@ -871,9 +921,12 @@ export default function CommunityPage() {
           <div className="bg-slate-900 border border-pink-500/40 rounded-3xl p-6 w-full max-w-md shadow-2xl relative">
             
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold text-white flex items-center gap-2 whitespace-nowrap">
-                <span>✨</span> Create New Post
-              </h3>
+              <div className="flex items-center gap-2.5">
+                {renderAvatar(userAvatar, currentName, "w-8 h-8")}
+                <h3 className="text-base font-bold text-white flex items-center gap-2 whitespace-nowrap">
+                  <span>✨</span> Create New Post
+                </h3>
+              </div>
             </div>
 
             <div className="flex flex-col gap-4">
@@ -900,7 +953,7 @@ export default function CommunityPage() {
                 <div className="relative w-full h-[140px] bg-slate-950 rounded-xl overflow-hidden border border-pink-500/30">
                   <div className="w-full h-full flex items-center justify-center">
                     {mediaType === 'video' ? (
-                     <span className="text-xs text-emerald-400">📹 Video attached successfully</span>
+                      <span className="text-xs text-emerald-400">📹 Video attached successfully</span>
                     ) : (
                       <img src={mediaFile} alt="Preview" className="h-full object-contain" />
                     )}
@@ -947,4 +1000,4 @@ export default function CommunityPage() {
 
     </main>
   );
-} 
+}
