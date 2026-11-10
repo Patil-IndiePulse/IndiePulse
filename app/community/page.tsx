@@ -8,17 +8,12 @@ import { onAuthStateChanged } from "firebase/auth";
 import { 
   collection, 
   addDoc, 
-  getDocs, 
   query, 
   orderBy, 
-  onSnapshot, 
-  doc, 
-  updateDoc, 
-  arrayUnion, 
-  serverTimestamp 
+  onSnapshot 
 } from "firebase/firestore";
 
-// Instagram-style Relative Time Formatter
+// Dynamic Instagram-style Relative Time Formatter
 const formatTimeAgo = (timestamp: any): string => {
   if (!timestamp) return 'Just now';
   
@@ -71,7 +66,7 @@ export default function CommunityPage() {
   const [selectedMediaPost, setSelectedMediaPost] = useState<any>(null);
   const [commentText, setCommentText] = useState("");
   const [commentMediaFiles, setCommentMediaFiles] = useState<string[]>([]);
-  const [postComments, setPostComments] = useState<{[key: string]: Array<{id: string, author: string, authorAvatar?: string, text: string, media?: string[], createdAt: number, likes?: number}>}>({});
+  const [postComments, setPostComments] = useState<{[key: string]: Array<{id: string, author: string, authorAvatar?: string, text: string, media?: string[], time?: string, createdAt?: number, likes?: number}>}>({});
   const [commentLikedState, setCommentLikedState] = useState<{[key: string]: boolean}>({});
   const [showCommentSheet, setShowCommentSheet] = useState(false);
   const [userLikedPosts, setUserLikedPosts] = useState<{[key: string]: boolean}>({});
@@ -83,7 +78,7 @@ export default function CommunityPage() {
   const commentInputRef = useRef<HTMLInputElement>(null);
   const commentFileInputRef = useRef<HTMLInputElement>(null);
 
-  // Function to sync profile name & avatar live from localStorage / Auth
+  // Sync profile name & avatar live from localStorage / Auth
   const syncProfileData = () => {
     if (typeof window !== 'undefined') {
       const savedName = localStorage.getItem('indiePulse_name') || localStorage.getItem('indiePulse_community_name');
@@ -139,7 +134,7 @@ export default function CommunityPage() {
       }
     }
 
-    // Real-time Firestore sync if connected
+    // Real-time Firestore Sync
     let unsubscribePosts: () => void;
     if (db) {
       try {
@@ -333,7 +328,6 @@ export default function CommunityPage() {
       createdAt: nowTimestamp
     };
 
-    // Push to Backend Database
     if (db) {
       try {
         await addDoc(collection(db, "posts"), newPostObj);
@@ -478,6 +472,7 @@ export default function CommunityPage() {
       authorAvatar: currentLatestAvatar || undefined,
       text: commentText.trim(),
       media: commentMediaFiles,
+      time: "Just now",
       createdAt: nowTimestamp,
       likes: 0
     };
@@ -500,7 +495,6 @@ export default function CommunityPage() {
       setSelectedMediaPost({ ...selectedMediaPost, comments: selectedMediaPost.comments + 1 });
     }
 
-    // Save to Database & LocalStorage
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem('indiePulse_comments_v1', JSON.stringify(updatedComments));
@@ -543,7 +537,6 @@ export default function CommunityPage() {
     }
   };
 
-  // Helper Avatar Renderer (Forces live profile picture for current user's posts & comments)
   const renderAvatar = (avatarUrl?: string | null, name?: string, sizeClass: string = "w-9 h-9") => {
     const liveAvatarFromStorage = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : null;
     const liveNameFromStorage = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_name') || currentName) : currentName;
