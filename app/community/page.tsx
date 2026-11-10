@@ -3,8 +3,57 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { auth } from "@/app/firebase";
+import { auth, db } from "@/app/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  query, 
+  orderBy, 
+  onSnapshot, 
+  doc, 
+  updateDoc, 
+  arrayUnion, 
+  serverTimestamp 
+} from "firebase/firestore";
+
+// Instagram-style Relative Time Formatter
+const formatTimeAgo = (timestamp: any): string => {
+  if (!timestamp) return 'Just now';
+  
+  let date: Date;
+  if (typeof timestamp === 'number') {
+    date = new Date(timestamp);
+  } else if (timestamp?.toDate && typeof timestamp.toDate === 'function') {
+    date = timestamp.toDate();
+  } else if (typeof timestamp === 'string') {
+    const parsed = Date.parse(timestamp);
+    date = isNaN(parsed) ? new Date() : new Date(parsed);
+  } else {
+    date = new Date();
+  }
+
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) return 'Just now';
+  
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) return `${diffInMinutes}m`;
+
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours}h`;
+
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 7) return `${diffInDays}d`;
+
+  const diffInWeeks = Math.floor(diffInDays / 7);
+  if (diffInWeeks < 52) return `${diffInWeeks}w`;
+
+  const diffInYears = Math.floor(diffInDays / 365);
+  return `${diffInYears}y`;
+};
 
 export default function CommunityPage() {
   const router = useRouter();
@@ -14,7 +63,7 @@ export default function CommunityPage() {
   const [mediaFile, setMediaFile] = useState<string | null>(null);
   const [mediaType, setMediaType] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentName, setCurrentName] = useState('Jayvaant Patil');
+  const [currentName, setCurrentName] = useState('Bharat Patil');
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -22,7 +71,7 @@ export default function CommunityPage() {
   const [selectedMediaPost, setSelectedMediaPost] = useState<any>(null);
   const [commentText, setCommentText] = useState("");
   const [commentMediaFiles, setCommentMediaFiles] = useState<string[]>([]);
-  const [postComments, setPostComments] = useState<{[key: string]: Array<{id: string, author: string, authorAvatar?: string, text: string, media?: string[], time: string, likes?: number}>}>({});
+  const [postComments, setPostComments] = useState<{[key: string]: Array<{id: string, author: string, authorAvatar?: string, text: string, media?: string[], createdAt: number, likes?: number}>}>({});
   const [commentLikedState, setCommentLikedState] = useState<{[key: string]: boolean}>({});
   const [showCommentSheet, setShowCommentSheet] = useState(false);
   const [userLikedPosts, setUserLikedPosts] = useState<{[key: string]: boolean}>({});
@@ -54,7 +103,7 @@ export default function CommunityPage() {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       syncProfileData();
     });
@@ -67,79 +116,56 @@ export default function CommunityPage() {
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('focus', handleStorageChange);
 
+    // Initial load from local fallback
     if (typeof window !== 'undefined') {
       const savedPosts = localStorage.getItem('indiePulse_community_posts_v32');
       if (savedPosts) {
-        try {
-          setPosts(JSON.parse(savedPosts));
-        } catch (e) {
-          setPosts([]);
-        }
-      } else {
-        const initialPosts = [
-          { 
-            id: '1', 
-            authorName: localStorage.getItem('indiePulse_name') || "Jayvaant Patil", 
-            authorEmail: "bharatrajupatil5200@gmail.com", 
-            authorAvatar: localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar'),
-            content: "Working on a new indie platform using Next.js and Tailwind CSS! Excited to share soon. 🚀", 
-            media: null,
-            mediaType: null,
-            likes: 0, 
-            comments: 0, 
-            reposts: 0,
-            shares: 0,
-            time: "Just now" 
-          },
-          { 
-            id: '2', 
-            authorName: "Aarav Dev", 
-            authorEmail: "aarav@gmail.com", 
-            authorAvatar: null,
-            content: "Just released an update for Cyber Neon Runner. Check out the new levels! 🎮✨", 
-            media: null,
-            mediaType: null,
-            likes: 617, 
-            comments: 12, 
-            reposts: 1,
-            shares: 1,
-            time: "2 hours ago" 
-          }
-        ];
-        setPosts(initialPosts);
-        localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(initialPosts));
+        try { setPosts(JSON.parse(savedPosts)); } catch (e) { setPosts([]); }
       }
 
       const savedComments = localStorage.getItem('indiePulse_comments_v1');
       if (savedComments) {
-        try {
-          setPostComments(JSON.parse(savedComments));
-        } catch (e) {
-          setPostComments({});
-        }
+        try { setPostComments(JSON.parse(savedComments)); } catch (e) { setPostComments({}); }
       }
 
       const savedLikes = localStorage.getItem('indiePulse_user_likes_v1');
       if (savedLikes) {
-        try {
-          setUserLikedPosts(JSON.parse(savedLikes));
-        } catch (e) {
-          setUserLikedPosts({});
-        }
+        try { setUserLikedPosts(JSON.parse(savedLikes)); } catch (e) { setUserLikedPosts({}); }
       }
 
       const savedReposts = localStorage.getItem('indiePulse_user_reposts_v1');
       if (savedReposts) {
-        try {
-          setUserRepostedPosts(JSON.parse(savedReposts));
-        } catch (e) {
-          setUserRepostedPosts({});
-        }
+        try { setUserRepostedPosts(JSON.parse(savedReposts)); } catch (e) { setUserRepostedPosts({}); }
+      }
+    }
+
+    // Real-time Firestore sync if connected
+    let unsubscribePosts: () => void;
+    if (db) {
+      try {
+        const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+        unsubscribePosts = onSnapshot(q, (snapshot) => {
+          const fetchedPosts = snapshot.docs.map(docSnap => ({
+            id: docSnap.id,
+            ...docSnap.data()
+          }));
+          if (fetchedPosts.length > 0) {
+            setPosts(fetchedPosts);
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(fetchedPosts));
+            }
+          }
+        }, (err) => {
+          console.log("Firestore fallback active", err);
+        });
+      } catch (err) {
+        console.log("Firestore query error", err);
       }
     }
 
     return () => {
-      unsubscribe();
+      unsubscribeAuth();
+      if (unsubscribePosts) unsubscribePosts();
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('focus', handleStorageChange);
     };
@@ -270,7 +296,7 @@ export default function CommunityPage() {
     }
   };
 
-  const executePostSubmission = (e: any) => {
+  const executePostSubmission = async (e: any) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -290,9 +316,10 @@ export default function CommunityPage() {
 
     const currentLatestAvatar = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : userAvatar;
     const currentLatestName = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_name') || currentName) : currentName;
+    const nowTimestamp = Date.now();
 
     const newPostObj = {
-      id: Date.now().toString(),
+      id: nowTimestamp.toString(),
       authorName: currentLatestName,
       authorEmail: currentEmail,
       authorAvatar: currentLatestAvatar,
@@ -303,8 +330,17 @@ export default function CommunityPage() {
       comments: 0,
       reposts: 0,
       shares: 0,
-      time: "Just now"
+      createdAt: nowTimestamp
     };
+
+    // Push to Backend Database
+    if (db) {
+      try {
+        await addDoc(collection(db, "posts"), newPostObj);
+      } catch (err) {
+        console.error("Database save fallback", err);
+      }
+    }
 
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
@@ -428,20 +464,21 @@ export default function CommunityPage() {
     }
   };
 
-  const handleAddComment = (postId: string) => {
+  const handleAddComment = async (postId: string) => {
     if (!commentText.trim() && commentMediaFiles.length === 0) return;
 
     syncProfileData();
     const currentLatestAvatar = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : userAvatar;
     const currentLatestName = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_name') || currentName) : currentName;
+    const nowTimestamp = Date.now();
 
     const newCommentObj = {
-      id: Date.now().toString(),
+      id: nowTimestamp.toString(),
       author: currentLatestName,
       authorAvatar: currentLatestAvatar || undefined,
       text: commentText.trim(),
       media: commentMediaFiles,
-      time: "Just now",
+      createdAt: nowTimestamp,
       likes: 0
     };
 
@@ -463,12 +500,21 @@ export default function CommunityPage() {
       setSelectedMediaPost({ ...selectedMediaPost, comments: selectedMediaPost.comments + 1 });
     }
 
+    // Save to Database & LocalStorage
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem('indiePulse_comments_v1', JSON.stringify(updatedComments));
         localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
       } catch(err) {
         console.error("Storage quota full:", err);
+      }
+    }
+
+    if (db) {
+      try {
+        await addDoc(collection(db, `posts/${postId}/comments`), newCommentObj);
+      } catch (err) {
+        console.log("Comment database error", err);
       }
     }
   };
@@ -580,7 +626,7 @@ export default function CommunityPage() {
                     {renderAvatar(isMyPost ? (userAvatar || (typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : null)) : post.authorAvatar, displayAuthor, "w-8 h-8")}
                     <span className="font-bold text-pink-400 text-sm text-left">{displayAuthor}</span>
                   </div>
-                  <span className="text-xs text-slate-400">{post.time}</span>
+                  <span className="text-xs text-slate-400">{formatTimeAgo(post.createdAt || post.time)}</span>
                 </div>
 
                 {/* Main Content Paragraph */}
@@ -784,7 +830,7 @@ export default function CommunityPage() {
                           <div className="flex flex-col items-start justify-start text-left w-full min-w-0 gap-1">
                             <div className="flex items-center justify-start gap-2 w-full text-left" style={{ textAlign: 'left' }}>
                               <span className="font-bold text-pink-400 text-xs text-left truncate block">{isMyComment ? liveName : c.author}</span>
-                              <span className="text-[11px] text-slate-400 flex-shrink-0 text-left">{c.time}</span>
+                              <span className="text-[11px] text-slate-400 flex-shrink-0 text-left">{formatTimeAgo(c.createdAt || (c as any).time)}</span>
                             </div>
                             
                             {c.text && (
