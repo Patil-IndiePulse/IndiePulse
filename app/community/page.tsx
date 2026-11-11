@@ -100,21 +100,13 @@ export default function CommunityPage() {
     }
   };
 
-  // Safe Storage without quota crash (Only metadata & lightweight URL fallbacks)
+  // Safe Storage without quota crash & preserves videos safely
   const safeSaveLocalStorage = (key: string, data: any) => {
     if (typeof window === 'undefined') return;
     try {
-      // Strip out giant base64 video payloads from localStorage to prevent quota crash
-      const sanitizedData = Array.isArray(data) ? data.map(item => {
-        if (item.mediaType === 'video' && item.media?.length > 100000) {
-          return { ...item, media: item.media.substring(0, 500) + '...[video]' };
-        }
-        return item;
-      }) : data;
-
-      localStorage.setItem(key, JSON.stringify(sanitizedData));
+      localStorage.setItem(key, JSON.stringify(data));
     } catch (e) {
-      console.warn("Storage quota limit safely handled.");
+      console.warn("Storage quota fallback limit - handled gracefully.");
     }
   };
 
@@ -134,7 +126,7 @@ export default function CommunityPage() {
 
     // Initial load from local fallback
     if (typeof window !== 'undefined') {
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v35');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v40');
       if (savedPosts) {
         try { setPosts(JSON.parse(savedPosts)); } catch (e) { setPosts([]); }
       }
@@ -155,23 +147,26 @@ export default function CommunityPage() {
       }
     }
 
-    // Real-time Firestore Sync
+    // Real-time Firestore Sync with Persistent Metrics
     let unsubscribePosts: () => void;
     if (db) {
       try {
         const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
         unsubscribePosts = onSnapshot(q, (snapshot) => {
-          const fetchedPosts = snapshot.docs.map(docSnap => ({
-            id: docSnap.id,
-            likes: 0,
-            comments: 0,
-            reposts: 0,
-            shares: 0,
-            ...docSnap.data()
-          }));
+          const fetchedPosts = snapshot.docs.map(docSnap => {
+            const data = docSnap.data();
+            return {
+              id: docSnap.id,
+              ...data,
+              likes: typeof data.likes === 'number' ? data.likes : 0,
+              comments: typeof data.comments === 'number' ? data.comments : 0,
+              reposts: typeof data.reposts === 'number' ? data.reposts : 0,
+              shares: typeof data.shares === 'number' ? data.shares : 0,
+            };
+          });
           if (fetchedPosts.length > 0) {
             setPosts(fetchedPosts);
-            safeSaveLocalStorage('indiePulse_community_posts_v35', fetchedPosts);
+            safeSaveLocalStorage('indiePulse_community_posts_v40', fetchedPosts);
           }
         }, (err) => {
           console.log("Firestore fallback active", err);
@@ -189,10 +184,10 @@ export default function CommunityPage() {
     };
   }, []);
 
-  // Format count guarantees zero (0) and numbers always display clearly
+  // Format count guarantees numbers are always visible
   const formatCount = (num: any) => {
     const parsedNum = typeof num === 'number' ? num : parseInt(num || '0', 10);
-    if (isNaN(parsedNum) || parsedNum === 0) return '0';
+    if (isNaN(parsedNum)) return '0';
     if (parsedNum >= 1000000) return (parsedNum / 1000000).toFixed(1) + 'M';
     if (parsedNum >= 1000) return (parsedNum / 1000).toFixed(1) + 'K';
     return parsedNum.toString();
@@ -268,6 +263,7 @@ export default function CommunityPage() {
     };
   };
 
+  // Permanent Media FileReader (No Blob URLs that break on refresh)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -277,13 +273,9 @@ export default function CommunityPage() {
           setMediaType('image');
         });
       } else {
-        // Safe video object URL binding for memory persistence across refresh/mobile
-        const videoBlobUrl = URL.createObjectURL(file);
         const reader = new FileReader();
         reader.onloadend = () => {
-          // If video is small, use reader string, else use resilient blob URL
-          const resultStr = reader.result as string;
-          setMediaFile(resultStr.length < 2000000 ? resultStr : videoBlobUrl);
+          setMediaFile(reader.result as string);
           setMediaType('video');
         };
         reader.readAsDataURL(file);
@@ -337,7 +329,6 @@ export default function CommunityPage() {
     const nowTimestamp = Date.now();
 
     const newPostObj = {
-      id: nowTimestamp.toString(),
       authorName: currentLatestName,
       authorEmail: currentEmail,
       authorAvatar: currentLatestAvatar,
@@ -351,17 +342,21 @@ export default function CommunityPage() {
       createdAt: nowTimestamp
     };
 
+    let docId = nowTimestamp.toString();
+
     if (db) {
       try {
-        await addDoc(collection(db, "posts"), newPostObj);
+        const docRef = await addDoc(collection(db, "posts"), newPostObj);
+        docId = docRef.id;
       } catch (err) {
         console.error("Database save fallback", err);
       }
     }
 
-    const updatedPosts = [newPostObj, ...posts];
+    const finalPostObj = { id: docId, ...newPostObj };
+    const updatedPosts = [finalPostObj, ...posts];
     setPosts(updatedPosts);
-    safeSaveLocalStorage('indiePulse_community_posts_v35', updatedPosts);
+    safeSaveLocalStorage('indiePulse_community_posts_v40', updatedPosts);
 
     setTimeout(() => {
       setIsModalOpen(false);
@@ -398,10 +393,10 @@ export default function CommunityPage() {
       setSelectedMediaPost({ ...selectedMediaPost, likes: newLikesCount });
     }
 
-    safeSaveLocalStorage('indiePulse_community_posts_v35', updatedPosts);
+    safeSaveLocalStorage('indiePulse_community_posts_v40', updatedPosts);
     safeSaveLocalStorage('indiePulse_user_likes_v1', updatedLikedMap);
 
-    if (db) {
+    if (db && id) {
       try {
         const postRef = doc(db, "posts", id);
         await updateDoc(postRef, {
@@ -444,10 +439,10 @@ export default function CommunityPage() {
       setTimeout(() => setShowRepostToast(false), 3000);
     }
 
-    safeSaveLocalStorage('indiePulse_community_posts_v35', updatedPosts);
+    safeSaveLocalStorage('indiePulse_community_posts_v40', updatedPosts);
     safeSaveLocalStorage('indiePulse_user_reposts_v1', updatedRepostMap);
 
-    if (db) {
+    if (db && id) {
       try {
         const postRef = doc(db, "posts", id);
         await updateDoc(postRef, {
@@ -481,9 +476,9 @@ export default function CommunityPage() {
         setSelectedMediaPost({ ...selectedMediaPost, shares: currentShares + 1 });
       }
 
-      safeSaveLocalStorage('indiePulse_community_posts_v35', updatedPosts);
+      safeSaveLocalStorage('indiePulse_community_posts_v40', updatedPosts);
 
-      if (db) {
+      if (db && post.id) {
         try {
           const postRef = doc(db, "posts", post.id);
           await updateDoc(postRef, {
@@ -550,9 +545,9 @@ export default function CommunityPage() {
     }
 
     safeSaveLocalStorage('indiePulse_comments_v1', updatedComments);
-    safeSaveLocalStorage('indiePulse_community_posts_v35', updatedPosts);
+    safeSaveLocalStorage('indiePulse_community_posts_v40', updatedPosts);
 
-    if (db) {
+    if (db && postId) {
       try {
         await addDoc(collection(db, `posts/${postId}/comments`), newCommentObj);
         const postRef = doc(db, "posts", postId);
@@ -682,7 +677,7 @@ export default function CommunityPage() {
                     className="rounded-xl overflow-hidden border border-slate-700 bg-slate-950 mt-1 cursor-pointer relative group w-full"
                   >
                     {post.mediaType === 'video' ? (
-                      <video src={post.media} className="w-full max-h-64 object-cover pointer-events-none" />
+                      <video src={post.media} preload="metadata" playsInline className="w-full max-h-64 object-cover pointer-events-none" />
                     ) : (
                       <img src={post.media} alt="Post attachment" className="w-full max-h-64 object-cover transition-transform group-hover:scale-105" />
                     )}
@@ -740,6 +735,7 @@ export default function CommunityPage() {
                 autoPlay 
                 loop
                 playsInline 
+                preload="auto"
                 className="w-full h-full object-cover" 
               />
             ) : (
@@ -905,7 +901,7 @@ export default function CommunityPage() {
                               </svg>
                             )}
                           </button>
-                          
+
                           {commentLikesCount > 0 && (
                             <span className="text-[10px] text-slate-400 font-semibold -mt-0.5">
                               {commentLikesCount}
