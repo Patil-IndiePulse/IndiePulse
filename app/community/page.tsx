@@ -100,19 +100,27 @@ export default function CommunityPage() {
     }
   };
 
-  // Safe Storage with Quota Management & Video Persistence Buffer
-  const safeSaveLocalStorage = (key: string, data: any) => {
+  // Smart Persistent Local Storage Buffer for Video Data Preservation on Refresh
+  const smartSavePosts = (postsToSave: any[]) => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem('indiePulse_community_posts_persistent_v100', JSON.stringify(postsToSave));
+    } catch (e) {
+      try {
+        localStorage.removeItem('indiePulse_community_posts_v45');
+        localStorage.setItem('indiePulse_community_posts_persistent_v100', JSON.stringify(postsToSave));
+      } catch (err) {
+        console.warn("Storage quota warning managed.");
+      }
+    }
+  };
+
+  const smartSaveLocalStorage = (key: string, data: any) => {
     if (typeof window === 'undefined') return;
     try {
       localStorage.setItem(key, JSON.stringify(data));
     } catch (e) {
-      // If quota exceeded, clear old caches to keep latest posts & videos safe
-      try {
-        localStorage.removeItem('indiePulse_community_posts_v35');
-        localStorage.setItem(key, JSON.stringify(data));
-      } catch (err) {
-        console.warn("LocalStorage quota fully utilized, relying on Firestore live sync.");
-      }
+      console.warn("Storage warning handled.");
     }
   };
 
@@ -130,11 +138,16 @@ export default function CommunityPage() {
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('focus', handleStorageChange);
 
-    // Initial load from local fallback
+    // Initial load from persistent local buffer
     if (typeof window !== 'undefined') {
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v45');
-      if (savedPosts) {
-        try { setPosts(JSON.parse(savedPosts)); } catch (e) { setPosts([]); }
+      const savedPersistentPosts = localStorage.getItem('indiePulse_community_posts_persistent_v100');
+      if (savedPersistentPosts) {
+        try { setPosts(JSON.parse(savedPersistentPosts)); } catch (e) { setPosts([]); }
+      } else {
+        const legacyPosts = localStorage.getItem('indiePulse_community_posts_v45');
+        if (legacyPosts) {
+          try { setPosts(JSON.parse(legacyPosts)); } catch (e) { setPosts([]); }
+        }
       }
 
       const savedComments = localStorage.getItem('indiePulse_comments_v1');
@@ -153,7 +166,7 @@ export default function CommunityPage() {
       }
     }
 
-    // Real-time Firestore Sync with Persistent Metrics & Media
+    // Real-time Firestore Sync with Merged Local Persistence
     let unsubscribePosts: () => void;
     if (db) {
       try {
@@ -170,9 +183,19 @@ export default function CommunityPage() {
               shares: typeof data.shares === 'number' ? data.shares : 0,
             };
           });
+          
           if (fetchedPosts.length > 0) {
-            setPosts(fetchedPosts);
-            safeSaveLocalStorage('indiePulse_community_posts_v45', fetchedPosts);
+            setPosts((prevPosts) => {
+              const mergedMap = new Map();
+              [...fetchedPosts, ...prevPosts].forEach(p => {
+                if (p && p.id && !mergedMap.has(p.id)) {
+                  mergedMap.set(p.id, p);
+                }
+              });
+              const finalMerged = Array.from(mergedMap.values()).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+              smartSavePosts(finalMerged);
+              return finalMerged;
+            });
           }
         }, (err) => {
           console.log("Firestore fallback active", err);
@@ -190,7 +213,6 @@ export default function CommunityPage() {
     };
   }, []);
 
-  // Format count guarantees numbers are always visible
   const formatCount = (num: any) => {
     const parsedNum = typeof num === 'number' ? num : parseInt(num || '0', 10);
     if (isNaN(parsedNum)) return '0';
@@ -269,7 +291,6 @@ export default function CommunityPage() {
     };
   };
 
-  // Resilient Video Safe Compression & Chunk Buffer for Persistence
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -281,8 +302,7 @@ export default function CommunityPage() {
       } else {
         const reader = new FileReader();
         reader.onloadend = () => {
-          const resultStr = reader.result as string;
-          setMediaFile(resultStr);
+          setMediaFile(reader.result as string);
           setMediaType('video');
         };
         reader.readAsDataURL(file);
@@ -349,21 +369,21 @@ export default function CommunityPage() {
       createdAt: nowTimestamp
     };
 
-    let docId = nowTimestamp.toString();
+    let docId = 'local_' + nowTimestamp;
 
     if (db) {
       try {
         const docRef = await addDoc(collection(db, "posts"), newPostObj);
         docId = docRef.id;
       } catch (err) {
-        console.error("Database save fallback", err);
+        console.error("Database save fallback active", err);
       }
     }
 
     const finalPostObj = { id: docId, ...newPostObj };
     const updatedPosts = [finalPostObj, ...posts];
     setPosts(updatedPosts);
-    safeSaveLocalStorage('indiePulse_community_posts_v45', updatedPosts);
+    smartSavePosts(updatedPosts);
 
     setTimeout(() => {
       setIsModalOpen(false);
@@ -400,10 +420,10 @@ export default function CommunityPage() {
       setSelectedMediaPost({ ...selectedMediaPost, likes: newLikesCount });
     }
 
-    safeSaveLocalStorage('indiePulse_community_posts_v45', updatedPosts);
-    safeSaveLocalStorage('indiePulse_user_likes_v1', updatedLikedMap);
+    smartSavePosts(updatedPosts);
+    smartSaveLocalStorage('indiePulse_user_likes_v1', updatedLikedMap);
 
-    if (db && id && id.length > 15) {
+    if (db && id && !id.startsWith('local_')) {
       try {
         const postRef = doc(db, "posts", id);
         await updateDoc(postRef, {
@@ -446,10 +466,10 @@ export default function CommunityPage() {
       setTimeout(() => setShowRepostToast(false), 3000);
     }
 
-    safeSaveLocalStorage('indiePulse_community_posts_v45', updatedPosts);
-    safeSaveLocalStorage('indiePulse_user_reposts_v1', updatedRepostMap);
+    smartSavePosts(updatedPosts);
+    smartSaveLocalStorage('indiePulse_user_reposts_v1', updatedRepostMap);
 
-    if (db && id && id.length > 15) {
+    if (db && id && !id.startsWith('local_')) {
       try {
         const postRef = doc(db, "posts", id);
         await updateDoc(postRef, {
@@ -483,9 +503,9 @@ export default function CommunityPage() {
         setSelectedMediaPost({ ...selectedMediaPost, shares: currentShares + 1 });
       }
 
-      safeSaveLocalStorage('indiePulse_community_posts_v45', updatedPosts);
+      smartSavePosts(updatedPosts);
 
-      if (db && post.id && post.id.length > 15) {
+      if (db && post.id && !post.id.startsWith('local_')) {
         try {
           const postRef = doc(db, "posts", post.id);
           await updateDoc(postRef, {
@@ -551,10 +571,10 @@ export default function CommunityPage() {
       setSelectedMediaPost({ ...selectedMediaPost, comments: currentComments + 1 });
     }
 
-    safeSaveLocalStorage('indiePulse_comments_v1', updatedComments);
-    safeSaveLocalStorage('indiePulse_community_posts_v45', updatedPosts);
+    smartSaveLocalStorage('indiePulse_comments_v1', updatedComments);
+    smartSavePosts(updatedPosts);
 
-    if (db && postId && postId.length > 15) {
+    if (db && postId && !postId.startsWith('local_')) {
       try {
         await addDoc(collection(db, `posts/${postId}/comments`), newCommentObj);
         const postRef = doc(db, "posts", postId);
@@ -566,7 +586,6 @@ export default function CommunityPage() {
       }
     }
   };
-
   const handleCommentLike = (commentId: string, postId: string) => {
     const isLiked = !!commentLikedState[commentId];
     const newLikedState = !isLiked;
@@ -584,7 +603,7 @@ export default function CommunityPage() {
 
       const updatedMap = { ...postComments, [postId]: updatedCommentsList };
       setPostComments(updatedMap);
-      safeSaveLocalStorage('indiePulse_comments_v1', updatedMap);
+      smartSaveLocalStorage('indiePulse_comments_v1', updatedMap);
     }
   };
 
