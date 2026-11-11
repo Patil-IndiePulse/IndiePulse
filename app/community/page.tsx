@@ -13,7 +13,7 @@ import {
   onSnapshot 
 } from "firebase/firestore";
 
-// Dynamic Instagram-style Relative Time Formatter
+// Instagram-style Relative Time Formatter
 const formatTimeAgo = (timestamp: any): string => {
   if (!timestamp) return 'Just now';
   
@@ -32,7 +32,7 @@ const formatTimeAgo = (timestamp: any): string => {
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-  if (diffInSeconds < 60) return 'Just now';
+  if (diffInSeconds < 300) return 'Just now';
   
   const diffInMinutes = Math.floor(diffInSeconds / 60);
   if (diffInMinutes < 60) return `${diffInMinutes}m`;
@@ -97,6 +97,15 @@ export default function CommunityPage() {
     }
   };
 
+  const safeSaveLocalStorage = (key: string, data: any) => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(key, JSON.stringify(data));
+    } catch (e) {
+      console.warn("Storage quota exceeded, keeping in memory/Firestore");
+    }
+  };
+
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -146,9 +155,7 @@ export default function CommunityPage() {
           }));
           if (fetchedPosts.length > 0) {
             setPosts(fetchedPosts);
-            if (typeof window !== 'undefined') {
-              localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(fetchedPosts));
-            }
+            safeSaveLocalStorage('indiePulse_community_posts_v32', fetchedPosts);
           }
         }, (err) => {
           console.log("Firestore fallback active", err);
@@ -283,12 +290,6 @@ export default function CommunityPage() {
     setMediaFile(null);
     setMediaType(null);
     setIsSubmitting(false);
-    
-    if (window.history.length > 2) {
-      router.back();
-    } else {
-      router.push('/');
-    }
   };
 
   const executePostSubmission = async (e: any) => {
@@ -338,13 +339,7 @@ export default function CommunityPage() {
 
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
-      } catch (err) {
-        console.error("Storage full");
-      }
-    }
+    safeSaveLocalStorage('indiePulse_community_posts_v32', updatedPosts);
 
     setTimeout(() => {
       setIsModalOpen(false);
@@ -352,13 +347,7 @@ export default function CommunityPage() {
       setMediaFile(null);
       setMediaType(null);
       setIsSubmitting(false);
-
-      if (window.history.length > 2) {
-        router.back();
-      } else {
-        router.push('/');
-      }
-    }, 800);
+    }, 400);
   };
 
   const handleLike = (id: string, e?: any) => {
@@ -385,10 +374,8 @@ export default function CommunityPage() {
       setSelectedMediaPost({ ...selectedMediaPost, likes: newLikesCount });
     }
 
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
-      localStorage.setItem('indiePulse_user_likes_v1', JSON.stringify(updatedLikedMap));
-    }
+    safeSaveLocalStorage('indiePulse_community_posts_v32', updatedPosts);
+    safeSaveLocalStorage('indiePulse_user_likes_v1', updatedLikedMap);
   };
 
   const handleRepost = (id: string, e?: any) => {
@@ -420,10 +407,8 @@ export default function CommunityPage() {
       setTimeout(() => setShowRepostToast(false), 3000);
     }
 
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
-      localStorage.setItem('indiePulse_user_reposts_v1', JSON.stringify(updatedRepostMap));
-    }
+    safeSaveLocalStorage('indiePulse_community_posts_v32', updatedPosts);
+    safeSaveLocalStorage('indiePulse_user_reposts_v1', updatedRepostMap);
   };
 
   const handleShare = (post: any, e?: any) => {
@@ -441,9 +426,7 @@ export default function CommunityPage() {
         setSelectedMediaPost({ ...selectedMediaPost, shares: (selectedMediaPost.shares || 0) + 1 });
       }
 
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
-      }
+      safeSaveLocalStorage('indiePulse_community_posts_v32', updatedPosts);
     }
 
     if (navigator.share) {
@@ -472,7 +455,6 @@ export default function CommunityPage() {
       authorAvatar: currentLatestAvatar || undefined,
       text: commentText.trim(),
       media: commentMediaFiles,
-      time: "Just now",
       createdAt: nowTimestamp,
       likes: 0
     };
@@ -495,14 +477,8 @@ export default function CommunityPage() {
       setSelectedMediaPost({ ...selectedMediaPost, comments: selectedMediaPost.comments + 1 });
     }
 
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('indiePulse_comments_v1', JSON.stringify(updatedComments));
-        localStorage.setItem('indiePulse_community_posts_v32', JSON.stringify(updatedPosts));
-      } catch(err) {
-        console.error("Storage quota full:", err);
-      }
-    }
+    safeSaveLocalStorage('indiePulse_comments_v1', updatedComments);
+    safeSaveLocalStorage('indiePulse_community_posts_v32', updatedPosts);
 
     if (db) {
       try {
@@ -523,17 +499,14 @@ export default function CommunityPage() {
       const updatedCommentsList = postComments[postId].map((c) => {
         if (c.id === commentId) {
           const currentLikes = c.likes || 0;
-          return { ...c, likes: newLikedState ? currentLikes + 1 : Math.max(0, currentLikes - 1) };
+          return { ...c, likes: newLikedState ? currentLikes + 1 : Math.max(0, currentLikes - 1) }
         }
         return c;
       });
 
       const updatedMap = { ...postComments, [postId]: updatedCommentsList };
       setPostComments(updatedMap);
-
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('indiePulse_comments_v1', JSON.stringify(updatedMap));
-      }
+      safeSaveLocalStorage('indiePulse_comments_v1', updatedMap);
     }
   };
 
@@ -613,7 +586,6 @@ export default function CommunityPage() {
                 key={post.id} 
                 className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 transition-all flex flex-col items-start justify-start text-left gap-2.5 w-full"
               >
-                {/* Post Author Row with Live DP */}
                 <div className="flex justify-between items-center w-full">
                   <div className="flex items-center gap-2.5">
                     {renderAvatar(isMyPost ? (userAvatar || (typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : null)) : post.authorAvatar, displayAuthor, "w-8 h-8")}
@@ -622,7 +594,6 @@ export default function CommunityPage() {
                   <span className="text-xs text-slate-400">{formatTimeAgo(post.createdAt || post.time)}</span>
                 </div>
 
-                {/* Main Content Paragraph */}
                 {post.content && (
                   <p className="text-slate-300 text-sm leading-relaxed text-left block w-full m-0 break-words whitespace-normal font-normal" style={{ textAlign: 'left' }}>
                     {post.content}
@@ -913,7 +884,7 @@ export default function CommunityPage() {
                   <div className="flex items-center justify-between w-full gap-2">
                     {renderAvatar(userAvatar || (typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : null), currentName, "w-7 h-7")}
 
-                    <input 
+                    <input
                       ref={commentInputRef}
                       type="text"
                       value={commentText}
