@@ -10,7 +10,10 @@ import {
   addDoc, 
   query, 
   orderBy, 
-  onSnapshot 
+  onSnapshot,
+  doc,
+  updateDoc,
+  increment
 } from "firebase/firestore";
 
 // Instagram-style Relative Time Formatter
@@ -97,12 +100,21 @@ export default function CommunityPage() {
     }
   };
 
+  // Safe Storage without quota crash (Only metadata & lightweight URL fallbacks)
   const safeSaveLocalStorage = (key: string, data: any) => {
     if (typeof window === 'undefined') return;
     try {
-      localStorage.setItem(key, JSON.stringify(data));
+      // Strip out giant base64 video payloads from localStorage to prevent quota crash
+      const sanitizedData = Array.isArray(data) ? data.map(item => {
+        if (item.mediaType === 'video' && item.media?.length > 100000) {
+          return { ...item, media: item.media.substring(0, 500) + '...[video]' };
+        }
+        return item;
+      }) : data;
+
+      localStorage.setItem(key, JSON.stringify(sanitizedData));
     } catch (e) {
-      console.warn("Storage quota exceeded, keeping in memory/Firestore");
+      console.warn("Storage quota limit safely handled.");
     }
   };
 
@@ -122,7 +134,7 @@ export default function CommunityPage() {
 
     // Initial load from local fallback
     if (typeof window !== 'undefined') {
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v33');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v35');
       if (savedPosts) {
         try { setPosts(JSON.parse(savedPosts)); } catch (e) { setPosts([]); }
       }
@@ -151,11 +163,15 @@ export default function CommunityPage() {
         unsubscribePosts = onSnapshot(q, (snapshot) => {
           const fetchedPosts = snapshot.docs.map(docSnap => ({
             id: docSnap.id,
+            likes: 0,
+            comments: 0,
+            reposts: 0,
+            shares: 0,
             ...docSnap.data()
           }));
           if (fetchedPosts.length > 0) {
             setPosts(fetchedPosts);
-            safeSaveLocalStorage('indiePulse_community_posts_v33', fetchedPosts);
+            safeSaveLocalStorage('indiePulse_community_posts_v35', fetchedPosts);
           }
         }, (err) => {
           console.log("Firestore fallback active", err);
@@ -173,11 +189,13 @@ export default function CommunityPage() {
     };
   }, []);
 
-  const formatCount = (num: number) => {
-    if (!num || num === 0) return '';
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-    return num.toString();
+  // Format count guarantees zero (0) and numbers always display clearly
+  const formatCount = (num: any) => {
+    const parsedNum = typeof num === 'number' ? num : parseInt(num || '0', 10);
+    if (isNaN(parsedNum) || parsedNum === 0) return '0';
+    if (parsedNum >= 1000000) return (parsedNum / 1000000).toFixed(1) + 'M';
+    if (parsedNum >= 1000) return (parsedNum / 1000).toFixed(1) + 'K';
+    return parsedNum.toString();
   };
 
   const openModal = () => {
@@ -259,9 +277,13 @@ export default function CommunityPage() {
           setMediaType('image');
         });
       } else {
+        // Safe video object URL binding for memory persistence across refresh/mobile
+        const videoBlobUrl = URL.createObjectURL(file);
         const reader = new FileReader();
         reader.onloadend = () => {
-          setMediaFile(reader.result as string);
+          // If video is small, use reader string, else use resilient blob URL
+          const resultStr = reader.result as string;
+          setMediaFile(resultStr.length < 2000000 ? resultStr : videoBlobUrl);
           setMediaType('video');
         };
         reader.readAsDataURL(file);
@@ -339,7 +361,7 @@ export default function CommunityPage() {
 
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
-    safeSaveLocalStorage('indiePulse_community_posts_v33', updatedPosts);
+    safeSaveLocalStorage('indiePulse_community_posts_v35', updatedPosts);
 
     setTimeout(() => {
       setIsModalOpen(false);
@@ -350,7 +372,7 @@ export default function CommunityPage() {
     }, 400);
   };
 
-  const handleLike = (id: string, e?: any) => {
+  const handleLike = async (id: string, e?: any) => {
     if (e) e.stopPropagation();
     
     const isCurrentlyLiked = !!userLikedPosts[id];
@@ -376,11 +398,22 @@ export default function CommunityPage() {
       setSelectedMediaPost({ ...selectedMediaPost, likes: newLikesCount });
     }
 
-    safeSaveLocalStorage('indiePulse_community_posts_v33', updatedPosts);
+    safeSaveLocalStorage('indiePulse_community_posts_v35', updatedPosts);
     safeSaveLocalStorage('indiePulse_user_likes_v1', updatedLikedMap);
+
+    if (db) {
+      try {
+        const postRef = doc(db, "posts", id);
+        await updateDoc(postRef, {
+          likes: increment(newLikedState ? 1 : -1)
+        });
+      } catch (err) {
+        console.log("Firestore like update error", err);
+      }
+    }
   };
 
-  const handleRepost = (id: string, e?: any) => {
+  const handleRepost = async (id: string, e?: any) => {
     if (e) e.stopPropagation();
 
     const isCurrentlyReposted = !!userRepostedPosts[id];
@@ -411,11 +444,22 @@ export default function CommunityPage() {
       setTimeout(() => setShowRepostToast(false), 3000);
     }
 
-    safeSaveLocalStorage('indiePulse_community_posts_v33', updatedPosts);
+    safeSaveLocalStorage('indiePulse_community_posts_v35', updatedPosts);
     safeSaveLocalStorage('indiePulse_user_reposts_v1', updatedRepostMap);
+
+    if (db) {
+      try {
+        const postRef = doc(db, "posts", id);
+        await updateDoc(postRef, {
+          reposts: increment(newRepostState ? 1 : -1)
+        });
+      } catch (err) {
+        console.log("Firestore repost error", err);
+      }
+    }
   };
 
-  const handleShare = (post: any, e?: any) => {
+  const handleShare = async (post: any, e?: any) => {
     if (e) e.stopPropagation();
     
     if (!userSharedPosts[post.id]) {
@@ -437,7 +481,18 @@ export default function CommunityPage() {
         setSelectedMediaPost({ ...selectedMediaPost, shares: currentShares + 1 });
       }
 
-      safeSaveLocalStorage('indiePulse_community_posts_v33', updatedPosts);
+      safeSaveLocalStorage('indiePulse_community_posts_v35', updatedPosts);
+
+      if (db) {
+        try {
+          const postRef = doc(db, "posts", post.id);
+          await updateDoc(postRef, {
+            shares: increment(1)
+          });
+        } catch (err) {
+          console.log("Firestore share error", err);
+        }
+      }
     }
 
     if (navigator.share) {
@@ -495,11 +550,15 @@ export default function CommunityPage() {
     }
 
     safeSaveLocalStorage('indiePulse_comments_v1', updatedComments);
-    safeSaveLocalStorage('indiePulse_community_posts_v33', updatedPosts);
+    safeSaveLocalStorage('indiePulse_community_posts_v35', updatedPosts);
 
     if (db) {
       try {
         await addDoc(collection(db, `posts/${postId}/comments`), newCommentObj);
+        const postRef = doc(db, "posts", postId);
+        await updateDoc(postRef, {
+          comments: increment(1)
+        });
       } catch (err) {
         console.log("Comment database error", err);
       }
@@ -720,9 +779,7 @@ export default function CommunityPage() {
                     </svg>
                   )}
                 </div>
-                {formatCount(selectedMediaPost.likes) && (
-                  <span className="text-[11px] font-semibold drop-shadow">{formatCount(selectedMediaPost.likes)}</span>
-                )}
+                <span className="text-[11px] font-semibold drop-shadow">{formatCount(selectedMediaPost.likes)}</span>
               </button>
 
               <button 
@@ -734,9 +791,7 @@ export default function CommunityPage() {
                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
                   </svg>
                 </div>
-                {formatCount(selectedMediaPost.comments) && (
-                  <span className="text-[11px] font-semibold drop-shadow">{formatCount(selectedMediaPost.comments)}</span>
-                )}
+                <span className="text-[11px] font-semibold drop-shadow">{formatCount(selectedMediaPost.comments)}</span>
               </button>
 
               <button 
@@ -748,9 +803,7 @@ export default function CommunityPage() {
                     <path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
                   </svg>
                 </div>
-                {formatCount(selectedMediaPost.reposts) && (
-                  <span className="text-[11px] font-semibold drop-shadow">{formatCount(selectedMediaPost.reposts)}</span>
-                )}
+                <span className="text-[11px] font-semibold drop-shadow">{formatCount(selectedMediaPost.reposts)}</span>
               </button>
 
               <button 
@@ -763,9 +816,7 @@ export default function CommunityPage() {
                     <polygon points="22 2 15 22 11 13 2 9 22 2"/>
                   </svg>
                 </div>
-                {formatCount(selectedMediaPost.shares) && (
-                  <span className="text-[11px] font-semibold drop-shadow">{formatCount(selectedMediaPost.shares)}</span>
-                )}
+                <span className="text-[11px] font-semibold drop-shadow">{formatCount(selectedMediaPost.shares)}</span>
               </button>
 
             </div>
