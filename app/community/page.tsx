@@ -122,7 +122,7 @@ export default function CommunityPage() {
 
     // Initial load from local fallback
     if (typeof window !== 'undefined') {
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v32');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v33');
       if (savedPosts) {
         try { setPosts(JSON.parse(savedPosts)); } catch (e) { setPosts([]); }
       }
@@ -155,7 +155,7 @@ export default function CommunityPage() {
           }));
           if (fetchedPosts.length > 0) {
             setPosts(fetchedPosts);
-            safeSaveLocalStorage('indiePulse_community_posts_v32', fetchedPosts);
+            safeSaveLocalStorage('indiePulse_community_posts_v33', fetchedPosts);
           }
         }, (err) => {
           console.log("Firestore fallback active", err);
@@ -339,7 +339,7 @@ export default function CommunityPage() {
 
     const updatedPosts = [newPostObj, ...posts];
     setPosts(updatedPosts);
-    safeSaveLocalStorage('indiePulse_community_posts_v32', updatedPosts);
+    safeSaveLocalStorage('indiePulse_community_posts_v33', updatedPosts);
 
     setTimeout(() => {
       setIsModalOpen(false);
@@ -361,7 +361,8 @@ export default function CommunityPage() {
 
     const updatedPosts = posts.map((post) => {
       if (post.id === id) {
-        const newLikesCount = newLikedState ? post.likes + 1 : Math.max(0, post.likes - 1);
+        const currentLikes = typeof post.likes === 'number' ? post.likes : 0;
+        const newLikesCount = newLikedState ? currentLikes + 1 : Math.max(0, currentLikes - 1);
         return { ...post, likes: newLikesCount };
       }
       return post;
@@ -370,11 +371,12 @@ export default function CommunityPage() {
     setPosts(updatedPosts);
 
     if (selectedMediaPost && selectedMediaPost.id === id) {
-      const newLikesCount = newLikedState ? selectedMediaPost.likes + 1 : Math.max(0, selectedMediaPost.likes - 1);
+      const currentLikes = typeof selectedMediaPost.likes === 'number' ? selectedMediaPost.likes : 0;
+      const newLikesCount = newLikedState ? currentLikes + 1 : Math.max(0, currentLikes - 1);
       setSelectedMediaPost({ ...selectedMediaPost, likes: newLikesCount });
     }
 
-    safeSaveLocalStorage('indiePulse_community_posts_v32', updatedPosts);
+    safeSaveLocalStorage('indiePulse_community_posts_v33', updatedPosts);
     safeSaveLocalStorage('indiePulse_user_likes_v1', updatedLikedMap);
   };
 
@@ -389,7 +391,8 @@ export default function CommunityPage() {
 
     const updatedPosts = posts.map((post) => {
       if (post.id === id) {
-        const newCount = newRepostState ? (post.reposts || 0) + 1 : Math.max(0, (post.reposts || 0) - 1);
+        const currentReposts = typeof post.reposts === 'number' ? post.reposts : 0;
+        const newCount = newRepostState ? currentReposts + 1 : Math.max(0, currentReposts - 1);
         return { ...post, reposts: newCount };
       }
       return post;
@@ -398,7 +401,8 @@ export default function CommunityPage() {
     setPosts(updatedPosts);
 
     if (selectedMediaPost && selectedMediaPost.id === id) {
-      const newCount = newRepostState ? (selectedMediaPost.reposts || 0) + 1 : Math.max(0, (selectedMediaPost.reposts || 0) - 1);
+      const currentReposts = typeof selectedMediaPost.reposts === 'number' ? selectedMediaPost.reposts : 0;
+      const newCount = newRepostState ? currentReposts + 1 : Math.max(0, currentReposts - 1);
       setSelectedMediaPost({ ...selectedMediaPost, reposts: newCount });
     }
 
@@ -407,7 +411,7 @@ export default function CommunityPage() {
       setTimeout(() => setShowRepostToast(false), 3000);
     }
 
-    safeSaveLocalStorage('indiePulse_community_posts_v32', updatedPosts);
+    safeSaveLocalStorage('indiePulse_community_posts_v33', updatedPosts);
     safeSaveLocalStorage('indiePulse_user_reposts_v1', updatedRepostMap);
   };
 
@@ -415,18 +419,25 @@ export default function CommunityPage() {
     if (e) e.stopPropagation();
     
     if (!userSharedPosts[post.id]) {
-      const updatedShares = { ...userSharedPosts, [post.id]: true };
-      setUserSharedPosts(updatedShares);
+      const updatedSharesMap = { ...userSharedPosts, [post.id]: true };
+      setUserSharedPosts(updatedSharesMap);
 
-      const updatedPosts = posts.map((p) => 
-        p.id === post.id ? { ...p, shares: (p.shares || 0) + 1 } : p
-      );
+      const updatedPosts = posts.map((p) => {
+        if (p.id === post.id) {
+          const currentShares = typeof p.shares === 'number' ? p.shares : 0;
+          return { ...p, shares: currentShares + 1 };
+        }
+        return p;
+      });
+
       setPosts(updatedPosts);
+
       if (selectedMediaPost && selectedMediaPost.id === post.id) {
-        setSelectedMediaPost({ ...selectedMediaPost, shares: (selectedMediaPost.shares || 0) + 1 });
+        const currentShares = typeof selectedMediaPost.shares === 'number' ? selectedMediaPost.shares : 0;
+        setSelectedMediaPost({ ...selectedMediaPost, shares: currentShares + 1 });
       }
 
-      safeSaveLocalStorage('indiePulse_community_posts_v32', updatedPosts);
+      safeSaveLocalStorage('indiePulse_community_posts_v33', updatedPosts);
     }
 
     if (navigator.share) {
@@ -468,17 +479,23 @@ export default function CommunityPage() {
     setCommentText("");
     setCommentMediaFiles([]);
 
-    const updatedPosts = posts.map((post) =>
-      post.id === postId ? { ...post, comments: post.comments + 1 } : post
-    );
+    const updatedPosts = posts.map((post) => {
+      if (post.id === postId) {
+        const currentComments = typeof post.comments === 'number' ? post.comments : 0;
+        return { ...post, comments: currentComments + 1 };
+      }
+      return post;
+    });
+
     setPosts(updatedPosts);
 
     if (selectedMediaPost && selectedMediaPost.id === postId) {
-      setSelectedMediaPost({ ...selectedMediaPost, comments: selectedMediaPost.comments + 1 });
+      const currentComments = typeof selectedMediaPost.comments === 'number' ? selectedMediaPost.comments : 0;
+      setSelectedMediaPost({ ...selectedMediaPost, comments: currentComments + 1 });
     }
 
     safeSaveLocalStorage('indiePulse_comments_v1', updatedComments);
-    safeSaveLocalStorage('indiePulse_community_posts_v32', updatedPosts);
+    safeSaveLocalStorage('indiePulse_community_posts_v33', updatedPosts);
 
     if (db) {
       try {
@@ -499,7 +516,7 @@ export default function CommunityPage() {
       const updatedCommentsList = postComments[postId].map((c) => {
         if (c.id === commentId) {
           const currentLikes = c.likes || 0;
-          return { ...c, likes: newLikedState ? currentLikes + 1 : Math.max(0, currentLikes - 1) }
+          return { ...c, likes: newLikedState ? currentLikes + 1 : Math.max(0, currentLikes - 1) };
         }
         return c;
       });
@@ -884,7 +901,7 @@ export default function CommunityPage() {
                   <div className="flex items-center justify-between w-full gap-2">
                     {renderAvatar(userAvatar || (typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : null), currentName, "w-7 h-7")}
 
-                    <input
+                    <input 
                       ref={commentInputRef}
                       type="text"
                       value={commentText}
