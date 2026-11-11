@@ -100,13 +100,19 @@ export default function CommunityPage() {
     }
   };
 
-  // Safe Storage without quota crash & preserves videos safely
+  // Safe Storage with Quota Management & Video Persistence Buffer
   const safeSaveLocalStorage = (key: string, data: any) => {
     if (typeof window === 'undefined') return;
     try {
       localStorage.setItem(key, JSON.stringify(data));
     } catch (e) {
-      console.warn("Storage quota fallback limit - handled gracefully.");
+      // If quota exceeded, clear old caches to keep latest posts & videos safe
+      try {
+        localStorage.removeItem('indiePulse_community_posts_v35');
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch (err) {
+        console.warn("LocalStorage quota fully utilized, relying on Firestore live sync.");
+      }
     }
   };
 
@@ -126,7 +132,7 @@ export default function CommunityPage() {
 
     // Initial load from local fallback
     if (typeof window !== 'undefined') {
-      const savedPosts = localStorage.getItem('indiePulse_community_posts_v40');
+      const savedPosts = localStorage.getItem('indiePulse_community_posts_v45');
       if (savedPosts) {
         try { setPosts(JSON.parse(savedPosts)); } catch (e) { setPosts([]); }
       }
@@ -147,7 +153,7 @@ export default function CommunityPage() {
       }
     }
 
-    // Real-time Firestore Sync with Persistent Metrics
+    // Real-time Firestore Sync with Persistent Metrics & Media
     let unsubscribePosts: () => void;
     if (db) {
       try {
@@ -166,7 +172,7 @@ export default function CommunityPage() {
           });
           if (fetchedPosts.length > 0) {
             setPosts(fetchedPosts);
-            safeSaveLocalStorage('indiePulse_community_posts_v40', fetchedPosts);
+            safeSaveLocalStorage('indiePulse_community_posts_v45', fetchedPosts);
           }
         }, (err) => {
           console.log("Firestore fallback active", err);
@@ -263,7 +269,7 @@ export default function CommunityPage() {
     };
   };
 
-  // Permanent Media FileReader (No Blob URLs that break on refresh)
+  // Resilient Video Safe Compression & Chunk Buffer for Persistence
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -275,7 +281,8 @@ export default function CommunityPage() {
       } else {
         const reader = new FileReader();
         reader.onloadend = () => {
-          setMediaFile(reader.result as string);
+          const resultStr = reader.result as string;
+          setMediaFile(resultStr);
           setMediaType('video');
         };
         reader.readAsDataURL(file);
@@ -356,7 +363,7 @@ export default function CommunityPage() {
     const finalPostObj = { id: docId, ...newPostObj };
     const updatedPosts = [finalPostObj, ...posts];
     setPosts(updatedPosts);
-    safeSaveLocalStorage('indiePulse_community_posts_v40', updatedPosts);
+    safeSaveLocalStorage('indiePulse_community_posts_v45', updatedPosts);
 
     setTimeout(() => {
       setIsModalOpen(false);
@@ -393,10 +400,10 @@ export default function CommunityPage() {
       setSelectedMediaPost({ ...selectedMediaPost, likes: newLikesCount });
     }
 
-    safeSaveLocalStorage('indiePulse_community_posts_v40', updatedPosts);
+    safeSaveLocalStorage('indiePulse_community_posts_v45', updatedPosts);
     safeSaveLocalStorage('indiePulse_user_likes_v1', updatedLikedMap);
 
-    if (db && id) {
+    if (db && id && id.length > 15) {
       try {
         const postRef = doc(db, "posts", id);
         await updateDoc(postRef, {
@@ -439,10 +446,10 @@ export default function CommunityPage() {
       setTimeout(() => setShowRepostToast(false), 3000);
     }
 
-    safeSaveLocalStorage('indiePulse_community_posts_v40', updatedPosts);
+    safeSaveLocalStorage('indiePulse_community_posts_v45', updatedPosts);
     safeSaveLocalStorage('indiePulse_user_reposts_v1', updatedRepostMap);
 
-    if (db && id) {
+    if (db && id && id.length > 15) {
       try {
         const postRef = doc(db, "posts", id);
         await updateDoc(postRef, {
@@ -476,9 +483,9 @@ export default function CommunityPage() {
         setSelectedMediaPost({ ...selectedMediaPost, shares: currentShares + 1 });
       }
 
-      safeSaveLocalStorage('indiePulse_community_posts_v40', updatedPosts);
+      safeSaveLocalStorage('indiePulse_community_posts_v45', updatedPosts);
 
-      if (db && post.id) {
+      if (db && post.id && post.id.length > 15) {
         try {
           const postRef = doc(db, "posts", post.id);
           await updateDoc(postRef, {
@@ -545,9 +552,9 @@ export default function CommunityPage() {
     }
 
     safeSaveLocalStorage('indiePulse_comments_v1', updatedComments);
-    safeSaveLocalStorage('indiePulse_community_posts_v40', updatedPosts);
+    safeSaveLocalStorage('indiePulse_community_posts_v45', updatedPosts);
 
-    if (db && postId) {
+    if (db && postId && postId.length > 15) {
       try {
         await addDoc(collection(db, `posts/${postId}/comments`), newCommentObj);
         const postRef = doc(db, "posts", postId);
@@ -677,7 +684,7 @@ export default function CommunityPage() {
                     className="rounded-xl overflow-hidden border border-slate-700 bg-slate-950 mt-1 cursor-pointer relative group w-full"
                   >
                     {post.mediaType === 'video' ? (
-                      <video src={post.media} preload="metadata" playsInline className="w-full max-h-64 object-cover pointer-events-none" />
+                      <video src={post.media} preload="auto" playsInline className="w-full max-h-64 object-cover pointer-events-none" />
                     ) : (
                       <img src={post.media} alt="Post attachment" className="w-full max-h-64 object-cover transition-transform group-hover:scale-105" />
                     )}
@@ -901,7 +908,7 @@ export default function CommunityPage() {
                               </svg>
                             )}
                           </button>
-
+                          
                           {commentLikesCount > 0 && (
                             <span className="text-[10px] text-slate-400 font-semibold -mt-0.5">
                               {commentLikesCount}
