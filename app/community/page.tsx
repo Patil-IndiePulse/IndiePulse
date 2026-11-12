@@ -64,6 +64,7 @@ export default function CommunityPage() {
   const [currentName, setCurrentName] = useState('Bharat Patil');
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingMedia, setIsUploadingMedia] = useState(false);
   
   // Full-screen Viewer States
   const [selectedMediaPost, setSelectedMediaPost] = useState<any>(null);
@@ -85,6 +86,8 @@ export default function CommunityPage() {
   const submitBtnRef = useRef<HTMLButtonElement>(null);
   const commentInputRef = useRef<HTMLInputElement>(null);
   const commentFileInputRef = useRef<HTMLInputElement>(null);
+  const latestUploadedUrlRef = useRef<string | null>(null);
+  const activeUploadPromiseRef = useRef<Promise<string> | null>(null);
 
   // Sync profile name & avatar live from localStorage / Auth
   const syncProfileData = () => {
@@ -225,6 +228,7 @@ export default function CommunityPage() {
 
   const openModal = () => {
     syncProfileData();
+    setIsSubmitting(false);
     setIsModalOpen(true);
     if (typeof window !== 'undefined') {
       window.history.pushState({ modalOpen: true }, '');
@@ -291,20 +295,30 @@ export default function CommunityPage() {
     }
   };
 
-  // Instant File Selection & Background Upload without UI blocking
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Instant File Selection & Non-Blocking Background Upload
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const localPreviewUrl = URL.createObjectURL(file);
       setMediaFile(localPreviewUrl);
       setMediaType(file.type.startsWith('video') ? 'video' : 'image');
+      latestUploadedUrlRef.current = null;
+      setIsUploadingMedia(true);
 
-      try {
-        const uploadedUrl = await uploadToCloudinary(file);
-        setMediaFile(uploadedUrl);
-      } catch (err) {
-        console.error("Upload error:", err);
-      }
+      const uploadPromise = uploadToCloudinary(file)
+        .then((uploadedUrl) => {
+          latestUploadedUrlRef.current = uploadedUrl;
+          setMediaFile(uploadedUrl);
+          setIsUploadingMedia(false);
+          return uploadedUrl;
+        })
+        .catch((err) => {
+          console.error("Upload error:", err);
+          setIsUploadingMedia(false);
+          return localPreviewUrl;
+        });
+
+      activeUploadPromiseRef.current = uploadPromise;
     }
   };
 
@@ -332,30 +346,48 @@ export default function CommunityPage() {
     setMediaFile(null);
     setMediaType(null);
     setIsSubmitting(false);
+    setIsUploadingMedia(false);
+    latestUploadedUrlRef.current = null;
+    activeUploadPromiseRef.current = null;
   };
 
-  // Instant Post Submission without waiting for blocking network states
+  // Instant Post Submission with immediate '✓ Success' and automatic back
   const executePostSubmission = async (e: any) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
     if (!newPost.trim() && !mediaFile) return;
+    if (isSubmitting) return;
 
     syncProfileData();
-    setIsModalOpen(false);
+    setIsSubmitting(true);
+
+    // 1. Instant visual '✓ Success' feedback on button
+    if (submitBtnRef.current) {
+      submitBtnRef.current.style.backgroundColor = '#059669';
+      submitBtnRef.current.style.borderColor = '#34d399';
+      submitBtnRef.current.style.boxShadow = '0 0 25px rgba(16, 185, 129, 0.9)';
+      submitBtnRef.current.innerText = '✓ Success';
+    }
 
     const currentLatestAvatar = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : userAvatar;
     const currentLatestName = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_name') || currentName) : currentName;
     const nowTimestamp = Date.now();
+    const tempPostId = 'local_' + nowTimestamp;
+
+    const initialMediaUrl = latestUploadedUrlRef.current || mediaFile;
+    const capturedContent = newPost;
+    const capturedMediaType = mediaType;
+    const pendingUploadPromise = activeUploadPromiseRef.current;
 
     const newPostObj = {
       authorName: currentLatestName,
       authorEmail: currentEmail,
       authorAvatar: currentLatestAvatar,
-      content: newPost,
-      media: mediaFile,
-      mediaType: mediaType,
+      content: capturedContent,
+      media: initialMediaUrl,
+      mediaType: capturedMediaType,
       likes: 0,
       comments: 0,
       reposts: 0,
@@ -363,25 +395,58 @@ export default function CommunityPage() {
       createdAt: nowTimestamp
     };
 
-    let docId = 'local_' + nowTimestamp;
+    // 2. Immediately update feed so it feels instant
+    const finalPostObj = { id: tempPostId, ...newPostObj };
+    setPosts((prev) => {
+      const updated = [finalPostObj, ...prev];
+      smartSavePosts(updated);
+      return updated;
+    });
 
-    // Background sync with Firestore
-    if (db) {
-      addDoc(collection(db, "posts"), newPostObj).then((docRef) => {
-        // Doc added successfully in background
-      }).catch((err) => {
-        console.error("Database save fallback active", err);
-      });
-    }
+    // 3. Auto close modal immediately after showing Success
+    setTimeout(() => {
+      setIsModalOpen(false);
+      setNewPost("");
+      setMediaFile(null);
+      setMediaType(null);
+      setIsSubmitting(false);
+      latestUploadedUrlRef.current = null;
+      activeUploadPromiseRef.current = null;
+    }, 350);
 
-    const finalPostObj = { id: docId, ...newPostObj };
-    const updatedPosts = [finalPostObj, ...posts];
-    setPosts(updatedPosts);
-    smartSavePosts(updatedPosts);
+    // 4. Finish upload (if still running) & sync to Firestore in background
+    (async () => {
+      let finalCloudMediaUrl = initialMediaUrl;
+      if (pendingUploadPromise && (!finalCloudMediaUrl || finalCloudMediaUrl.startsWith('blob:'))) {
+        try {
+          finalCloudMediaUrl = await pendingUploadPromise;
+          setPosts((prev) => {
+            const updated = prev.map((p) => p.id === tempPostId ? { ...p, media: finalCloudMediaUrl } : p);
+            smartSavePosts(updated);
+            return updated;
+          });
+        } catch (err) {
+          console.error("Background media resolve error:", err);
+        }
+      }
 
-    setNewPost("");
-    setMediaFile(null);
-    setMediaType(null);
+      if (db) {
+        try {
+          const firestorePayload = {
+            ...newPostObj,
+            media: finalCloudMediaUrl && !finalCloudMediaUrl.startsWith('blob:') ? finalCloudMediaUrl : null
+          };
+          const docRef = await addDoc(collection(db, "posts"), firestorePayload);
+          setPosts((prev) => {
+            const updated = prev.map((p) => p.id === tempPostId ? { ...p, id: docRef.id, media: finalCloudMediaUrl } : p);
+            smartSavePosts(updated);
+            return updated;
+          });
+        } catch (err) {
+          console.error("Database save fallback active", err);
+        }
+      }
+    })();
   };
 
   const handleLike = async (id: string, e?: any) => {
@@ -508,7 +573,7 @@ export default function CommunityPage() {
     }
 
     if (navigator.share) {
-      navigator.share({
+     navigator.share({
         title: 'IndiePulse Clips',
         text: post.content || 'Check out this clip on IndiePulse!',
         url: window.location.href,
@@ -740,7 +805,7 @@ export default function CommunityPage() {
         </div>
       </div>
 
-      {/* 100% Fullscreen Instagram-style Media Viewer */}
+      {/* 100% Fullscreen Instagram-style Media Viewer with Tap Play/Pause & Progress Bar */}
       {selectedMediaPost && (
         <div 
           className="fixed inset-0 bg-black z-50 flex flex-col justify-between overflow-hidden select-none"
@@ -784,26 +849,28 @@ export default function CommunityPage() {
             )}
           </div>
 
-          {/* Exact Instagram-style Play/Pause circle overlay indicator */}
+          {/* Original Instagram-style Play/Pause circle overlay indicator */}
           {selectedMediaPost.mediaType === 'video' && !isPlaying && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-              <div className="w-16 h-16 bg-black/50 rounded-full flex items-center justify-center text-white text-2xl backdrop-blur-sm shadow-2xl transition-all">
-                <svg className="w-8 h-8 fill-current ml-1" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              <div className="w-16 h-16 bg-black/45 rounded-full flex items-center justify-center text-white backdrop-blur-md shadow-2xl">
+                <svg className="w-8 h-8 fill-white ml-1" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
               </div>
             </div>
           )}
 
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80 pointer-events-none"></div>
 
-          {/* Top Bar with INDIPULSE CLIPS in single line and NO close 'X' button */}
+          {/* Top Bar: INDIEPULSE CLIPS in single line, without close 'X' button */}
           <div className="relative z-10 p-4 flex items-center justify-start text-white pointer-events-none">
             <span className="text-xs font-black tracking-wider text-pink-500 flex items-center gap-1.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] bg-black/30 px-3.5 py-1.5 rounded-full border border-pink-500/30 backdrop-blur-md whitespace-nowrap">
               <span>🎮</span> INDIEPULSE CLIPS
             </span>
           </div>
 
-          {/* Instagram-style Bottom Author DP & Name (Openly without box, moved higher up) */}
-          <div className="relative z-10 p-4 pb-12 flex items-end justify-between w-full pointer-events-none">
+          {/* Instagram-style Bottom Author DP & Name openly without box, moved higher up, without Original Audio */}
+          <div className="relative z-10 p-4 pb-14 flex items-end justify-between w-full pointer-events-none">
             <div className="flex items-center gap-3 pointer-events-auto">
               {renderAvatar(userAvatar || (typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : null), currentName, "w-10 h-10")}
               <div className="flex flex-col text-left">
@@ -894,7 +961,7 @@ export default function CommunityPage() {
             </div>
           )}
 
-          {/* Comment Sheet */}
+          {/* Comment Sheet with Live DP */}
           {showCommentSheet && (
             <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/98 backdrop-blur-2xl border-t border-slate-800 rounded-t-3xl p-4 flex flex-col max-h-[70vh] transition-all shadow-2xl text-left items-start" onClick={(e) => e.stopPropagation()}>
               
@@ -913,18 +980,18 @@ export default function CommunityPage() {
                     return (
                       <div key={c.id} className="grid grid-cols-[1fr_auto] items-start justify-between gap-3 w-full py-2.5 border-b border-slate-800/40 last:border-0 text-left">
                         
-                        <div className="flex items-start justify-start text-left w-full min-w-0 gap-3">
+                        <div className="flex items-start justify-start text-left w-full min-w-0 gap-3" style={{ textAlign: 'left' }}>
                           {renderAvatar(isMyComment ? (userAvatar || (typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : null)) : c.authorAvatar, c.author, "w-8 h-8 mt-0.5")}
 
                           <div className="flex flex-col items-start justify-start text-left w-full min-w-0 gap-1">
-                            <div className="flex items-center justify-start gap-2 w-full text-left">
+                            <div className="flex items-center justify-start gap-2 w-full text-left" style={{ textAlign: 'left' }}>
                               <span className="font-bold text-pink-400 text-xs text-left truncate block">{isMyComment ? liveName : c.author}</span>
                               <span className="text-[11px] text-slate-400 flex-shrink-0 text-left">{formatTimeAgo(c.createdAt || (c as any).time)}</span>
                             </div>
                             
                             {c.text && (
                               <div className="w-full text-left flex justify-start items-start">
-                                <p className="text-slate-200 text-xs leading-relaxed text-left block w-full m-0 break-words whitespace-normal">
+                                <p className="text-slate-200 text-xs leading-relaxed text-left block w-full m-0 break-words whitespace-normal" style={{ textAlign: 'left' }}>
                                   {c.text}
                                 </p>
                               </div>
@@ -976,7 +1043,7 @@ export default function CommunityPage() {
                 )}
               </div>
 
-              {/* Input Container */}
+              {/* Input Container with Live DP */}
               <div className="w-full pt-2 border-t border-slate-800">
                 <input 
                   type="file" 
@@ -1099,7 +1166,9 @@ export default function CommunityPage() {
                 <div className="relative w-full h-[140px] bg-slate-950 rounded-xl overflow-hidden border border-pink-500/30">
                   <div className="w-full h-full flex items-center justify-center">
                     {mediaType === 'video' ? (
-                      <span className="text-xs text-emerald-400">📹 Video selected successfully</span>
+                      <span className="text-xs text-emerald-400">
+                        {isUploadingMedia ? '📹 Video selected (Syncing...)' : '📹 Video ready!'}
+                      </span>
                     ) : (
                       <img src={mediaFile} alt="Preview" className="h-full object-contain" />
                     )}
@@ -1108,7 +1177,7 @@ export default function CommunityPage() {
                   <div className="absolute top-2 right-2 z-50 w-7 h-7">
                     <button 
                       type="button" 
-                      onClick={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); }}
+                      onClick={(e) => { e.stopPropagation(); setMediaFile(null); setMediaType(null); setIsUploadingMedia(false); }}
                       className="w-7 h-7 bg-pink-600 text-white rounded-full border-2 border-pink-400 flex items-center justify-center text-xs font-bold cursor-pointer outline-none shadow-md"
                     >
                       ✕
@@ -1121,8 +1190,6 @@ export default function CommunityPage() {
                 <button
                   type="button"
                   onClick={handleCancel}
-                  onTouchEnd={handleCancel}
-                  disabled={isSubmitting}
                   className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-xs cursor-pointer border border-slate-700"
                 >
                   Cancel
@@ -1131,8 +1198,7 @@ export default function CommunityPage() {
                   ref={submitBtnRef}
                   type="button"
                   onClick={executePostSubmission}
-                  onTouchEnd={executePostSubmission}
-                  className="flex-1 py-3 font-bold rounded-xl text-xs cursor-pointer flex items-center justify-center gap-1.5 bg-pink-600 text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all"
+                  className="flex-1 py-3 font-bold rounded-xl text-xs cursor-pointer flex items-center justify-center gap-1.5 bg-pink-600 hover:bg-pink-500 active:scale-95 text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all"
                 >
                   Post Now 🚀
                 </button>
@@ -1145,4 +1211,4 @@ export default function CommunityPage() {
 
     </main>
   );
-}
+} 
