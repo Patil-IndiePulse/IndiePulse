@@ -295,20 +295,15 @@ export default function CommunityPage() {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Show instant local preview immediately for zero-lag feeling
       const localPreviewUrl = URL.createObjectURL(file);
       setMediaFile(localPreviewUrl);
       setMediaType(file.type.startsWith('video') ? 'video' : 'image');
 
       try {
-        setIsSubmitting(true);
         const uploadedUrl = await uploadToCloudinary(file);
-        setMediaFile(uploadedUrl); // Replace with permanent Cloudinary URL in background
+        setMediaFile(uploadedUrl);
       } catch (err) {
         console.error("Upload error:", err);
-        alert("Failed to upload file to Cloudinary. Please try again.");
-      } finally {
-        setIsSubmitting(false);
       }
     }
   };
@@ -339,23 +334,16 @@ export default function CommunityPage() {
     setIsSubmitting(false);
   };
 
+  // Instant Post Submission without waiting for blocking network states
   const executePostSubmission = async (e: any) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
     if (!newPost.trim() && !mediaFile) return;
-    if (isSubmitting) return;
 
     syncProfileData();
-    setIsSubmitting(true);
-
-    if (submitBtnRef.current) {
-      submitBtnRef.current.style.backgroundColor = '#059669';
-      submitBtnRef.current.style.borderColor = '#34d399';
-      submitBtnRef.current.style.boxShadow = '0 0 25px rgba(16, 185, 129, 0.9)';
-      submitBtnRef.current.innerText = '✓ Success';
-    }
+    setIsModalOpen(false);
 
     const currentLatestAvatar = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : userAvatar;
     const currentLatestName = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_name') || currentName) : currentName;
@@ -377,13 +365,13 @@ export default function CommunityPage() {
 
     let docId = 'local_' + nowTimestamp;
 
+    // Background sync with Firestore
     if (db) {
-      try {
-        const docRef = await addDoc(collection(db, "posts"), newPostObj);
-        docId = docRef.id;
-      } catch (err) {
+      addDoc(collection(db, "posts"), newPostObj).then((docRef) => {
+        // Doc added successfully in background
+      }).catch((err) => {
         console.error("Database save fallback active", err);
-      }
+      });
     }
 
     const finalPostObj = { id: docId, ...newPostObj };
@@ -391,13 +379,9 @@ export default function CommunityPage() {
     setPosts(updatedPosts);
     smartSavePosts(updatedPosts);
 
-    setTimeout(() => {
-      setIsModalOpen(false);
-      setNewPost("");
-      setMediaFile(null);
-      setMediaType(null);
-      setIsSubmitting(false);
-    }, 400);
+    setNewPost("");
+    setMediaFile(null);
+    setMediaType(null);
   };
 
   const handleLike = async (id: string, e?: any) => {
@@ -756,7 +740,7 @@ export default function CommunityPage() {
         </div>
       </div>
 
-      {/* 100% Fullscreen Instagram-style Media Viewer with Tap Play/Pause & Progress Bar */}
+      {/* 100% Fullscreen Instagram-style Media Viewer */}
       {selectedMediaPost && (
         <div 
           className="fixed inset-0 bg-black z-50 flex flex-col justify-between overflow-hidden select-none"
@@ -800,39 +784,30 @@ export default function CommunityPage() {
             )}
           </div>
 
-          {/* Pause overlay icon indicator */}
+          {/* Exact Instagram-style Play/Pause circle overlay indicator */}
           {selectedMediaPost.mediaType === 'video' && !isPlaying && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-              <div className="w-16 h-16 bg-black/60 rounded-full flex items-center justify-center text-white text-2xl backdrop-blur-sm shadow-2xl">
-                ▶️
+              <div className="w-16 h-16 bg-black/50 rounded-full flex items-center justify-center text-white text-2xl backdrop-blur-sm shadow-2xl transition-all">
+                <svg className="w-8 h-8 fill-current ml-1" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
               </div>
             </div>
           )}
 
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80 pointer-events-none"></div>
 
-          <div className="relative z-10 p-4 flex items-center justify-between text-white pointer-events-none">
-            <span className="text-sm font-black tracking-widest text-pink-500 flex items-center gap-1.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] bg-black/30 px-3 py-1 rounded-full border border-pink-500/30 backdrop-blur-md">
+          {/* Top Bar with INDIPULSE CLIPS in single line and NO close 'X' button */}
+          <div className="relative z-10 p-4 flex items-center justify-start text-white pointer-events-none">
+            <span className="text-xs font-black tracking-wider text-pink-500 flex items-center gap-1.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] bg-black/30 px-3.5 py-1.5 rounded-full border border-pink-500/30 backdrop-blur-md whitespace-nowrap">
               <span>🎮</span> INDIEPULSE CLIPS
             </span>
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedMediaPost(null);
-              }}
-              className="text-white bg-black/40 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border border-white/20 pointer-events-auto cursor-pointer"
-            >
-              ✕
-            </button>
           </div>
 
-          {/* Instagram-style Bottom Author DP & Name Info */}
-          <div className="relative z-10 p-4 pb-6 flex items-end justify-between w-full pointer-events-none">
-            <div className="flex items-center gap-3 pointer-events-auto bg-black/20 p-2 rounded-2xl backdrop-blur-md border border-white/10">
+          {/* Instagram-style Bottom Author DP & Name (Openly without box, moved higher up) */}
+          <div className="relative z-10 p-4 pb-12 flex items-end justify-between w-full pointer-events-none">
+            <div className="flex items-center gap-3 pointer-events-auto">
               {renderAvatar(userAvatar || (typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : null), currentName, "w-10 h-10")}
               <div className="flex flex-col text-left">
-                <span className="font-bold text-white text-sm drop-shadow">{typeof window !== 'undefined' && localStorage.getItem('indiePulse_name') ? localStorage.getItem('indiePulse_name') : currentName}</span>
-                <span className="text-[11px] text-pink-400 font-medium">Original Audio</span>
+                <span className="font-bold text-white text-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">{typeof window !== 'undefined' && localStorage.getItem('indiePulse_name') ? localStorage.getItem('indiePulse_name') : currentName}</span>
               </div>
             </div>
 
@@ -919,7 +894,7 @@ export default function CommunityPage() {
             </div>
           )}
 
-          {/* Comment Sheet with Live DP */}
+          {/* Comment Sheet */}
           {showCommentSheet && (
             <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/98 backdrop-blur-2xl border-t border-slate-800 rounded-t-3xl p-4 flex flex-col max-h-[70vh] transition-all shadow-2xl text-left items-start" onClick={(e) => e.stopPropagation()}>
               
@@ -938,18 +913,18 @@ export default function CommunityPage() {
                     return (
                       <div key={c.id} className="grid grid-cols-[1fr_auto] items-start justify-between gap-3 w-full py-2.5 border-b border-slate-800/40 last:border-0 text-left">
                         
-                        <div className="flex items-start justify-start text-left w-full min-w-0 gap-3" style={{ textAlign: 'left' }}>
+                        <div className="flex items-start justify-start text-left w-full min-w-0 gap-3">
                           {renderAvatar(isMyComment ? (userAvatar || (typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : null)) : c.authorAvatar, c.author, "w-8 h-8 mt-0.5")}
 
                           <div className="flex flex-col items-start justify-start text-left w-full min-w-0 gap-1">
-                            <div className="flex items-center justify-start gap-2 w-full text-left" style={{ textAlign: 'left' }}>
+                            <div className="flex items-center justify-start gap-2 w-full text-left">
                               <span className="font-bold text-pink-400 text-xs text-left truncate block">{isMyComment ? liveName : c.author}</span>
                               <span className="text-[11px] text-slate-400 flex-shrink-0 text-left">{formatTimeAgo(c.createdAt || (c as any).time)}</span>
                             </div>
                             
                             {c.text && (
                               <div className="w-full text-left flex justify-start items-start">
-                                <p className="text-slate-200 text-xs leading-relaxed text-left block w-full m-0 break-words whitespace-normal" style={{ textAlign: 'left' }}>
+                                <p className="text-slate-200 text-xs leading-relaxed text-left block w-full m-0 break-words whitespace-normal">
                                   {c.text}
                                 </p>
                               </div>
@@ -1001,7 +976,7 @@ export default function CommunityPage() {
                 )}
               </div>
 
-              {/* Input Container with Live DP */}
+              {/* Input Container */}
               <div className="w-full pt-2 border-t border-slate-800">
                 <input 
                   type="file" 
@@ -1124,7 +1099,7 @@ export default function CommunityPage() {
                 <div className="relative w-full h-[140px] bg-slate-950 rounded-xl overflow-hidden border border-pink-500/30">
                   <div className="w-full h-full flex items-center justify-center">
                     {mediaType === 'video' ? (
-                      <span className="text-xs text-emerald-400">📹 Video selected successfully (Uploading...)</span>
+                      <span className="text-xs text-emerald-400">📹 Video selected successfully</span>
                     ) : (
                       <img src={mediaFile} alt="Preview" className="h-full object-contain" />
                     )}
@@ -1157,7 +1132,6 @@ export default function CommunityPage() {
                   type="button"
                   onClick={executePostSubmission}
                   onTouchEnd={executePostSubmission}
-                  disabled={isSubmitting}
                   className="flex-1 py-3 font-bold rounded-xl text-xs cursor-pointer flex items-center justify-center gap-1.5 bg-pink-600 text-white border border-pink-400/40 shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all"
                 >
                   Post Now 🚀
