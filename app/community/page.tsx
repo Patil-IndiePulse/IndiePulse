@@ -77,6 +77,11 @@ export default function CommunityPage() {
   const [userRepostedPosts, setUserRepostedPosts] = useState<{[key: string]: boolean}>({});
   const [showRepostToast, setShowRepostToast] = useState(false);
 
+  // Video playback & progress states
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [videoProgress, setVideoProgress] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   const submitBtnRef = useRef<HTMLButtonElement>(null);
   const commentInputRef = useRef<HTMLInputElement>(null);
   const commentFileInputRef = useRef<HTMLInputElement>(null);
@@ -100,7 +105,6 @@ export default function CommunityPage() {
     }
   };
 
-  // Smart Persistent Local Storage Buffer for Video Data Preservation on Refresh
   const smartSavePosts = (postsToSave: any[]) => {
     if (typeof window === 'undefined') return;
     try {
@@ -138,7 +142,6 @@ export default function CommunityPage() {
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('focus', handleStorageChange);
 
-    // Initial load from persistent local buffer
     if (typeof window !== 'undefined') {
       const savedPersistentPosts = localStorage.getItem('indiePulse_community_posts_persistent_v100');
       if (savedPersistentPosts) {
@@ -166,7 +169,6 @@ export default function CommunityPage() {
       }
     }
 
-    // Real-time Firestore Sync with Merged Local Persistence
     let unsubscribePosts: () => void;
     if (db) {
       try {
@@ -231,6 +233,8 @@ export default function CommunityPage() {
 
   const openMediaViewer = (post: any) => {
     setSelectedMediaPost(post);
+    setIsPlaying(true);
+    setVideoProgress(0);
     if (typeof window !== 'undefined') {
       window.history.pushState({ mediaViewerOpen: true }, '');
     }
@@ -264,15 +268,15 @@ export default function CommunityPage() {
 
   const currentEmail = user?.email || 'bharatrajupatil5200@gmail.com';
 
-  // Cloudinary Upload Integration Function for Videos and Images
+  // Cloudinary Upload Integration Function (Fast & Direct)
   const uploadToCloudinary = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "indiepulse_preset"); // Created Preset
+    formData.append("upload_preset", "indiepulse_preset");
 
     const resourceType = file.type.startsWith('video') ? 'video' : 'image';
     const response = await fetch(
-      `https://api.cloudinary.com/v1_1/xfd36qxj/${resourceType}/upload`, // Cloud Name: xfd36qxj
+      `https://api.cloudinary.com/v1_1/xfd36qxj/${resourceType}/upload`,
       {
         method: "POST",
         body: formData,
@@ -287,14 +291,19 @@ export default function CommunityPage() {
     }
   };
 
+  // Instant File Selection & Background Upload without UI blocking
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Show instant local preview immediately for zero-lag feeling
+      const localPreviewUrl = URL.createObjectURL(file);
+      setMediaFile(localPreviewUrl);
+      setMediaType(file.type.startsWith('video') ? 'video' : 'image');
+
       try {
         setIsSubmitting(true);
         const uploadedUrl = await uploadToCloudinary(file);
-        setMediaFile(uploadedUrl);
-        setMediaType(file.type.startsWith('video') ? 'video' : 'image');
+        setMediaFile(uploadedUrl); // Replace with permanent Cloudinary URL in background
       } catch (err) {
         console.error("Upload error:", err);
         alert("Failed to upload file to Cloudinary. Please try again.");
@@ -747,19 +756,39 @@ export default function CommunityPage() {
         </div>
       </div>
 
-      {/* 100% Fullscreen Gaming Clips Media Viewer */}
+      {/* 100% Fullscreen Instagram-style Media Viewer with Tap Play/Pause & Progress Bar */}
       {selectedMediaPost && (
-        <div className="fixed inset-0 bg-black z-50 flex flex-col justify-between overflow-hidden select-none">
+        <div 
+          className="fixed inset-0 bg-black z-50 flex flex-col justify-between overflow-hidden select-none"
+          onClick={() => {
+            if (selectedMediaPost.mediaType === 'video' && videoRef.current) {
+              if (isPlaying) {
+                videoRef.current.pause();
+                setIsPlaying(false);
+              } else {
+                videoRef.current.play();
+                setIsPlaying(true);
+              }
+            }
+          }}
+        >
           
           <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-black">
             {selectedMediaPost.mediaType === 'video' ? (
               <video 
+                ref={videoRef}
                 src={selectedMediaPost.media} 
-                controls
                 autoPlay 
                 loop
                 playsInline 
                 preload="auto"
+                onTimeUpdate={() => {
+                  if (videoRef.current) {
+                    const current = videoRef.current.currentTime;
+                    const duration = videoRef.current.duration;
+                    setVideoProgress((current / duration) * 100);
+                  }
+                }}
                 className="w-full h-full object-cover" 
               />
             ) : (
@@ -771,18 +800,43 @@ export default function CommunityPage() {
             )}
           </div>
 
+          {/* Pause overlay icon indicator */}
+          {selectedMediaPost.mediaType === 'video' && !isPlaying && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+              <div className="w-16 h-16 bg-black/60 rounded-full flex items-center justify-center text-white text-2xl backdrop-blur-sm shadow-2xl">
+                ▶️
+              </div>
+            </div>
+          )}
+
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80 pointer-events-none"></div>
 
-          <div className="relative z-10 p-4 flex items-center justify-between text-white">
+          <div className="relative z-10 p-4 flex items-center justify-between text-white pointer-events-none">
             <span className="text-sm font-black tracking-widest text-pink-500 flex items-center gap-1.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] bg-black/30 px-3 py-1 rounded-full border border-pink-500/30 backdrop-blur-md">
               <span>🎮</span> INDIEPULSE CLIPS
             </span>
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedMediaPost(null);
+              }}
+              className="text-white bg-black/40 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border border-white/20 pointer-events-auto cursor-pointer"
+            >
+              ✕
+            </button>
           </div>
 
-          <div className="relative z-10 p-4 pb-8 flex items-end justify-between w-full">
-            <div className="flex flex-col gap-2 max-w-[75%] text-left pointer-events-none opacity-0"></div>
+          {/* Instagram-style Bottom Author DP & Name Info */}
+          <div className="relative z-10 p-4 pb-6 flex items-end justify-between w-full pointer-events-none">
+            <div className="flex items-center gap-3 pointer-events-auto bg-black/20 p-2 rounded-2xl backdrop-blur-md border border-white/10">
+              {renderAvatar(userAvatar || (typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : null), currentName, "w-10 h-10")}
+              <div className="flex flex-col text-left">
+                <span className="font-bold text-white text-sm drop-shadow">{typeof window !== 'undefined' && localStorage.getItem('indiePulse_name') ? localStorage.getItem('indiePulse_name') : currentName}</span>
+                <span className="text-[11px] text-pink-400 font-medium">Original Audio</span>
+              </div>
+            </div>
 
-            <div className="flex flex-col items-center gap-4 pb-2 ml-auto">
+            <div className="flex flex-col items-center gap-4 pb-2 ml-auto pointer-events-auto" onClick={(e) => e.stopPropagation()}>
               
               <button 
                 onClick={(e) => handleLike(selectedMediaPost.id, e)}
@@ -842,8 +896,16 @@ export default function CommunityPage() {
             </div>
           </div>
 
+          {/* Instagram-style Video/Photo Progress Bar at the bottom */}
+          <div className="absolute bottom-0 inset-x-0 h-1 bg-white/20 z-30">
+            <div 
+              className="h-full bg-pink-500 transition-all duration-150" 
+              style={{ width: selectedMediaPost.mediaType === 'video' ? `${videoProgress}%` : '100%' }}
+            ></div>
+          </div>
+
           {showRepostToast && (
-            <div className="absolute bottom-6 left-4 right-4 z-50 bg-slate-900/95 border border-slate-700 text-white p-3.5 rounded-2xl flex items-center justify-between shadow-2xl backdrop-blur-md animate-bounce">
+            <div className="absolute bottom-10 left-4 right-4 z-50 bg-slate-900/95 border border-slate-700 text-white p-3.5 rounded-2xl flex items-center justify-between shadow-2xl backdrop-blur-md animate-bounce">
               <div className="flex items-center gap-2 text-xs font-semibold">
                 <svg className="w-4 h-4 fill-none stroke-current stroke-2 text-green-400" viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
                 <span>Reposted to your feed</span>
@@ -859,7 +921,7 @@ export default function CommunityPage() {
 
           {/* Comment Sheet with Live DP */}
           {showCommentSheet && (
-            <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/98 backdrop-blur-2xl border-t border-slate-800 rounded-t-3xl p-4 flex flex-col max-h-[70vh] transition-all shadow-2xl text-left items-start">
+            <div className="absolute inset-x-0 bottom-0 z-50 bg-slate-900/98 backdrop-blur-2xl border-t border-slate-800 rounded-t-3xl p-4 flex flex-col max-h-[70vh] transition-all shadow-2xl text-left items-start" onClick={(e) => e.stopPropagation()}>
               
               <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto my-1 self-center"></div>
 
@@ -1062,7 +1124,7 @@ export default function CommunityPage() {
                 <div className="relative w-full h-[140px] bg-slate-950 rounded-xl overflow-hidden border border-pink-500/30">
                   <div className="w-full h-full flex items-center justify-center">
                     {mediaType === 'video' ? (
-                      <span className="text-xs text-emerald-400">📹 Video uploaded to Cloudinary successfully</span>
+                      <span className="text-xs text-emerald-400">📹 Video selected successfully (Uploading...)</span>
                     ) : (
                       <img src={mediaFile} alt="Preview" className="h-full object-contain" />
                     )}
