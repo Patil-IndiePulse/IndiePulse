@@ -66,8 +66,8 @@ export default function CommunityPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
   
-  // Full-screen Viewer States
-  const [selectedMediaPost, setSelectedMediaPost] = useState<any>(null);
+  // Full-screen Viewer States (stores active post ID so it always stays in sync with live posts)
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");
   const [commentMediaFiles, setCommentMediaFiles] = useState<string[]>([]);
   const [postComments, setPostComments] = useState<{[key: string]: Array<{id: string, author: string, authorAvatar?: string, text: string, media?: string[], time?: string, createdAt?: number, likes?: number}>}>({});
@@ -88,6 +88,12 @@ export default function CommunityPage() {
   const commentFileInputRef = useRef<HTMLInputElement>(null);
   const latestUploadedUrlRef = useRef<string | null>(null);
   const activeUploadPromiseRef = useRef<Promise<string> | null>(null);
+  const idAliasMapRef = useRef<{[oldId: string]: string}>({});
+
+  // Always derive the live selectedMediaPost directly from posts array
+  const selectedMediaPost = selectedPostId 
+    ? posts.find((p) => p.id === selectedPostId || p.clientPostId === selectedPostId || idAliasMapRef.current[selectedPostId] === p.id) || null
+    : null;
 
   // Sync profile name & avatar live from localStorage / Auth
   const syncProfileData = () => {
@@ -111,7 +117,12 @@ export default function CommunityPage() {
   const smartSavePosts = (postsToSave: any[]) => {
     if (typeof window === 'undefined') return;
     try {
-      localStorage.setItem('indiePulse_community_posts_persistent_v100', JSON.stringify(postsToSave));
+      // Do not save temporary blob URLs into localStorage so refresh never breaks media
+      const cleanPosts = postsToSave.map((p) => ({
+        ...p,
+        media: p.media && typeof p.media === 'string' && p.media.startsWith('blob:') ? (p.cloudMedia || null) : p.media
+      }));
+      localStorage.setItem('indiePulse_community_posts_persistent_v100', JSON.stringify(cleanPosts));
     } catch (e) {
       try {
         localStorage.removeItem('indiePulse_community_posts_v45');
@@ -170,6 +181,11 @@ export default function CommunityPage() {
       if (savedReposts) {
         try { setUserRepostedPosts(JSON.parse(savedReposts)); } catch (e) { setUserRepostedPosts({}); }
       }
+
+      const savedShares = localStorage.getItem('indiePulse_user_shares_v1');
+      if (savedShares) {
+        try { setUserSharedPosts(JSON.parse(savedShares)); } catch (e) { setUserSharedPosts({}); }
+      }
     }
 
     let unsubscribePosts: () => void;
@@ -192,11 +208,33 @@ export default function CommunityPage() {
           if (fetchedPosts.length > 0) {
             setPosts((prevPosts) => {
               const mergedMap = new Map();
-              [...fetchedPosts, ...prevPosts].forEach(p => {
-                if (p && p.id && !mergedMap.has(p.id)) {
-                  mergedMap.set(p.id, p);
+
+              // 1. Add Firestore posts first (deduplicated by clientPostId or id)
+              fetchedPosts.forEach((fp: any) => {
+                const uniqueKey = fp.clientPostId || fp.id;
+                mergedMap.set(uniqueKey, fp);
+              });
+
+              // 2. Merge local posts without duplicating already synced posts
+              prevPosts.forEach((lp: any) => {
+                if (!lp || !lp.id) return;
+                const uniqueKey = lp.clientPostId || lp.id;
+                if (mergedMap.has(uniqueKey)) {
+                  const existing = mergedMap.get(uniqueKey);
+                  // Keep local higher engagement counts if Firestore sync hasn't finished yet, and preserve playable media URL
+                  mergedMap.set(uniqueKey, {
+                    ...existing,
+                    media: existing.media || lp.media,
+                    likes: Math.max(existing.likes || 0, lp.likes || 0),
+                    comments: Math.max(existing.comments || 0, lp.comments || 0),
+                    reposts: Math.max(existing.reposts || 0, lp.reposts || 0),
+                    shares: Math.max(existing.shares || 0, lp.shares || 0),
+                  });
+                } else {
+                  mergedMap.set(uniqueKey, lp);
                 }
               });
+
               const finalMerged = Array.from(mergedMap.values()).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
               smartSavePosts(finalMerged);
               return finalMerged;
@@ -236,7 +274,7 @@ export default function CommunityPage() {
   };
 
   const openMediaViewer = (post: any) => {
-    setSelectedMediaPost(post);
+    setSelectedPostId(post.id);
     setIsPlaying(true);
     setVideoProgress(0);
     if (typeof window !== 'undefined') {
@@ -257,8 +295,8 @@ export default function CommunityPage() {
     const handlePopState = (e: PopStateEvent) => {
       if (showCommentSheet) {
         setShowCommentSheet(false);
-      } else if (selectedMediaPost) {
-        setSelectedMediaPost(null);
+      } else if (selectedPostId) {
+        setSelectedPostId(null);
       } else if (isModalOpen) {
         setIsModalOpen(false);
       }
@@ -268,7 +306,7 @@ export default function CommunityPage() {
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [isModalOpen, selectedMediaPost, showCommentSheet]);
+  }, [isModalOpen, selectedPostId, showCommentSheet]);
 
   const currentEmail = user?.email || 'bharatrajupatil5200@gmail.com';
 
@@ -351,7 +389,7 @@ export default function CommunityPage() {
     activeUploadPromiseRef.current = null;
   };
 
-  // Instant Post Submission with immediate '✓ Success' and automatic back
+  // Instant Post Submission with immediate '✓ Success', automatic back, and zero duplicate posts
   const executePostSubmission = async (e: any) => {
     if (e) {
       e.preventDefault();
@@ -374,7 +412,7 @@ export default function CommunityPage() {
     const currentLatestAvatar = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : userAvatar;
     const currentLatestName = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_name') || currentName) : currentName;
     const nowTimestamp = Date.now();
-    const tempPostId = 'local_' + nowTimestamp;
+    const clientPostId = `post_${nowTimestamp}_${Math.random().toString(36).substring(2, 7)}`;
 
     const initialMediaUrl = latestUploadedUrlRef.current || mediaFile;
     const capturedContent = newPost;
@@ -382,6 +420,7 @@ export default function CommunityPage() {
     const pendingUploadPromise = activeUploadPromiseRef.current;
 
     const newPostObj = {
+      clientPostId,
       authorName: currentLatestName,
       authorEmail: currentEmail,
       authorAvatar: currentLatestAvatar,
@@ -396,7 +435,7 @@ export default function CommunityPage() {
     };
 
     // 2. Immediately update feed so it feels instant
-    const finalPostObj = { id: tempPostId, ...newPostObj };
+    const finalPostObj = { id: clientPostId, ...newPostObj };
     setPosts((prev) => {
       const updated = [finalPostObj, ...prev];
       smartSavePosts(updated);
@@ -414,14 +453,18 @@ export default function CommunityPage() {
       activeUploadPromiseRef.current = null;
     }, 350);
 
-    // 4. Finish upload (if still running) & sync to Firestore in background
+    // 4. Finish upload (if still running) & sync to Firestore in background without duplicating
     (async () => {
       let finalCloudMediaUrl = initialMediaUrl;
       if (pendingUploadPromise && (!finalCloudMediaUrl || finalCloudMediaUrl.startsWith('blob:'))) {
         try {
           finalCloudMediaUrl = await pendingUploadPromise;
           setPosts((prev) => {
-            const updated = prev.map((p) => p.id === tempPostId ? { ...p, media: finalCloudMediaUrl } : p);
+            const updated = prev.map((p) =>
+              (p.id === clientPostId || p.clientPostId === clientPostId)
+                ? { ...p, media: finalCloudMediaUrl, cloudMedia: finalCloudMediaUrl }
+                : p
+            );
             smartSavePosts(updated);
             return updated;
           });
@@ -432,13 +475,81 @@ export default function CommunityPage() {
 
       if (db) {
         try {
+          // Read latest counts in case user already liked/commented/reposted/shared while video was uploading
+          let latestCounts = { likes: 0, comments: 0, reposts: 0, shares: 0 };
+          setPosts((prev) => {
+            const currentMatch = prev.find((p) => p.id === clientPostId || p.clientPostId === clientPostId);
+            if (currentMatch) {
+              latestCounts = {
+                likes: currentMatch.likes || 0,
+                comments: currentMatch.comments || 0,
+                reposts: currentMatch.reposts || 0,
+                shares: currentMatch.shares || 0,
+              };
+            }
+            return prev;
+          });
+
           const firestorePayload = {
             ...newPostObj,
+            ...latestCounts,
             media: finalCloudMediaUrl && !finalCloudMediaUrl.startsWith('blob:') ? finalCloudMediaUrl : null
           };
+
           const docRef = await addDoc(collection(db, "posts"), firestorePayload);
+          const realFirestoreId = docRef.id;
+          idAliasMapRef.current[clientPostId] = realFirestoreId;
+
+          // Migrate any early user interactions from clientPostId to realFirestoreId
+          setUserLikedPosts((prev) => {
+            if (prev[clientPostId]) {
+              const next = { ...prev, [realFirestoreId]: true };
+              smartSaveLocalStorage('indiePulse_user_likes_v1', next);
+              return next;
+            }
+            return prev;
+          });
+
+          setUserRepostedPosts((prev) => {
+            if (prev[clientPostId]) {
+              const next = { ...prev, [realFirestoreId]: true };
+              smartSaveLocalStorage('indiePulse_user_reposts_v1', next);
+              return next;
+            }
+            return prev;
+          });
+
+          setUserSharedPosts((prev) => {
+            if (prev[clientPostId]) {
+              const next = { ...prev, [realFirestoreId]: true };
+              smartSaveLocalStorage('indiePulse_user_shares_v1', next);
+              return next;
+            }
+            return prev;
+          });
+
+          setPostComments((prev) => {
+            if (prev[clientPostId] && prev[clientPostId].length > 0) {
+              const next = {
+                ...prev,
+                [realFirestoreId]: [...prev[clientPostId], ...(prev[realFirestoreId] || [])]
+              };
+              smartSaveLocalStorage('indiePulse_comments_v1', next);
+              return next;
+            }
+            return prev;
+          });
+
+          setSelectedPostId((prevId) => (prevId === clientPostId ? realFirestoreId : prevId));
+
           setPosts((prev) => {
-            const updated = prev.map((p) => p.id === tempPostId ? { ...p, id: docRef.id, media: finalCloudMediaUrl } : p);
+            // Remove any duplicate that onSnapshot might have inserted simultaneously
+            const filtered = prev.filter((p) => p.id !== realFirestoreId);
+            const updated = filtered.map((p) =>
+              (p.id === clientPostId || p.clientPostId === clientPostId)
+                ? { ...p, id: realFirestoreId, media: finalCloudMediaUrl, cloudMedia: finalCloudMediaUrl }
+                : p
+            );
             smartSavePosts(updated);
             return updated;
           });
@@ -449,17 +560,22 @@ export default function CommunityPage() {
     })();
   };
 
-  const handleLike = async (id: string, e?: any) => {
+  // Resolve real ID if post just finished syncing to Firestore
+  const resolvePostId = (id: string) => idAliasMapRef.current[id] || id;
+
+  const handleLike = async (rawId: string, e?: any) => {
     if (e) e.stopPropagation();
+    const id = resolvePostId(rawId);
     
-    const isCurrentlyLiked = !!userLikedPosts[id];
+    const isCurrentlyLiked = !!(userLikedPosts[id] || userLikedPosts[rawId]);
     const newLikedState = !isCurrentlyLiked;
     
-    const updatedLikedMap = { ...userLikedPosts, [id]: newLikedState };
+    const updatedLikedMap = { ...userLikedPosts, [id]: newLikedState, [rawId]: newLikedState };
     setUserLikedPosts(updatedLikedMap);
+    smartSaveLocalStorage('indiePulse_user_likes_v1', updatedLikedMap);
 
     const updatedPosts = posts.map((post) => {
-      if (post.id === id) {
+      if (post.id === id || post.id === rawId || post.clientPostId === rawId) {
         const currentLikes = typeof post.likes === 'number' ? post.likes : 0;
         const newLikesCount = newLikedState ? currentLikes + 1 : Math.max(0, currentLikes - 1);
         return { ...post, likes: newLikesCount };
@@ -468,17 +584,9 @@ export default function CommunityPage() {
     });
 
     setPosts(updatedPosts);
-
-    if (selectedMediaPost && selectedMediaPost.id === id) {
-      const currentLikes = typeof selectedMediaPost.likes === 'number' ? selectedMediaPost.likes : 0;
-      const newLikesCount = newLikedState ? currentLikes + 1 : Math.max(0, currentLikes - 1);
-      setSelectedMediaPost({ ...selectedMediaPost, likes: newLikesCount });
-    }
-
     smartSavePosts(updatedPosts);
-    smartSaveLocalStorage('indiePulse_user_likes_v1', updatedLikedMap);
 
-    if (db && id && !id.startsWith('local_')) {
+    if (db && id && !id.startsWith('local_') && !id.startsWith('post_')) {
       try {
         const postRef = doc(db, "posts", id);
         await updateDoc(postRef, {
@@ -490,17 +598,19 @@ export default function CommunityPage() {
     }
   };
 
-  const handleRepost = async (id: string, e?: any) => {
+  const handleRepost = async (rawId: string, e?: any) => {
     if (e) e.stopPropagation();
+    const id = resolvePostId(rawId);
 
-    const isCurrentlyReposted = !!userRepostedPosts[id];
+    const isCurrentlyReposted = !!(userRepostedPosts[id] || userRepostedPosts[rawId]);
     const newRepostState = !isCurrentlyReposted;
 
-    const updatedRepostMap = { ...userRepostedPosts, [id]: newRepostState };
+    const updatedRepostMap = { ...userRepostedPosts, [id]: newRepostState, [rawId]: newRepostState };
     setUserRepostedPosts(updatedRepostMap);
+    smartSaveLocalStorage('indiePulse_user_reposts_v1', updatedRepostMap);
 
     const updatedPosts = posts.map((post) => {
-      if (post.id === id) {
+      if (post.id === id || post.id === rawId || post.clientPostId === rawId) {
         const currentReposts = typeof post.reposts === 'number' ? post.reposts : 0;
         const newCount = newRepostState ? currentReposts + 1 : Math.max(0, currentReposts - 1);
         return { ...post, reposts: newCount };
@@ -509,22 +619,14 @@ export default function CommunityPage() {
     });
 
     setPosts(updatedPosts);
-
-    if (selectedMediaPost && selectedMediaPost.id === id) {
-      const currentReposts = typeof selectedMediaPost.reposts === 'number' ? selectedMediaPost.reposts : 0;
-      const newCount = newRepostState ? currentReposts + 1 : Math.max(0, currentReposts - 1);
-      setSelectedMediaPost({ ...selectedMediaPost, reposts: newCount });
-    }
+    smartSavePosts(updatedPosts);
 
     if (newRepostState) {
       setShowRepostToast(true);
       setTimeout(() => setShowRepostToast(false), 3000);
     }
 
-    smartSavePosts(updatedPosts);
-    smartSaveLocalStorage('indiePulse_user_reposts_v1', updatedRepostMap);
-
-    if (db && id && !id.startsWith('local_')) {
+    if (db && id && !id.startsWith('local_') && !id.startsWith('post_')) {
       try {
         const postRef = doc(db, "posts", id);
         await updateDoc(postRef, {
@@ -538,13 +640,15 @@ export default function CommunityPage() {
 
   const handleShare = async (post: any, e?: any) => {
     if (e) e.stopPropagation();
+    const id = resolvePostId(post.id);
     
-    if (!userSharedPosts[post.id]) {
-      const updatedSharesMap = { ...userSharedPosts, [post.id]: true };
+    if (!userSharedPosts[id] && !userSharedPosts[post.id]) {
+      const updatedSharesMap = { ...userSharedPosts, [id]: true, [post.id]: true };
       setUserSharedPosts(updatedSharesMap);
+      smartSaveLocalStorage('indiePulse_user_shares_v1', updatedSharesMap);
 
       const updatedPosts = posts.map((p) => {
-        if (p.id === post.id) {
+        if (p.id === id || p.id === post.id || p.clientPostId === post.id) {
           const currentShares = typeof p.shares === 'number' ? p.shares : 0;
           return { ...p, shares: currentShares + 1 };
         }
@@ -552,17 +656,11 @@ export default function CommunityPage() {
       });
 
       setPosts(updatedPosts);
-
-      if (selectedMediaPost && selectedMediaPost.id === post.id) {
-        const currentShares = typeof selectedMediaPost.shares === 'number' ? selectedMediaPost.shares : 0;
-        setSelectedMediaPost({ ...selectedMediaPost, shares: currentShares + 1 });
-      }
-
       smartSavePosts(updatedPosts);
 
-      if (db && post.id && !post.id.startsWith('local_')) {
+      if (db && id && !id.startsWith('local_') && !id.startsWith('post_')) {
         try {
-          const postRef = doc(db, "posts", post.id);
+          const postRef = doc(db, "posts", id);
           await updateDoc(postRef, {
             shares: increment(1)
           });
@@ -573,7 +671,7 @@ export default function CommunityPage() {
     }
 
     if (navigator.share) {
-     navigator.share({
+      navigator.share({
         title: 'IndiePulse Clips',
         text: post.content || 'Check out this clip on IndiePulse!',
         url: window.location.href,
@@ -584,8 +682,9 @@ export default function CommunityPage() {
     }
   };
 
-  const handleAddComment = async (postId: string) => {
+  const handleAddComment = async (rawPostId: string) => {
     if (!commentText.trim() && commentMediaFiles.length === 0) return;
+    const postId = resolvePostId(rawPostId);
 
     syncProfileData();
     const currentLatestAvatar = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_pic') || localStorage.getItem('indiePulse_user_avatar')) : userAvatar;
@@ -602,17 +701,22 @@ export default function CommunityPage() {
       likes: 0
     };
 
+    const existingList = postComments[postId] || postComments[rawPostId] || [];
     const updatedComments = {
       ...postComments,
-      [postId]: [newCommentObj, ...(postComments[postId] || [])]
+      [postId]: [newCommentObj, ...existingList]
     };
+    if (rawPostId !== postId) {
+      updatedComments[rawPostId] = [newCommentObj, ...existingList];
+    }
 
     setPostComments(updatedComments);
+    smartSaveLocalStorage('indiePulse_comments_v1', updatedComments);
     setCommentText("");
     setCommentMediaFiles([]);
 
     const updatedPosts = posts.map((post) => {
-      if (post.id === postId) {
+      if (post.id === postId || post.id === rawPostId || post.clientPostId === rawPostId) {
         const currentComments = typeof post.comments === 'number' ? post.comments : 0;
         return { ...post, comments: currentComments + 1 };
       }
@@ -620,16 +724,9 @@ export default function CommunityPage() {
     });
 
     setPosts(updatedPosts);
-
-    if (selectedMediaPost && selectedMediaPost.id === postId) {
-      const currentComments = typeof selectedMediaPost.comments === 'number' ? selectedMediaPost.comments : 0;
-      setSelectedMediaPost({ ...selectedMediaPost, comments: currentComments + 1 });
-    }
-
-    smartSaveLocalStorage('indiePulse_comments_v1', updatedComments);
     smartSavePosts(updatedPosts);
 
-    if (db && postId && !postId.startsWith('local_')) {
+    if (db && postId && !postId.startsWith('local_') && !postId.startsWith('post_')) {
       try {
         await addDoc(collection(db, `posts/${postId}/comments`), newCommentObj);
         const postRef = doc(db, "posts", postId);
@@ -642,14 +739,16 @@ export default function CommunityPage() {
     }
   };
 
-  const handleCommentLike = (commentId: string, postId: string) => {
+  const handleCommentLike = (commentId: string, rawPostId: string) => {
+    const postId = resolvePostId(rawPostId);
     const isLiked = !!commentLikedState[commentId];
     const newLikedState = !isLiked;
     
     setCommentLikedState((prev) => ({ ...prev, [commentId]: newLikedState }));
 
-    if (postComments[postId]) {
-      const updatedCommentsList = postComments[postId].map((c) => {
+    const targetList = postComments[postId] || postComments[rawPostId];
+    if (targetList) {
+      const updatedCommentsList = targetList.map((c) => {
         if (c.id === commentId) {
           const currentLikes = c.likes || 0;
           return { ...c, likes: newLikedState ? currentLikes + 1 : Math.max(0, currentLikes - 1) };
@@ -658,6 +757,9 @@ export default function CommunityPage() {
       });
 
       const updatedMap = { ...postComments, [postId]: updatedCommentsList };
+      if (rawPostId !== postId) {
+        updatedMap[rawPostId] = updatedCommentsList;
+      }
       setPostComments(updatedMap);
       smartSaveLocalStorage('indiePulse_comments_v1', updatedMap);
     }
@@ -694,6 +796,10 @@ export default function CommunityPage() {
       </div>
     );
   };
+
+  const activeCommentsList = selectedMediaPost
+    ? (postComments[selectedMediaPost.id] || (selectedMediaPost.clientPostId ? postComments[selectedMediaPost.clientPostId] : []) || [])
+    : [];
 
   return (
     <main className="min-h-screen bg-slate-950 text-white flex flex-col px-4 py-6 max-w-xl mx-auto w-full relative overflow-x-hidden select-none">
@@ -732,11 +838,14 @@ export default function CommunityPage() {
             const liveName = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_name') || currentName) : currentName;
             const isMyPost = post.authorEmail === currentEmail || post.authorName === liveName || post.authorName === 'Bharat Patil' || post.authorName === 'Jayvaant Patil' || post.authorName === 'Saily';
             const displayAuthor = isMyPost ? "You" : post.authorName;
-            const isLiked = !!userLikedPosts[post.id];
+            const isLiked = !!(userLikedPosts[post.id] || (post.clientPostId && userLikedPosts[post.clientPostId]));
+            const isReposted = !!(userRepostedPosts[post.id] || (post.clientPostId && userRepostedPosts[post.clientPostId]));
+            const savedCommentCount = (postComments[post.id] || (post.clientPostId ? postComments[post.clientPostId] : []) || []).length;
+            const displayCommentsCount = Math.max(typeof post.comments === 'number' ? post.comments : 0, savedCommentCount);
 
             return (
               <div 
-                key={post.id} 
+                key={post.clientPostId || post.id} 
                 className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 transition-all flex flex-col items-start justify-start text-left gap-2.5 w-full"
               >
                 <div className="flex justify-between items-center w-full">
@@ -782,11 +891,11 @@ export default function CommunityPage() {
                     className="flex items-center gap-1.5 hover:text-pink-400 transition-colors cursor-pointer"
                   >
                     <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                    <span>{formatCount(post.comments)}</span>
+                    <span>{formatCount(displayCommentsCount)}</span>
                   </button>
                   <button 
                     onClick={(e) => handleRepost(post.id, e)}
-                    className="flex items-center gap-1.5 hover:text-pink-400 transition-colors cursor-pointer"
+                    className={`flex items-center gap-1.5 transition-colors cursor-pointer ${isReposted ? 'text-green-400 font-bold' : 'hover:text-pink-400'}`}
                   >
                     <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
                     <span>{formatCount(post.reposts)}</span>
@@ -885,7 +994,7 @@ export default function CommunityPage() {
                 className="flex flex-col items-center justify-center gap-0.5 text-white active:scale-125 transition-all cursor-pointer drop-shadow-lg"
               >
                 <div className="p-1">
-                  {userLikedPosts[selectedMediaPost.id] ? (
+                  {(userLikedPosts[selectedMediaPost.id] || (selectedMediaPost.clientPostId && userLikedPosts[selectedMediaPost.clientPostId])) ? (
                     <svg className="w-7 h-7 text-red-500 fill-current drop-shadow-md" viewBox="0 0 24 24">
                       <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
@@ -907,7 +1016,7 @@ export default function CommunityPage() {
                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
                   </svg>
                 </div>
-                <span className="text-[11px] font-semibold drop-shadow">{formatCount(selectedMediaPost.comments)}</span>
+                <span className="text-[11px] font-semibold drop-shadow">{formatCount(Math.max(selectedMediaPost.comments || 0, activeCommentsList.length))}</span>
               </button>
 
               <button 
@@ -915,7 +1024,7 @@ export default function CommunityPage() {
                 className="flex flex-col items-center justify-center gap-0.5 text-white hover:opacity-80 active:scale-125 transition-all cursor-pointer drop-shadow-lg"
               >
                 <div className="p-1">
-                  <svg className={`w-7 h-7 fill-none stroke-current stroke-[2] ${userRepostedPosts[selectedMediaPost.id] ? 'text-green-400' : 'text-white'}`} viewBox="0 0 24 24">
+                  <svg className={`w-7 h-7 fill-none stroke-current stroke-[2] ${(userRepostedPosts[selectedMediaPost.id] || (selectedMediaPost.clientPostId && userRepostedPosts[selectedMediaPost.clientPostId])) ? 'text-green-400' : 'text-white'}`} viewBox="0 0 24 24">
                     <path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
                   </svg>
                 </div>
@@ -968,10 +1077,10 @@ export default function CommunityPage() {
               <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto my-1 self-center"></div>
 
               <div className="flex flex-col gap-4 my-3 overflow-y-auto max-h-56 pr-1 text-left items-start justify-start w-full">
-                {(postComments[selectedMediaPost.id] || []).length === 0 ? (
+                {activeCommentsList.length === 0 ? (
                   <p className="text-slate-500 text-xs text-center py-6 w-full">No comments yet. Be the first to comment!</p>
                 ) : (
-                  (postComments[selectedMediaPost.id] || []).map((c) => {
+                  activeCommentsList.map((c) => {
                     const isCommentLiked = !!commentLikedState[c.id];
                     const commentLikesCount = c.likes || 0;
                     const liveName = typeof window !== 'undefined' ? (localStorage.getItem('indiePulse_name') || currentName) : currentName;
@@ -1211,4 +1320,4 @@ export default function CommunityPage() {
 
     </main>
   );
-} 
+}
