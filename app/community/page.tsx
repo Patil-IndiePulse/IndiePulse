@@ -264,60 +264,57 @@ export default function CommunityPage() {
 
   const currentEmail = user?.email || 'bharatrajupatil5200@gmail.com';
 
-  const compressImage = (file: File, callback: (compressedDataUrl: string) => void) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target?.result as string;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 400;
-        const scaleFactor = MAX_WIDTH / img.width;
-        
-        if (img.width > MAX_WIDTH) {
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scaleFactor;
-        } else {
-          canvas.width = img.width;
-          canvas.height = img.height;
-        }
+  // Cloudinary Upload Integration Function for Videos and Images
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "indiepulse_preset"); // Created Preset
 
-        const ctx = canvas.getContext('2d');
-        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const compressedUrl = canvas.toDataURL('image/jpeg', 0.5);
-        callback(compressedUrl);
-      };
-    };
+    const resourceType = file.type.startsWith('video') ? 'video' : 'image';
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/xfd36qxj/${resourceType}/upload`, // Cloud Name: xfd36qxj
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const data = await response.json();
+    if (data.secure_url) {
+      return data.secure_url;
+    } else {
+      throw new Error("Cloudinary upload failed");
+    }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.type.startsWith('image')) {
-        compressImage(file, (compressedBase64) => {
-          setMediaFile(compressedBase64);
-          setMediaType('image');
-        });
-      } else {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setMediaFile(reader.result as string);
-          setMediaType('video');
-        };
-        reader.readAsDataURL(file);
+      try {
+        setIsSubmitting(true);
+        const uploadedUrl = await uploadToCloudinary(file);
+        setMediaFile(uploadedUrl);
+        setMediaType(file.type.startsWith('video') ? 'video' : 'image');
+      } catch (err) {
+        console.error("Upload error:", err);
+        alert("Failed to upload file to Cloudinary. Please try again.");
+      } finally {
+        setIsSubmitting(false);
       }
     }
   };
 
-  const handleCommentMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCommentMediaChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      Array.from(files).forEach((file) => {
-        compressImage(file, (compressedBase64) => {
-          setCommentMediaFiles((prev) => [...prev, compressedBase64]);
-        });
-      });
+      for (let i = 0; i < files.length; i++) {
+        try {
+          const uploadedUrl = await uploadToCloudinary(files[i]);
+          setCommentMediaFiles((prev) => [...prev, uploadedUrl]);
+        } catch (err) {
+          console.error("Comment media upload error:", err);
+        }
+      }
     }
   };
 
@@ -586,6 +583,7 @@ export default function CommunityPage() {
       }
     }
   };
+
   const handleCommentLike = (commentId: string, postId: string) => {
     const isLiked = !!commentLikedState[commentId];
     const newLikedState = !isLiked;
@@ -1064,7 +1062,7 @@ export default function CommunityPage() {
                 <div className="relative w-full h-[140px] bg-slate-950 rounded-xl overflow-hidden border border-pink-500/30">
                   <div className="w-full h-full flex items-center justify-center">
                     {mediaType === 'video' ? (
-                      <span className="text-xs text-emerald-400">📹 Video attached successfully</span>
+                      <span className="text-xs text-emerald-400">📹 Video uploaded to Cloudinary successfully</span>
                     ) : (
                       <img src={mediaFile} alt="Preview" className="h-full object-contain" />
                     )}
