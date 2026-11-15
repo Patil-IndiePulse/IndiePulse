@@ -64,16 +64,16 @@ export default function IndiePulseEcoSystemPage() {
       {/* VIEW 1: DISCOVER (Swipe Feed) */}
       {/* ========================================================= */}
       {activeView === 'discover' && (
-        <div className="flex flex-col gap-4 relative z-10">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-3xl shadow-2xl relative overflow-hidden">
+        <div className="flex flex-col gap-4 relative z-10 text-left">
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-3xl shadow-2xl relative overflow-hidden text-left">
             <div className="absolute inset-0 bg-cover bg-center opacity-30 filter blur-sm" style={{ backgroundImage: `url(${gamesList[0].banner})` }}></div>
-            <div className="relative z-10 flex flex-col items-center text-center py-8">
+            <div className="relative z-10 flex flex-col items-start text-left py-6">
               <span className="px-3 py-1 rounded-full bg-pink-500/20 text-pink-400 text-[10px] font-bold mb-2 border border-pink-500/30">🔥 DISCOVER SWIPE FEED</span>
-              <h2 className="text-2xl font-black mb-1.5">{gamesList[0].title}</h2>
-              <p className="text-slate-300 text-xs max-w-xs mb-5 leading-relaxed">{gamesList[0].desc}</p>
+              <h2 className="text-2xl font-black mb-1.5 text-left w-full">{gamesList[0].title}</h2>
+              <p className="text-slate-300 text-xs max-w-xs mb-5 leading-relaxed text-left w-full">{gamesList[0].desc}</p>
               
               {/* Short & Compact Balanced Buttons */}
-              <div className="flex items-center justify-center gap-2.5 w-full">
+              <div className="flex items-center justify-start gap-2.5 w-full">
                 <button 
                   onClick={() => { setSelectedGame(gamesList[0]); setActiveView('playGame'); }}
                   className="py-2.5 px-5 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl shadow-md text-xs cursor-pointer flex items-center gap-1.5"
@@ -90,16 +90,16 @@ export default function IndiePulseEcoSystemPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={() => setActiveView('browse')} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl text-left hover:border-pink-500/50 transition-all cursor-pointer shadow-md">
-              <span className="text-xl">🔥</span>
-              <h4 className="font-bold text-xs mt-1 text-left w-full">Browse All</h4>
-              <p className="text-[10px] text-slate-400 text-left w-full">Explore game catalog</p>
+          <div className="grid grid-cols-2 gap-3 text-left">
+            <button onClick={() => setActiveView('browse')} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl text-left hover:border-pink-500/50 transition-all cursor-pointer shadow-md flex flex-col items-start justify-start">
+              <span className="text-xl mb-1">🔥</span>
+              <h4 className="font-bold text-xs text-left w-full">Browse All</h4>
+              <p className="text-[10px] text-slate-400 text-left w-full mt-0.5">Explore game catalog</p>
             </button>
-            <button onClick={() => setActiveView('submitGame')} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl text-left hover:border-pink-500/50 transition-all cursor-pointer shadow-md">
-              <span className="text-xl">🚀</span>
-              <h4 className="font-bold text-xs mt-1 text-left w-full">Submit Game</h4>
-              <p className="text-[10px] text-slate-400 text-left w-full">Publish your title</p>
+            <button onClick={() => setActiveView('submitGame')} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl text-left hover:border-pink-500/50 transition-all cursor-pointer shadow-md flex flex-col items-start justify-start">
+              <span className="text-xl mb-1">🚀</span>
+              <h4 className="font-bold text-xs text-left w-full">Submit Game</h4>
+              <p className="text-[10px] text-slate-400 text-left w-full mt-0.5">Publish your title</p>
             </button>
           </div>
         </div>
@@ -110,7 +110,7 @@ export default function IndiePulseEcoSystemPage() {
       {/* ========================================================= */}
       {activeView === 'browse' && (
         <div className="flex flex-col gap-4 relative z-10 text-left">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-4 rounded-2xl shadow-xl">
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-4 rounded-2xl shadow-xl text-left">
             <h2 className="text-lg font-black mb-2.5 text-left w-full">🔥 All Indie Games Catalog</h2>
             <input 
               type="text" 
@@ -359,32 +359,32 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-      {/* FIXED BOTTOM NAVIGATION DOCK (Fully Visible & Perfectly Fitted) */}
+      {/* FIXED BOTTOM NAVIGATION DOCK (Fully Visible & Un-truncated Names) */}
       {/* ========================================================= */}
-      <div className="fixed bottom-0 inset-x-0 bg-slate-950/98 backdrop-blur-2xl border-t border-slate-800 py-2 px-1 z-50 max-w-xl mx-auto grid grid-cols-6 text-[9px] sm:text-[10px] font-bold text-slate-400">
-        <button onClick={() => setActiveView('discover')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 ${activeView === 'discover' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+      <div className="fixed bottom-0 inset-x-0 bg-slate-950/98 backdrop-blur-2xl border-t border-slate-800 py-2 px-1 z-50 max-w-xl mx-auto grid grid-cols-6 text-[8.5px] sm:text-[10px] font-bold text-slate-400">
+        <button onClick={() => setActiveView('discover')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0.5 ${activeView === 'discover' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
           <span className="text-sm sm:text-base">🔥</span>
-          <span className="truncate w-full text-center">Discover</span>
+          <span className="w-full text-center truncate">Discover</span>
         </button>
-        <button onClick={() => setActiveView('browse')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 ${activeView === 'browse' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+        <button onClick={() => setActiveView('browse')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0.5 ${activeView === 'browse' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
           <span className="text-sm sm:text-base">🎮</span>
-          <span className="truncate w-full text-center">Browse</span>
+          <span className="w-full text-center truncate">Browse</span>
         </button>
-        <button onClick={() => setActiveView('submitGame')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 ${activeView === 'submitGame' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+        <button onClick={() => setActiveView('submitGame')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0.5 ${activeView === 'submitGame' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
           <span className="text-sm sm:text-base">🚀</span>
-          <span className="truncate w-full text-center">Submit</span>
+          <span className="w-full text-center truncate">Submit</span>
         </button>
-        <button onClick={() => setActiveView('playtest')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 ${activeView === 'playtest' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+        <button onClick={() => setActiveView('playtest')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0.5 ${activeView === 'playtest' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
           <span className="text-sm sm:text-base">🧪</span>
-          <span className="truncate w-full text-center">Playtest</span>
+          <span className="w-full text-center truncate">Playtest</span>
         </button>
-        <button onClick={() => setActiveView('teamFinder')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 ${activeView === 'teamFinder' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+        <button onClick={() => setActiveView('teamFinder')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0.5 ${activeView === 'teamFinder' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
           <span className="text-sm sm:text-base">👥</span>
-          <span className="truncate w-full text-center">Team</span>
+          <span className="w-full text-center truncate">Team</span>
         </button>
-        <button onClick={() => setActiveView('dashboard')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 ${activeView === 'dashboard' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+        <button onClick={() => setActiveView('dashboard')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0.5 ${activeView === 'dashboard' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
           <span className="text-sm sm:text-base">📊</span>
-          <span className="truncate w-full text-center">Stats</span>
+          <span className="w-full text-center truncate">Stats</span>
         </button>
       </div>
 
