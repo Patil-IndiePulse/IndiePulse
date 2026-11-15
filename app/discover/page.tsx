@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function IndiePulseEcoSystemPage() {
   const router = useRouter();
 
-  // Navigation View State ('discover' | 'browse' | 'gameDetail' | 'playGame' | 'projectDetail' | 'submitGame' | 'playtest' | 'teamFinder' | 'dashboard' | 'talent')
+  // Navigation View State
   const [activeView, setActiveView] = useState<'discover' | 'browse' | 'gameDetail' | 'playGame' | 'projectDetail' | 'submitGame' | 'playtest' | 'teamFinder' | 'dashboard' | 'talent'>('discover');
 
   // Interactive States
@@ -36,122 +36,96 @@ export default function IndiePulseEcoSystemPage() {
     { id: '2', title: "Playtest: Looking for 10 testers for Cyber Neon Runner v2", author: "Bharat Patil", tags: ["#Playtest", "#Feedback"] }
   ]);
 
-  // Submit Form States
-  const [newGameTitle, setNewGameTitle] = useState('');
-  const [newGameGenre, setNewGameGenre] = useState('Action');
-  const [newGameDesc, setNewGameDesc] = useState('');
   const [successToast, setSuccessToast] = useState(false);
 
-  const handleGameSubmit = (e: any) => {
-    e.preventDefault();
-    if (!newGameTitle.trim()) return;
-
-    const newEntry = {
-      id: Date.now().toString(),
-      title: newGameTitle,
-      creator: "You",
-      genre: newGameGenre,
-      plays: "1 play",
-      desc: newGameDesc || "Indie game crafted with passion.",
-      rating: "5.0 ⭐",
-      banner: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80"
-    };
-
-    setGamesList([newEntry, ...gamesList]);
+  const handlePublishGame = () => {
     setSuccessToast(true);
     setTimeout(() => {
       setSuccessToast(false);
-      setNewGameTitle('');
-      setNewGameDesc('');
       setActiveView('browse');
     }, 1500);
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white flex flex-col px-4 py-6 max-w-xl mx-auto w-full relative overflow-x-hidden select-none pb-24">
+    <main className="min-h-screen bg-slate-950 text-white flex flex-col px-3 py-6 max-w-xl mx-auto w-full relative overflow-x-hidden select-none pb-28">
       
       {/* Neon Glow Background Effects */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-600/15 rounded-full blur-3xl pointer-events-none"></div>
 
-      {/* Top Header & Back Navigation */}
-      <div className="w-full flex items-center justify-between mb-4 relative z-10">
-        <Link 
-          href="/" 
-          className="px-5 py-2 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:opacity-90 text-white text-xs font-bold shadow-[0_0_15px_rgba(236,72,153,0.4)] border border-pink-400/40 transition-all flex items-center justify-center cursor-pointer"
-        >
-          ← Home
-        </Link>
-        <span className="text-xs font-black tracking-widest text-pink-400 uppercase bg-slate-900/80 px-3.5 py-1.5 rounded-full border border-slate-800">
-          🎮 IndiePulse Ecosystem
+      {/* Top Header Badge (Without Home Button) */}
+      <div className="w-full flex items-center justify-center mb-4 relative z-10">
+        <span className="text-[11px] font-black tracking-widest text-pink-400 uppercase bg-slate-900/90 px-4 py-2 rounded-full border border-slate-800 shadow-md">
+          🎮 INDIEPULSE ECOSYSTEM
         </span>
       </div>
 
       {/* ========================================================= */}
-      {/* VIEW 1: DISCOVER (TikTok/Reels Swipe Feed) */}
+      {/* VIEW 1: DISCOVER (Swipe Feed) */}
       {/* ========================================================= */}
       {activeView === 'discover' && (
         <div className="flex flex-col gap-4 relative z-10">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-6 rounded-3xl shadow-2xl relative overflow-hidden">
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-3xl shadow-2xl relative overflow-hidden">
             <div className="absolute inset-0 bg-cover bg-center opacity-30 filter blur-sm" style={{ backgroundImage: `url(${gamesList[0].banner})` }}></div>
-            <div className="relative z-10 flex flex-col items-center text-center py-10">
-              <span className="px-3 py-1 rounded-full bg-pink-500/20 text-pink-400 text-[11px] font-bold mb-2 border border-pink-500/30">🔥 DISCOVER SWIPE FEED</span>
-              <h2 className="text-3xl font-black mb-2">{gamesList[0].title}</h2>
-              <p className="text-slate-300 text-xs max-w-xs mb-6">{gamesList[0].desc}</p>
+            <div className="relative z-10 flex flex-col items-center text-center py-8">
+              <span className="px-3 py-1 rounded-full bg-pink-500/20 text-pink-400 text-[10px] font-bold mb-2 border border-pink-500/30">🔥 DISCOVER SWIPE FEED</span>
+              <h2 className="text-2xl font-black mb-1.5">{gamesList[0].title}</h2>
+              <p className="text-slate-300 text-xs max-w-xs mb-5 leading-relaxed">{gamesList[0].desc}</p>
               
-              <div className="flex gap-3 w-full">
+              {/* Updated Buttons: Balanced Play Game & Sleek Interesting Details Button */}
+              <div className="flex items-center gap-3 w-full justify-center">
                 <button 
                   onClick={() => { setSelectedGame(gamesList[0]); setActiveView('playGame'); }}
-                  className="flex-1 py-3.5 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-2xl shadow-lg shadow-pink-600/40 text-sm cursor-pointer"
+                  className="flex-1 py-3 px-4 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-2xl shadow-lg shadow-pink-600/40 text-xs cursor-pointer flex items-center justify-center gap-1.5"
                 >
-                  ▶️ Play Game Now
+                  <span>▶️</span> Play Game Now
                 </button>
                 <button 
                   onClick={() => { setSelectedGame(gamesList[0]); setActiveView('gameDetail'); }}
-                  className="px-5 py-3.5 bg-slate-800/80 hover:bg-slate-800 text-slate-200 font-bold rounded-2xl border border-slate-700 text-sm cursor-pointer"
+                  className="px-4 py-3 bg-slate-800/90 hover:bg-slate-700 text-pink-300 font-semibold rounded-2xl border border-pink-500/30 text-xs cursor-pointer shadow-inner transition-all flex items-center gap-1"
                 >
-                  ℹ️ Details
+                  <span>✨</span> Details
                 </button>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <button onClick={() => setActiveView('browse')} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl text-left hover:border-pink-500/50 transition-all cursor-pointer">
+            <button onClick={() => setActiveView('browse')} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl text-left hover:border-pink-500/50 transition-all cursor-pointer shadow-md">
               <span className="text-xl">🔥</span>
-              <h4 className="font-bold text-sm mt-1">Browse All</h4>
-              <p className="text-[11px] text-slate-400">Explore game catalog</p>
+              <h4 className="font-bold text-xs mt-1">Browse All</h4>
+              <p className="text-[10px] text-slate-400">Explore game catalog</p>
             </button>
-            <button onClick={() => setActiveView('submitGame')} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl text-left hover:border-pink-500/50 transition-all cursor-pointer">
+            <button onClick={() => setActiveView('submitGame')} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl text-left hover:border-pink-500/50 transition-all cursor-pointer shadow-md">
               <span className="text-xl">🚀</span>
-              <h4 className="font-bold text-sm mt-1">Submit Game</h4>
-              <p className="text-[11px] text-slate-400">Publish your title</p>
+              <h4 className="font-bold text-xs mt-1">Submit Game</h4>
+              <p className="text-[10px] text-slate-400">Publish your title</p>
             </button>
           </div>
         </div>
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 2: BROWSE ALL (Catalog & Search) */}
+      {/* VIEW 2: BROWSE ALL */}
       {/* ========================================================= */}
       {activeView === 'browse' && (
         <div className="flex flex-col gap-4 relative z-10">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-xl">
-            <h2 className="text-xl font-black mb-3">🔥 All Indie Games Catalog</h2>
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-4 rounded-2xl shadow-xl">
+            <h2 className="text-lg font-black mb-2.5">🔥 All Indie Games Catalog</h2>
             <input 
               type="text" 
               placeholder="Search games by title or genre..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 mb-3"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 mb-2.5"
             />
             
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="flex gap-1.5 overflow-x-auto pb-1">
               {['All', 'Action', 'Adventure', 'Arcade', 'Shooter', 'Racing'].map((cat) => (
                 <button 
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap cursor-pointer transition-all ${selectedCategory === cat ? 'bg-pink-600 text-white shadow-md' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+                  className={`px-3 py-1 rounded-xl text-[11px] font-semibold whitespace-nowrap cursor-pointer transition-all ${selectedCategory === cat ? 'bg-pink-600 text-white shadow-md' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
                 >
                   {cat}
                 </button>
@@ -159,7 +133,7 @@ export default function IndiePulseEcoSystemPage() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2.5">
             {gamesList
               .filter(g => selectedCategory === 'All' || g.genre.toLowerCase().includes(selectedCategory.toLowerCase()))
               .filter(g => g.title.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -167,17 +141,17 @@ export default function IndiePulseEcoSystemPage() {
                 <div 
                   key={game.id} 
                   onClick={() => { setSelectedGame(game); setActiveView('gameDetail'); }}
-                  className="flex justify-between items-center p-4 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-pink-500/40 transition-all cursor-pointer"
+                  className="flex justify-between items-center p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-pink-500/40 transition-all cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
-                    <img src={game.banner} alt={game.title} className="w-12 h-12 rounded-xl object-cover border border-slate-700" />
+                    <img src={game.banner} alt={game.title} className="w-11 h-11 rounded-xl object-cover border border-slate-700" />
                     <div>
-                      <h3 className="font-bold text-white text-sm">{game.title}</h3>
-                      <p className="text-[11px] text-slate-400">By {game.creator} • <span className="text-pink-400">{game.genre}</span></p>
+                      <h3 className="font-bold text-white text-xs">{game.title}</h3>
+                      <p className="text-[10px] text-slate-400">By {game.creator} • <span className="text-pink-400">{game.genre}</span></p>
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <span className="text-emerald-400 font-bold text-xs">{game.plays}</span>
+                    <span className="text-emerald-400 font-bold text-[11px]">{game.plays}</span>
                   </div>
                 </div>
             ))}
@@ -189,26 +163,26 @@ export default function IndiePulseEcoSystemPage() {
       {/* VIEW 3: GAME DETAIL */}
       {/* ========================================================= */}
       {activeView === 'gameDetail' && selectedGame && (
-        <div className="flex flex-col gap-4 relative z-10">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-6 rounded-3xl shadow-2xl text-left">
-            <img src={selectedGame.banner} alt="Banner" className="w-full h-48 rounded-2xl object-cover mb-4 border border-slate-700 shadow-md" />
-            <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-black">{selectedGame.title}</h2>
-              <span className="bg-emerald-500/20 text-emerald-400 text-xs px-2.5 py-1 rounded-full font-bold">{selectedGame.rating}</span>
+        <div className="flex flex-col gap-4 relative z-10 text-left">
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-3xl shadow-2xl">
+            <img src={selectedGame.banner} alt="Banner" className="w-full h-44 rounded-2xl object-cover mb-3.5 border border-slate-700 shadow-md" />
+            <div className="flex justify-between items-start mb-1.5">
+              <h2 className="text-xl font-black">{selectedGame.title}</h2>
+              <span className="bg-emerald-500/20 text-emerald-400 text-[11px] px-2.5 py-0.5 rounded-full font-bold">{selectedGame.rating}</span>
             </div>
-            <p className="text-xs text-pink-400 font-semibold mb-3">Developed by {selectedGame.creator} • {selectedGame.genre}</p>
-            <p className="text-slate-300 text-xs leading-relaxed mb-6">{selectedGame.desc}</p>
+            <p className="text-[11px] text-pink-400 font-semibold mb-2.5">Developed by {selectedGame.creator} • {selectedGame.genre}</p>
+            <p className="text-slate-300 text-xs leading-relaxed mb-5">{selectedGame.desc}</p>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2.5">
               <button 
                 onClick={() => setActiveView('playGame')}
-                className="w-full py-3.5 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl shadow-lg shadow-pink-600/40 text-sm cursor-pointer"
+                className="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl shadow-lg shadow-pink-600/40 text-xs cursor-pointer"
               >
                 🎮 Play Game Now (WebGL)
               </button>
               <button 
                 onClick={() => setActiveView('projectDetail')}
-                className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs cursor-pointer border border-slate-700"
+                className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-[11px] cursor-pointer border border-slate-700"
               >
                 📜 View Dev Logs & Project Updates
               </button>
@@ -218,23 +192,23 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 4: PLAY GAME (Instant WebGL Simulator) */}
+      {/* VIEW 4: PLAY GAME */}
       {/* ========================================================= */}
       {activeView === 'playGame' && (
         <div className="flex flex-col gap-4 relative z-10 text-center">
-          <div className="bg-black border border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative h-[380px] flex flex-col items-center justify-center p-6">
+          <div className="bg-black border border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative h-[350px] flex flex-col items-center justify-center p-5">
             <div className="absolute inset-0 bg-cover bg-center opacity-40 filter blur-xs" style={{ backgroundImage: `url(${selectedGame?.banner || gamesList[0].banner})` }}></div>
             <div className="relative z-10 flex flex-col items-center">
-              <span className="w-16 h-16 bg-pink-600/30 border border-pink-500 rounded-full flex items-center justify-center text-3xl mb-3 animate-pulse">🎮</span>
-              <h3 className="text-xl font-black mb-1">{selectedGame?.title || gamesList[0].title}</h3>
-              <p className="text-xs text-slate-300 mb-6">Running live in IndiePulse Cloud Sandbox</p>
+              <span className="w-14 h-14 bg-pink-600/30 border border-pink-500 rounded-full flex items-center justify-center text-2xl mb-3 animate-pulse">🎮</span>
+              <h3 className="text-lg font-black mb-1">{selectedGame?.title || gamesList[0].title}</h3>
+              <p className="text-[11px] text-slate-300 mb-5">Running live in IndiePulse Cloud Sandbox</p>
               
-              <div className="flex gap-3">
-                <button onClick={() => alert('Game controller connected / Simulated play active!')} className="px-6 py-3 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded-xl text-xs shadow-lg cursor-pointer">
+              <div className="flex gap-2.5">
+                <button onClick={() => alert('Game active!')} className="px-5 py-2.5 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded-xl text-xs shadow-lg cursor-pointer">
                   Start Playing 🚀
                 </button>
-                <button onClick={() => setActiveView('gameDetail')} className="px-5 py-3 bg-slate-800 text-slate-300 font-bold rounded-xl text-xs cursor-pointer">
-                  Exit Game
+                <button onClick={() => setActiveView('gameDetail')} className="px-4 py-2.5 bg-slate-800 text-slate-300 font-bold rounded-xl text-xs cursor-pointer">
+                  Exit
                 </button>
               </div>
             </div>
@@ -247,20 +221,20 @@ export default function IndiePulseEcoSystemPage() {
       {/* ========================================================= */}
       {activeView === 'projectDetail' && (
         <div className="flex flex-col gap-4 relative z-10 text-left">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-6 rounded-2xl shadow-xl">
-            <h2 className="text-xl font-black mb-1">📜 Dev Logs & Updates</h2>
-            <p className="text-slate-400 text-xs mb-4">Behind-the-scenes progress from indie creators.</p>
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-xl">
+            <h2 className="text-lg font-black mb-1">📜 Dev Logs & Updates</h2>
+            <p className="text-slate-400 text-xs mb-3.5">Behind-the-scenes progress from indie creators.</p>
             
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2.5">
               {devLogs.map((log) => (
-                <div key={log.id} className="p-4 rounded-xl bg-slate-950 border border-slate-800">
+                <div key={log.id} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="font-bold text-pink-400 text-xs">{log.author}</span>
+                    <span className="font-bold text-pink-400 text-[11px]">{log.author}</span>
                     <span className="text-[10px] text-slate-500">{log.time}</span>
                   </div>
-                  <h4 className="font-bold text-white text-sm mb-1">{log.title}</h4>
-                  <p className="text-slate-300 text-xs mb-3">{log.content}</p>
-                  <div className="flex gap-4 text-[11px] text-slate-400 border-t border-slate-900 pt-2">
+                  <h4 className="font-bold text-white text-xs mb-1">{log.title}</h4>
+                  <p className="text-slate-300 text-[11px] mb-2.5">{log.content}</p>
+                  <div className="flex gap-3 text-[10px] text-slate-400 border-t border-slate-900 pt-2">
                     <span>❤️ {log.likes} Likes</span>
                     <span>💬 {log.comments} Comments</span>
                   </div>
@@ -272,90 +246,51 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 6: SUBMIT GAME / PROJECT */}
+      {/* VIEW 6: SUBMIT GAME (Only Publish Game Button as requested) */}
       {/* ========================================================= */}
       {activeView === 'submitGame' && (
-        <div className="flex flex-col gap-4 relative z-10 text-left">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-6 rounded-2xl shadow-xl">
-            <h2 className="text-xl font-black mb-1">🚀 Submit Game or Project</h2>
-            <p className="text-slate-400 text-xs mb-4">Publish your indie title to the community feed instantly.</p>
+        <div className="flex flex-col gap-4 relative z-10 text-center items-center justify-center py-12">
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-8 rounded-3xl shadow-2xl w-full max-w-sm flex flex-col items-center">
+            <span className="text-4xl mb-3">🚀</span>
+            <h2 className="text-xl font-black mb-2">Publish Your Game</h2>
+            <p className="text-slate-400 text-xs mb-6">Ready to share your creation with the IndiePulse community?</p>
 
             {successToast && (
-              <div className="mb-4 p-3 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold rounded-xl text-center animate-bounce">
-                ✓ Game published successfully! Redirecting...
+              <div className="mb-4 p-3 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold rounded-xl w-full animate-bounce">
+                ✓ Published successfully!
               </div>
             )}
 
-            <form onSubmit={handleGameSubmit} className="flex flex-col gap-3">
-              <div>
-                <label className="text-[11px] font-semibold text-pink-300 mb-1 block">Game Title</label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder="e.g. Cyber Neon Runner"
-                  value={newGameTitle}
-                  onChange={(e) => setNewGameTitle(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-pink-500"
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-semibold text-pink-300 mb-1 block">Genre</label>
-                <select 
-                  value={newGameGenre}
-                  onChange={(e) => setNewGameGenre(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-pink-500"
-                >
-                  <option value="Action / Sci-Fi">Action / Sci-Fi</option>
-                  <option value="Adventure">Adventure</option>
-                  <option value="Arcade">Arcade</option>
-                  <option value="Shooter">Shooter</option>
-                  <option value="Racing">Racing</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="text-[11px] font-semibold text-pink-300 mb-1 block">Description</label>
-                <textarea 
-                  rows={3}
-                  placeholder="Write a short summary of your game..."
-                  value={newGameDesc}
-                  onChange={(e) => setNewGameDesc(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-pink-500 resize-none"
-                />
-              </div>
-
-              <button 
-                type="submit"
-                className="w-full py-3.5 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl text-xs shadow-lg shadow-pink-600/30 cursor-pointer mt-2"
-              >
-                Publish Game Now 🚀
-              </button>
-            </form>
+            <button 
+              onClick={handlePublishGame}
+              className="w-full py-3.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-pink-600/40 cursor-pointer border border-pink-400/40"
+            >
+              Publish Game Now 🚀
+            </button>
           </div>
         </div>
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 7: PLAYTEST REQUESTS & FEEDBACK FORM */}
+      {/* VIEW 7: PLAYTEST REQUESTS */}
       {/* ========================================================= */}
       {activeView === 'playtest' && (
         <div className="flex flex-col gap-4 relative z-10 text-left">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-6 rounded-2xl shadow-xl">
-            <h2 className="text-xl font-black mb-1">🧪 Playtest & Feedback Board</h2>
-            <p className="text-slate-400 text-xs mb-4">Request player feedback or test upcoming indie builds.</p>
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-xl">
+            <h2 className="text-lg font-black mb-1">🧪 Playtest & Feedback Board</h2>
+            <p className="text-slate-400 text-xs mb-3.5">Request player feedback or test upcoming indie builds.</p>
             
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2.5">
               {playtestRequests.map((req) => (
-                <div key={req.id} className="p-4 rounded-xl bg-slate-950 border border-slate-800">
+                <div key={req.id} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800">
                   <span className="text-[10px] text-pink-400 font-bold block mb-1">Posted by {req.author}</span>
-                  <h4 className="font-bold text-white text-sm mb-2">{req.title}</h4>
-                  <div className="flex gap-2 flex-wrap mb-3">
+                  <h4 className="font-bold text-white text-xs mb-2">{req.title}</h4>
+                  <div className="flex gap-1.5 flex-wrap mb-3">
                     {req.tags.map((t, i) => (
                       <span key={i} className="px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-[10px]">{t}</span>
                     ))}
                   </div>
-                  <button onClick={() => alert('Feedback submitted! Thank you for helping indie developers.')} className="w-full py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-lg text-xs cursor-pointer">
+                  <button onClick={() => alert('Feedback submitted!')} className="w-full py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-lg text-xs cursor-pointer">
                     Test Game & Give Feedback 💬
                   </button>
                 </div>
@@ -366,56 +301,56 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 8: TEAM FINDER & DEVELOPER PROFILE */}
+      {/* VIEW 8: TEAM FINDER */}
       {/* ========================================================= */}
       {activeView === 'teamFinder' && (
         <div className="flex flex-col gap-4 relative z-10 text-left">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-6 rounded-2xl shadow-xl text-center">
-            <div className="w-20 h-20 bg-gradient-to-tr from-pink-500 to-purple-500 rounded-full mx-auto flex items-center justify-center text-3xl font-black mb-3 shadow-lg">
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-xl text-center">
+            <div className="w-16 h-16 bg-gradient-to-tr from-pink-500 to-purple-500 rounded-full mx-auto flex items-center justify-center text-2xl font-black mb-2.5 shadow-lg">
               BP
             </div>
-            <h2 className="text-xl font-black">Bharat Patil</h2>
-            <p className="text-xs text-pink-400 font-semibold mb-4">Solo Game Developer & Creator</p>
+            <h2 className="text-lg font-black">Bharat Patil</h2>
+            <p className="text-[11px] text-pink-400 font-semibold mb-3.5">Solo Game Developer & Creator</p>
             
-            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-left mb-4">
-              <h4 className="text-xs font-bold text-slate-300 mb-2">🛠️ Skills & Stack</h4>
-              <p className="text-[11px] text-slate-400">Next.js, TypeScript, Unity, C#, Tailwind CSS, WebGL</p>
+            <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-left mb-3.5">
+              <h4 className="text-[11px] font-bold text-slate-300 mb-1.5">🛠️ Skills & Stack</h4>
+              <p className="text-[10px] text-slate-400">Next.js, TypeScript, Unity, C#, Tailwind CSS, WebGL</p>
             </div>
 
-            <button onClick={() => alert('Collab request sent successfully!')} className="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl text-xs cursor-pointer shadow-md">
-              🤝 Send Collaboration / Hire Request
+            <button onClick={() => alert('Collab request sent!')} className="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl text-xs cursor-pointer shadow-md">
+              🤝 Send Collaboration Request
             </button>
           </div>
         </div>
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 9: DEVELOPER DASHBOARD & UPI SUPPORT */}
+      {/* VIEW 9: CREATOR DASHBOARD & UPI */}
       {/* ========================================================= */}
       {activeView === 'dashboard' && (
         <div className="flex flex-col gap-4 relative z-10 text-left">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-6 rounded-2xl shadow-xl">
-            <h2 className="text-xl font-black mb-1">📊 Creator Dashboard & UPI</h2>
-            <p className="text-slate-400 text-xs mb-4">Track your plays, tips, and earnings.</p>
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-xl">
+            <h2 className="text-lg font-black mb-1">📊 Creator Dashboard & UPI</h2>
+            <p className="text-slate-400 text-xs mb-3.5">Track your plays, tips, and earnings.</p>
 
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 text-center">
+            <div className="grid grid-cols-2 gap-2.5 mb-3.5">
+              <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-800 text-center">
                 <span className="text-[10px] text-slate-400 block">Total Plays</span>
-                <span className="text-xl font-black text-emerald-400">10.5K</span>
+                <span className="text-lg font-black text-emerald-400">10.5K</span>
               </div>
-              <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 text-center">
+              <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-800 text-center">
                 <span className="text-[10px] text-slate-400 block">UPI Tips Received</span>
-                <span className="text-xl font-black text-pink-400">₹5,500</span>
+                <span className="text-lg font-black text-pink-400">₹5,500</span>
               </div>
             </div>
 
-            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
-              <h4 className="text-xs font-bold text-white mb-2">⚡ Setup UPI Donations / Support</h4>
-              <p className="text-[11px] text-slate-400 mb-3">Allow players to tip you directly via UPI ID or QR code.</p>
-              <div className="bg-slate-900 p-3 rounded-xl border border-slate-800 text-xs font-mono text-cyan-400 mb-3">
+            <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-center">
+              <h4 className="text-xs font-bold text-white mb-1.5">⚡ Setup UPI Donations</h4>
+              <p className="text-[10px] text-slate-400 mb-2.5">Allow players to tip you directly via UPI.</p>
+              <div className="bg-slate-900 p-2.5 rounded-xl border border-slate-800 text-xs font-mono text-cyan-400 mb-2.5">
                 bharatpatil@upi
               </div>
-              <button onClick={() => alert('UPI QR generated successfully!')} className="w-full py-2.5 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded-xl text-xs cursor-pointer">
+              <button onClick={() => alert('UPI QR generated!')} className="w-full py-2 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded-xl text-xs cursor-pointer">
                 Generate UPI QR Code 📱
               </button>
             </div>
@@ -424,59 +359,32 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 10: TALENT & HIRE */}
+      {/* FIXED BOTTOM NAVIGATION DOCK (Fully Visible & Perfectly Fitted) */}
       {/* ========================================================= */}
-      {activeView === 'talent' && (
-        <div className="flex flex-col gap-4 relative z-10 text-left">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-6 rounded-2xl shadow-xl">
-            <h2 className="text-xl font-black mb-1">💼 Talent & Hire Directory</h2>
-            <p className="text-slate-400 text-xs mb-4">Find verified indie developers, level designers, and artists.</p>
-            
-            <div className="flex flex-col gap-3">
-              <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center">
-                <div>
-                  <h4 className="font-bold text-white text-sm">Bharat Patil</h4>
-                  <p className="text-[11px] text-pink-400">Full-Stack Dev & Game Creator</p>
-                </div>
-                <button onClick={() => alert('Message sent!')} className="px-4 py-2 bg-pink-600 text-white text-xs font-bold rounded-xl cursor-pointer">
-                  Hire 🤝
-                </button>
-              </div>
-              <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center">
-                <div>
-                  <h4 className="font-bold text-white text-sm">Aarav Dev</h4>
-                  <p className="text-[11px] text-pink-400">Unity C# & Mechanics Specialist</p>
-                </div>
-                <button onClick={() => alert('Message sent!')} className="px-4 py-2 bg-pink-600 text-white text-xs font-bold rounded-xl cursor-pointer">
-                  Hire 🤝
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================= */}
-      {/* FIXED BOTTOM NAVIGATION DOCK (App-like Multi-Page Switcher) */}
-      {/* ========================================================= */}
-      <div className="fixed bottom-0 inset-x-0 bg-slate-950/95 backdrop-blur-xl border-t border-slate-800 py-3 px-4 z-50 max-w-xl mx-auto flex items-center justify-around text-[10px] font-bold text-slate-400">
-        <button onClick={() => setActiveView('discover')} className={`flex flex-col items-center gap-1 cursor-pointer ${activeView === 'discover' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-lg">🔥</span> Discover
+      <div className="fixed bottom-0 inset-x-0 bg-slate-950/98 backdrop-blur-2xl border-t border-slate-800 py-2.5 px-2 z-50 max-w-xl mx-auto flex items-center justify-between text-[10px] font-bold text-slate-400">
+        <button onClick={() => setActiveView('discover')} className={`flex flex-col items-center gap-0.5 flex-1 cursor-pointer transition-colors ${activeView === 'discover' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+          <span className="text-base">🔥</span>
+          <span>Discover</span>
         </button>
-        <button onClick={() => setActiveView('browse')} className={`flex flex-col items-center gap-1 cursor-pointer ${activeView === 'browse' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-lg">🎮</span> Browse
+        <button onClick={() => setActiveView('browse')} className={`flex flex-col items-center gap-0.5 flex-1 cursor-pointer transition-colors ${activeView === 'browse' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+          <span className="text-base">🎮</span>
+          <span>Browse</span>
         </button>
-        <button onClick={() => setActiveView('submitGame')} className={`flex flex-col items-center gap-1 cursor-pointer ${activeView === 'submitGame' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-lg">🚀</span> Submit
+        <button onClick={() => setActiveView('submitGame')} className={`flex flex-col items-center gap-0.5 flex-1 cursor-pointer transition-colors ${activeView === 'submitGame' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+          <span className="text-base">🚀</span>
+          <span>Submit</span>
         </button>
-        <button onClick={() => setActiveView('playtest')} className={`flex flex-col items-center gap-1 cursor-pointer ${activeView === 'playtest' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-lg">🧪</span> Playtest
+        <button onClick={() => setActiveView('playtest')} className={`flex flex-col items-center gap-0.5 flex-1 cursor-pointer transition-colors ${activeView === 'playtest' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+          <span className="text-base">🧪</span>
+          <span>Playtest</span>
         </button>
-        <button onClick={() => setActiveView('teamFinder')} className={`flex flex-col items-center gap-1 cursor-pointer ${activeView === 'teamFinder' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-lg">👥</span> Team
+        <button onClick={() => setActiveView('teamFinder')} className={`flex flex-col items-center gap-0.5 flex-1 cursor-pointer transition-colors ${activeView === 'teamFinder' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+          <span className="text-base">👥</span>
+          <span>Team</span>
         </button>
-        <button onClick={() => setActiveView('dashboard')} className={`flex flex-col items-center gap-1 cursor-pointer ${activeView === 'dashboard' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-lg">📊</span> Stats
+        <button onClick={() => setActiveView('dashboard')} className={`flex flex-col items-center gap-0.5 flex-1 cursor-pointer transition-colors ${activeView === 'dashboard' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+          <span className="text-base">📊</span>
+          <span>Stats</span>
         </button>
       </div>
 
