@@ -14,28 +14,36 @@ export default function SubmitGamePage() {
     const link = formData.get('link') as string;
     const gameFile = formData.get('gameFile') as File;
 
-    // Create new game object
+    // Create new game object with matching structure
     const newGame = {
       id: Date.now().toString(),
       title: title,
+      desc: description,
       description: description,
-      link: link || '',
+      link: link || '#',
       fileName: gameFile ? gameFile.name : '',
-      developer: "Indie Creator",
-      genre: "Action / RPG"
+      creator: "Bharat Patil (You)",
+      developer: "Bharat Patil (You)",
+      genre: "Action / Indie",
+      plays: "0 plays",
+      rating: "5.0 ⭐",
+      banner: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80"
     };
 
     // Fetch existing games from localStorage and add the new one
-    const existingGames = JSON.parse(localStorage.getItem('indipulse_games') || '{}');
-    existingGames[newGame.id] = newGame;
+    const existingGames = JSON.parse(localStorage.getItem('indiePulse_submitted_games') || '[]');
+    const updatedGames = [newGame, ...existingGames];
     
     // Save updated list back to localStorage
-    localStorage.setItem('indipulse_games', JSON.stringify(existingGames));
+    localStorage.setItem('indiePulse_submitted_games', JSON.stringify(updatedGames));
 
     alert('Game Submitted Successfully and added to Search!');
     
     // Reset form
     e.currentTarget.reset();
+
+    // Redirect back to discover/catalog page
+    router.push('/discover');
   };
 
   return (
