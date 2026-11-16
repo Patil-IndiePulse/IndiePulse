@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -13,13 +13,28 @@ export default function IndiePulseEcoSystemPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  const [gamesList, setGamesList] = useState([
-    { id: '1', title: "Cyber Neon Runner", creator: "Aarav Dev", genre: "Action / Sci-Fi", plays: "3.4k plays", desc: "A fast-paced cyberpunk endless runner built with WebGL. Dodge obstacles and hack neon grids!", rating: "4.9 ⭐", banner: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80" },
-    { id: '2', title: "Mystic Quest RPG", creator: "Neha_Gamer", genre: "Adventure", plays: "2.8k plays", desc: "Immersive 2D pixel RPG featuring dungeon crawling and dynamic turn-based combat.", rating: "4.7 ⭐", banner: "https://images.unsplash.com/photo-1612287233002-81d0f53488d7?auto=format&fit=crop&w=800&q=80" },
-    { id: '3', title: "Pixel Bounce", creator: "Rahul (You)", genre: "Arcade", plays: "1.5k plays", desc: "Addictive physics-based puzzle arcade game with over 50 unique handcrafted levels.", rating: "4.8 ⭐", banner: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80" },
-    { id: '4', title: "Galactic Wars", creator: "StarStudio", genre: "Shooter", plays: "4.1k plays", desc: "Intense space shooter with epic boss fights and custom starship upgrading systems.", rating: "4.9 ⭐", banner: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=800&q=80" },
-    { id: '5', title: "Speed Drift X", creator: "TurboGamer", genre: "Racing", plays: "5.2k plays", desc: "Next-gen arcade drifting simulator with neon tracks and multiplayer leaderboard support.", rating: "4.6 ⭐", banner: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80" }
+  const [gamesList, setGamesList] = useState<any[]>([
+    { id: '1', title: "Cyber Neon Runner", creator: "Aarav Dev", genre: "Action / Sci-Fi", plays: "3.4k plays", desc: "A fast-paced cyberpunk endless runner built with WebGL. Dodge obstacles and hack neon grids!", rating: "4.9 ⭐", banner: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80", link: "#" },
+    { id: '2', title: "Mystic Quest RPG", creator: "Neha_Gamer", genre: "Adventure", plays: "2.8k plays", desc: "Immersive 2D pixel RPG featuring dungeon crawling and dynamic turn-based combat.", rating: "4.7 ⭐", banner: "https://images.unsplash.com/photo-1612287233002-81d0f53488d7?auto=format&fit=crop&w=800&q=80", link: "#" },
+    { id: '3', title: "Pixel Bounce", creator: "Rahul (You)", genre: "Arcade", plays: "1.5k plays", desc: "Addictive physics-based puzzle arcade game with over 50 unique handcrafted levels.", rating: "4.8 ⭐", banner: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80", link: "#" },
+    { id: '4', title: "Galactic Wars", creator: "StarStudio", genre: "Shooter", plays: "4.1k plays", desc: "Intense space shooter with epic boss fights and custom starship upgrading systems.", rating: "4.9 ⭐", banner: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=800&q=80", link: "#" },
+    { id: '5', title: "Speed Drift X", creator: "TurboGamer", genre: "Racing", plays: "5.2k plays", desc: "Next-gen arcade drifting simulator with neon tracks and multiplayer leaderboard support.", rating: "4.6 ⭐", banner: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80", link: "#" }
   ]);
+
+  // Load submitted games from localStorage automatically on page load
+  useEffect(() => {
+    const savedGames = localStorage.getItem('indiePulse_submitted_games');
+    if (savedGames) {
+      try {
+        const parsed = JSON.parse(savedGames);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setGamesList(prev => [...parsed, ...prev]);
+        }
+      } catch (e) {
+        console.error("Failed to load submitted games", e);
+      }
+    }
+  }, []);
 
   const [devLogs, setDevLogs] = useState([
     { id: '1', title: "Day 45: Physics Bug Fix & Lighting Polish", author: "Bharat Patil", time: "2 hours ago", content: "Optimized collision detection and added bloom lighting to the neon platforms.", likes: 24, comments: 5 },
@@ -51,11 +66,11 @@ export default function IndiePulseEcoSystemPage() {
       {activeView === 'discover' && (
         <div className="flex flex-col gap-4 relative z-10 w-full text-left">
           <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-3xl shadow-2xl relative overflow-hidden text-left">
-            <div className="absolute inset-0 bg-cover bg-center opacity-30 filter blur-sm" style={{ backgroundImage: `url(${gamesList[0].banner})` }}></div>
+            <div className="absolute inset-0 bg-cover bg-center opacity-30 filter blur-sm" style={{ backgroundImage: `url(${gamesList[0]?.banner || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f'})` }}></div>
             <div className="relative z-10 flex flex-col items-start text-left py-6 w-full">
               <span className="px-3 py-1 rounded-full bg-pink-500/20 text-pink-400 text-[10px] font-bold mb-2 border border-pink-500/30">🔥 DISCOVER SWIPE FEED</span>
-              <h2 className="text-2xl font-black mb-1.5 text-left w-full">{gamesList[0].title}</h2>
-              <p className="text-slate-300 text-xs max-w-xs mb-5 leading-relaxed text-left w-full">{gamesList[0].desc}</p>
+              <h2 className="text-2xl font-black mb-1.5 text-left w-full">{gamesList[0]?.title}</h2>
+              <p className="text-slate-300 text-xs max-w-xs mb-5 leading-relaxed text-left w-full">{gamesList[0]?.desc || gamesList[0]?.description}</p>
               
               {/* Short & Compact Balanced Buttons */}
               <div className="flex items-center justify-start gap-2.5 w-full">
@@ -120,8 +135,8 @@ export default function IndiePulseEcoSystemPage() {
 
           <div className="flex flex-col gap-2.5 text-left w-full">
             {gamesList
-              .filter(g => selectedCategory === 'All' || g.genre.toLowerCase().includes(selectedCategory.toLowerCase()))
-              .filter(g => g.title.toLowerCase().includes(searchQuery.toLowerCase()))
+              .filter(g => selectedCategory === 'All' || (g.genre && g.genre.toLowerCase().includes(selectedCategory.toLowerCase())))
+              .filter(g => g.title && g.title.toLowerCase().includes(searchQuery.toLowerCase()))
               .map((game) => (
                 <div 
                   key={game.id} 
@@ -129,14 +144,14 @@ export default function IndiePulseEcoSystemPage() {
                   className="flex justify-between items-center p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-pink-500/40 transition-all cursor-pointer text-left w-full"
                 >
                   <div className="flex items-center gap-3 text-left">
-                    <img src={game.banner} alt={game.title} className="w-11 h-11 rounded-xl object-cover border border-slate-700" />
+                    <img src={game.banner || "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80"} alt={game.title} className="w-11 h-11 rounded-xl object-cover border border-slate-700" />
                     <div className="text-left">
                       <h3 className="font-bold text-white text-xs text-left w-full">{game.title}</h3>
-                      <p className="text-[10px] text-slate-400 text-left w-full">By {game.creator} • <span className="text-pink-400">{game.genre}</span></p>
+                      <p className="text-[10px] text-slate-400 text-left w-full">By {game.creator || game.developer || 'Bharat Patil'} • <span className="text-pink-400">{game.genre || 'Action / Indie'}</span></p>
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <span className="text-emerald-400 font-bold text-[11px]">{game.plays}</span>
+                    <span className="text-emerald-400 font-bold text-[11px]">{game.plays || '0 plays'}</span>
                   </div>
                 </div>
             ))}
@@ -150,21 +165,32 @@ export default function IndiePulseEcoSystemPage() {
       {activeView === 'gameDetail' && selectedGame && (
         <div className="flex flex-col gap-4 relative z-10 text-left w-full">
           <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-3xl shadow-2xl text-left w-full">
-            <img src={selectedGame.banner} alt="Banner" className="w-full h-44 rounded-2xl object-cover mb-3.5 border border-slate-700 shadow-md" />
+            <img src={selectedGame.banner || "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80"} alt="Banner" className="w-full h-44 rounded-2xl object-cover mb-3.5 border border-slate-700 shadow-md" />
             <div className="flex justify-between items-start mb-1.5 text-left w-full">
               <h2 className="text-xl font-black text-left w-full">{selectedGame.title}</h2>
-              <span className="bg-emerald-500/20 text-emerald-400 text-[11px] px-2.5 py-0.5 rounded-full font-bold shrink-0">{selectedGame.rating}</span>
+              <span className="bg-emerald-500/20 text-emerald-400 text-[11px] px-2.5 py-0.5 rounded-full font-bold shrink-0">{selectedGame.rating || '5.0 ⭐'}</span>
             </div>
-            <p className="text-[11px] text-pink-400 font-semibold mb-2.5 text-left w-full">Developed by {selectedGame.creator} • {selectedGame.genre}</p>
-            <p className="text-slate-300 text-xs leading-relaxed mb-5 text-left w-full">{selectedGame.desc}</p>
+            <p className="text-[11px] text-pink-400 font-semibold mb-2.5 text-left w-full">Developed by {selectedGame.creator || selectedGame.developer || 'Bharat Patil'} • {selectedGame.genre || 'Indie'}</p>
+            <p className="text-slate-300 text-xs leading-relaxed mb-5 text-left w-full">{selectedGame.desc || selectedGame.description}</p>
 
             <div className="flex flex-col gap-2.5 text-left w-full">
-              <button 
-                onClick={() => setActiveView('playGame')}
-                className="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl shadow-lg shadow-pink-600/40 text-xs cursor-pointer text-center"
-              >
-                🎮 Play Game Now (WebGL)
-              </button>
+              {selectedGame.link && selectedGame.link !== '#' ? (
+                <a 
+                  href={selectedGame.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl shadow-lg shadow-pink-600/40 text-xs cursor-pointer text-center block"
+                >
+                  🎮 Play External Link 🚀
+                </a>
+              ) : (
+                <button 
+                  onClick={() => setActiveView('playGame')}
+                  className="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl shadow-lg shadow-pink-600/40 text-xs cursor-pointer text-center"
+                >
+                  🎮 Play Game Now (WebGL)
+                </button>
+              )}
               <button 
                 onClick={() => setActiveView('projectDetail')}
                 className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-[11px] cursor-pointer border border-slate-700 text-center"
@@ -189,9 +215,15 @@ export default function IndiePulseEcoSystemPage() {
               <p className="text-[11px] text-slate-300 mb-5">Running live in IndiePulse Cloud Sandbox</p>
               
               <div className="flex gap-2.5">
-                <button onClick={() => alert('Game active!')} className="px-5 py-2.5 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded-xl text-xs shadow-lg cursor-pointer">
-                  Start Playing 🚀
-                </button>
+                {selectedGame?.link && selectedGame.link !== '#' ? (
+                  <a href={selectedGame.link} target="_blank" rel="noopener noreferrer" className="px-5 py-2.5 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded-xl text-xs shadow-lg cursor-pointer">
+                    Open Game URL 🚀
+                  </a>
+                ) : (
+                  <button onClick={() => alert('Game active!')} className="px-5 py-2.5 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded-xl text-xs shadow-lg cursor-pointer">
+                    Start Playing 🚀
+                  </button>
+                )}
                 <button onClick={() => setActiveView('gameDetail')} className="px-4 py-2.5 bg-slate-800 text-slate-300 font-bold rounded-xl text-xs cursor-pointer">
                   Exit
                 </button>
@@ -231,7 +263,7 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 6: SUBMIT GAME (Shows the intermediate card with "Publish Game Now") */}
+      {/* VIEW 6: SUBMIT GAME (Intermediate Card) */}
       {/* ========================================================= */}
       {activeView === 'submitGame' && (
         <div className="flex flex-col gap-4 relative z-10 text-center items-center justify-center py-12 w-full">
@@ -240,7 +272,6 @@ export default function IndiePulseEcoSystemPage() {
             <h2 className="text-xl font-black mb-2 text-center w-full">Publish Your Game</h2>
             <p className="text-slate-400 text-xs mb-6 text-center w-full">Ready to share your creation with the IndiePulse community?</p>
 
-            {/* Clicking this button now routes to your actual /submit form page */}
             <button 
               onClick={() => router.push('/submit')}
               className="w-full py-3.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-pink-600/40 cursor-pointer border border-pink-400/40 text-center"
@@ -350,7 +381,6 @@ export default function IndiePulseEcoSystemPage() {
           <span className="text-sm">🎮</span>
           <span className="w-full text-center truncate">Browse</span>
         </button>
-        {/* Bottom Submit tab opens the intermediate 'submitGame' card view */}
         <button onClick={() => setActiveView('submitGame')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'submitGame' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
           <span className="text-sm">🚀</span>
           <span className="w-full text-center truncate">Submit</span>
