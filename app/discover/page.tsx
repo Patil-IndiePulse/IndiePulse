@@ -31,11 +31,6 @@ export default function IndiePulseEcoSystemPage() {
     { id: '2', title: "Playtest: Looking for 10 testers for Cyber Neon Runner v2", author: "Bharat Patil", tags: ["#Playtest", "#Feedback"] }
   ]);
 
-  // DIRECTLY REDIRECTS TO YOUR /submit FORM PAGE
-  const handlePublishGame = () => {
-    router.push('/submit');
-  };
-
   return (
     <main className="min-h-screen bg-slate-950 text-white flex flex-col px-3 py-6 max-w-xl mx-auto w-full relative overflow-x-hidden select-none pb-28 text-left">
       
@@ -86,7 +81,7 @@ export default function IndiePulseEcoSystemPage() {
               <h4 className="font-bold text-xs text-left w-full">Browse All</h4>
               <span className="text-[10px] text-slate-400 text-left w-full mt-0.5 block">Explore game catalog</span>
             </button>
-            <button onClick={() => router.push('/submit')} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl text-left hover:border-pink-500/50 transition-all cursor-pointer shadow-md flex flex-col items-start justify-start w-full">
+            <button onClick={() => setActiveView('submitGame')} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl text-left hover:border-pink-500/50 transition-all cursor-pointer shadow-md flex flex-col items-start justify-start w-full">
               <span className="text-xl mb-1 text-left">🚀</span>
               <h4 className="font-bold text-xs text-left w-full">Submit Game</h4>
               <span className="text-[10px] text-slate-400 text-left w-full mt-0.5 block">Publish your title</span>
@@ -236,7 +231,7 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 6: SUBMIT GAME (Directly redirects to /submit page) */}
+      {/* VIEW 6: SUBMIT GAME (Shows the intermediate card with "Publish Game Now") */}
       {/* ========================================================= */}
       {activeView === 'submitGame' && (
         <div className="flex flex-col gap-4 relative z-10 text-center items-center justify-center py-12 w-full">
@@ -245,6 +240,7 @@ export default function IndiePulseEcoSystemPage() {
             <h2 className="text-xl font-black mb-2 text-center w-full">Publish Your Game</h2>
             <p className="text-slate-400 text-xs mb-6 text-center w-full">Ready to share your creation with the IndiePulse community?</p>
 
+            {/* Clicking this button now routes to your actual /submit form page */}
             <button 
               onClick={() => router.push('/submit')}
               className="w-full py-3.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-pink-600/40 cursor-pointer border border-pink-400/40 text-center"
@@ -343,7 +339,7 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-      {/* FIXED BOTTOM NAVIGATION DOCK (Fully Optimized & Un-truncated) */}
+      {/* FIXED BOTTOM NAVIGATION DOCK */}
       {/* ========================================================= */}
       <div className="fixed bottom-0 inset-x-0 bg-slate-950/98 backdrop-blur-2xl border-t border-slate-800 py-1.5 px-0 z-50 max-w-xl mx-auto grid grid-cols-6 text-[8px] font-bold text-slate-400">
         <button onClick={() => setActiveView('discover')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'discover' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
@@ -354,7 +350,8 @@ export default function IndiePulseEcoSystemPage() {
           <span className="text-sm">🎮</span>
           <span className="w-full text-center truncate">Browse</span>
         </button>
-        <button onClick={() => router.push('/submit')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'submitGame' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+        {/* Bottom Submit tab opens the intermediate 'submitGame' card view */}
+        <button onClick={() => setActiveView('submitGame')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'submitGame' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
           <span className="text-sm">🚀</span>
           <span className="w-full text-center truncate">Submit</span>
         </button>
