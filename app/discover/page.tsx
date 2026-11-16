@@ -89,12 +89,12 @@ export default function IndiePulseEcoSystemPage() {
             <button onClick={() => setActiveView('browse')} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl text-left hover:border-pink-500/50 transition-all cursor-pointer shadow-md flex flex-col items-start justify-start w-full">
               <span className="text-xl mb-1 text-left">🔥</span>
               <h4 className="font-bold text-xs text-left w-full">Browse All</h4>
-              <p className="text-[10px] text-slate-400 text-left w-full mt-0.5">Explore game catalog</p>
+              <span className="text-[10px] text-slate-400 text-left w-full mt-0.5 block">Explore game catalog</span>
             </button>
             <button onClick={() => setActiveView('submitGame')} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl text-left hover:border-pink-500/50 transition-all cursor-pointer shadow-md flex flex-col items-start justify-start w-full">
               <span className="text-xl mb-1 text-left">🚀</span>
               <h4 className="font-bold text-xs text-left w-full">Submit Game</h4>
-              <p className="text-[10px] text-slate-400 text-left w-full mt-0.5">Publish your title</p>
+              <span className="text-[10px] text-slate-400 text-left w-full mt-0.5 block">Publish your title</span>
             </button>
           </div>
         </div>
@@ -354,32 +354,32 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-      {/* FIXED BOTTOM NAVIGATION DOCK (Compact & Fully Visible) */}
+      {/* FIXED BOTTOM NAVIGATION DOCK (Fully Optimized & Un-truncated) */}
       {/* ========================================================= */}
-      <div className="fixed bottom-0 inset-x-0 bg-slate-950/98 backdrop-blur-2xl border-t border-slate-800 py-1.5 px-0 z-50 max-w-xl mx-auto grid grid-cols-6 text-[8px] font-bold text-slate-400">
+      <div className="fixed bottom-0 inset-x-0 bg-slate-950/98 backdrop-blur-2xl border-t border-slate-800 py-1.5 px-0 z-50 max-w-xl mx-auto grid grid-cols-6 text-[7px] sm:text-[9.5px] font-bold text-slate-400">
         <button onClick={() => setActiveView('discover')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'discover' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
           <span className="text-sm">🔥</span>
-          <span className="w-full text-center truncate">Discover</span>
+          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Discover</span>
         </button>
         <button onClick={() => setActiveView('browse')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'browse' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
           <span className="text-sm">🎮</span>
-          <span className="w-full text-center truncate">Browse</span>
+          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Browse</span>
         </button>
         <button onClick={() => setActiveView('submitGame')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'submitGame' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
           <span className="text-sm">🚀</span>
-          <span className="w-full text-center truncate">Submit</span>
+          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Submit</span>
         </button>
         <button onClick={() => setActiveView('playtest')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'playtest' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
           <span className="text-sm">🧪</span>
-          <span className="w-full text-center truncate">Playtest</span>
+          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Playtest</span>
         </button>
         <button onClick={() => setActiveView('teamFinder')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'teamFinder' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
           <span className="text-sm">👥</span>
-          <span className="w-full text-center truncate">Team</span>
+          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Team</span>
         </button>
         <button onClick={() => setActiveView('dashboard')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'dashboard' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
           <span className="text-sm">📊</span>
-          <span className="w-full text-center truncate">Stats</span>
+          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Stats</span>
         </button>
       </div>
 
