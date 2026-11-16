@@ -332,12 +332,13 @@ export default function Home() {
           </p>
 
           <div className="mb-6 flex flex-wrap items-center justify-center gap-3 w-full">
-            <a 
-              href="/submit" 
+            {/* UPDATED LINK TO DIRECTLY OPEN YOUR /submit PAGE */}
+            <button 
+              onClick={() => router.push('/submit')}
               className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white rounded-xl text-xs font-bold shadow-[0_0_20px_rgba(236,72,153,0.6)] transition-all inline-flex items-center justify-center gap-2 border border-pink-400/50 cursor-pointer"
             >
               <span>+</span> Publish Game
-            </a>
+            </button>
             
             <Link 
               href="/community"
@@ -361,7 +362,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Trending Section - Automatic Steam-Style Cards (Image on side, Name/Rating/Play on other) */}
+      {/* Trending Section - Automatic Steam-Style Cards */}
       <section className="px-4 py-8 max-w-6xl mx-auto w-full relative z-10">
         <div className="flex items-center justify-between mb-6 px-1">
           <div>
@@ -393,7 +394,7 @@ export default function Home() {
                       {game.title}
                     </h3>
                     <div className="text-[10px] text-yellow-400 mb-1 flex items-center gap-0.5">
-                    <span>★</span><span>★</span><span>★</span><span>★</span><span>☆</span>
+                      <span>★</span><span>★</span><span>★</span><span>★</span><span>☆</span>
                       <span className="text-slate-400 text-[9px] ml-1">({game.plays || '4.8'})</span>
                     </div>
                   </div>
@@ -418,7 +419,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Core Drives & Community Feed Section (Fully Restored & Linked) */}
+      {/* Core Drives & Community Feed Section */}
       <section className="px-4 py-8 max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
         <Link 
           href="/development" 
