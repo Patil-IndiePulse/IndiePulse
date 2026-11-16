@@ -361,30 +361,30 @@ export default function IndiePulseEcoSystemPage() {
       {/* ========================================================= */}
       {/* FIXED BOTTOM NAVIGATION DOCK (Fully Visible & Un-truncated Names) */}
       {/* ========================================================= */}
-      <div className="fixed bottom-0 inset-x-0 bg-slate-950/98 backdrop-blur-2xl border-t border-slate-800 py-2 px-1 z-50 max-w-xl mx-auto grid grid-cols-6 text-[8.5px] sm:text-[10px] font-bold text-slate-400">
-        <button onClick={() => setActiveView('discover')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0.5 ${activeView === 'discover' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-sm sm:text-base">🔥</span>
-          <span className="w-full text-center truncate">Discover</span>
+      <div className="fixed bottom-0 inset-x-0 bg-slate-950/98 backdrop-blur-2xl border-t border-slate-800 py-2 px-0.5 z-50 max-w-xl mx-auto grid grid-cols-6 text-[7px] sm:text-[9.5px] font-bold text-slate-400">
+        <button onClick={() => setActiveView('discover')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'discover' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+          <span className="text-xs sm:text-base">🔥</span>
+          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Discover</span>
         </button>
-        <button onClick={() => setActiveView('browse')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0.5 ${activeView === 'browse' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-sm sm:text-base">🎮</span>
-          <span className="w-full text-center truncate">Browse</span>
+        <button onClick={() => setActiveView('browse')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'browse' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+          <span className="text-xs sm:text-base">🎮</span>
+          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Browse</span>
         </button>
-        <button onClick={() => setActiveView('submitGame')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0.5 ${activeView === 'submitGame' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-sm sm:text-base">🚀</span>
-          <span className="w-full text-center truncate">Submit</span>
+        <button onClick={() => setActiveView('submitGame')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'submitGame' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+          <span className="text-xs sm:text-base">🚀</span>
+          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Submit</span>
         </button>
-        <button onClick={() => setActiveView('playtest')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0.5 ${activeView === 'playtest' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-sm sm:text-base">🧪</span>
-          <span className="w-full text-center truncate">Playtest</span>
+        <button onClick={() => setActiveView('playtest')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'playtest' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+          <span className="text-xs sm:text-base">🧪</span>
+          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Playtest</span>
         </button>
-        <button onClick={() => setActiveView('teamFinder')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0.5 ${activeView === 'teamFinder' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-sm sm:text-base">👥</span>
-          <span className="w-full text-center truncate">Team</span>
+        <button onClick={() => setActiveView('teamFinder')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'teamFinder' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+          <span className="text-xs sm:text-base">👥</span>
+          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Team</span>
         </button>
-        <button onClick={() => setActiveView('dashboard')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0.5 ${activeView === 'dashboard' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-sm sm:text-base">📊</span>
-          <span className="w-full text-center truncate">Stats</span>
+        <button onClick={() => setActiveView('dashboard')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'dashboard' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
+          <span className="text-xs sm:text-base">📊</span>
+          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Stats</span>
         </button>
       </div>
 
