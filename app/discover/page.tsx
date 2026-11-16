@@ -7,15 +7,12 @@ import { useRouter } from 'next/navigation';
 export default function IndiePulseEcoSystemPage() {
   const router = useRouter();
 
-  // Navigation View State
   const [activeView, setActiveView] = useState<'discover' | 'browse' | 'gameDetail' | 'playGame' | 'projectDetail' | 'submitGame' | 'playtest' | 'teamFinder' | 'dashboard' | 'talent'>('discover');
 
-  // Interactive States
   const [selectedGame, setSelectedGame] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  // Persistent Games Catalog
   const [gamesList, setGamesList] = useState([
     { id: '1', title: "Cyber Neon Runner", creator: "Aarav Dev", genre: "Action / Sci-Fi", plays: "3.4k plays", desc: "A fast-paced cyberpunk endless runner built with WebGL. Dodge obstacles and hack neon grids!", rating: "4.9 ⭐", banner: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80" },
     { id: '2', title: "Mystic Quest RPG", creator: "Neha_Gamer", genre: "Adventure", plays: "2.8k plays", desc: "Immersive 2D pixel RPG featuring dungeon crawling and dynamic turn-based combat.", rating: "4.7 ⭐", banner: "https://images.unsplash.com/photo-1612287233002-81d0f53488d7?auto=format&fit=crop&w=800&q=80" },
@@ -24,13 +21,11 @@ export default function IndiePulseEcoSystemPage() {
     { id: '5', title: "Speed Drift X", creator: "TurboGamer", genre: "Racing", plays: "5.2k plays", desc: "Next-gen arcade drifting simulator with neon tracks and multiplayer leaderboard support.", rating: "4.6 ⭐", banner: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80" }
   ]);
 
-  // Dev Logs & Projects
   const [devLogs, setDevLogs] = useState([
     { id: '1', title: "Day 45: Physics Bug Fix & Lighting Polish", author: "Bharat Patil", time: "2 hours ago", content: "Optimized collision detection and added bloom lighting to the neon platforms.", likes: 24, comments: 5 },
     { id: '2', title: "Building the Inventory UI System", author: "Rahul Dev", time: "1 day ago", content: "Implemented drag-and-drop mechanics using TypeScript and Tailwind CSS.", likes: 41, comments: 12 }
   ]);
 
-  // Playtest Requests & Team Finder
   const [playtestRequests, setPlaytestRequests] = useState([
     { id: '1', title: "C# Coder needed for RPG Boss Battle Logic", author: "Aarav Dev", tags: ["#C#", "#Unity", "#TeamFinder"] },
     { id: '2', title: "Playtest: Looking for 10 testers for Cyber Neon Runner v2", author: "Bharat Patil", tags: ["#Playtest", "#Feedback"] }
@@ -47,7 +42,7 @@ export default function IndiePulseEcoSystemPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white flex flex-col px-3 py-6 max-w-xl mx-auto w-full relative overflow-x-hidden select-none pb-28">
+    <main className="min-h-screen bg-slate-950 text-white flex flex-col px-3 py-6 max-w-xl mx-auto w-full relative overflow-x-hidden select-none pb-28 text-left">
       
       {/* Neon Glow Background Effects */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none"></div>
@@ -64,10 +59,10 @@ export default function IndiePulseEcoSystemPage() {
       {/* VIEW 1: DISCOVER (Swipe Feed) */}
       {/* ========================================================= */}
       {activeView === 'discover' && (
-        <div className="flex flex-col gap-4 relative z-10 text-left">
+        <div className="flex flex-col gap-4 relative z-10 w-full text-left">
           <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-3xl shadow-2xl relative overflow-hidden text-left">
             <div className="absolute inset-0 bg-cover bg-center opacity-30 filter blur-sm" style={{ backgroundImage: `url(${gamesList[0].banner})` }}></div>
-            <div className="relative z-10 flex flex-col items-start text-left py-6">
+            <div className="relative z-10 flex flex-col items-start text-left py-6 w-full">
               <span className="px-3 py-1 rounded-full bg-pink-500/20 text-pink-400 text-[10px] font-bold mb-2 border border-pink-500/30">🔥 DISCOVER SWIPE FEED</span>
               <h2 className="text-2xl font-black mb-1.5 text-left w-full">{gamesList[0].title}</h2>
               <p className="text-slate-300 text-xs max-w-xs mb-5 leading-relaxed text-left w-full">{gamesList[0].desc}</p>
@@ -90,14 +85,14 @@ export default function IndiePulseEcoSystemPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 text-left">
-            <button onClick={() => setActiveView('browse')} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl text-left hover:border-pink-500/50 transition-all cursor-pointer shadow-md flex flex-col items-start justify-start">
-              <span className="text-xl mb-1">🔥</span>
+          <div className="grid grid-cols-2 gap-3 w-full text-left">
+            <button onClick={() => setActiveView('browse')} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl text-left hover:border-pink-500/50 transition-all cursor-pointer shadow-md flex flex-col items-start justify-start w-full">
+              <span className="text-xl mb-1 text-left">🔥</span>
               <h4 className="font-bold text-xs text-left w-full">Browse All</h4>
               <p className="text-[10px] text-slate-400 text-left w-full mt-0.5">Explore game catalog</p>
             </button>
-            <button onClick={() => setActiveView('submitGame')} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl text-left hover:border-pink-500/50 transition-all cursor-pointer shadow-md flex flex-col items-start justify-start">
-              <span className="text-xl mb-1">🚀</span>
+            <button onClick={() => setActiveView('submitGame')} className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl text-left hover:border-pink-500/50 transition-all cursor-pointer shadow-md flex flex-col items-start justify-start w-full">
+              <span className="text-xl mb-1 text-left">🚀</span>
               <h4 className="font-bold text-xs text-left w-full">Submit Game</h4>
               <p className="text-[10px] text-slate-400 text-left w-full mt-0.5">Publish your title</p>
             </button>
@@ -109,8 +104,8 @@ export default function IndiePulseEcoSystemPage() {
       {/* VIEW 2: BROWSE ALL */}
       {/* ========================================================= */}
       {activeView === 'browse' && (
-        <div className="flex flex-col gap-4 relative z-10 text-left">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-4 rounded-2xl shadow-xl text-left">
+        <div className="flex flex-col gap-4 relative z-10 text-left w-full">
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-4 rounded-2xl shadow-xl text-left w-full">
             <h2 className="text-lg font-black mb-2.5 text-left w-full">🔥 All Indie Games Catalog</h2>
             <input 
               type="text" 
@@ -120,7 +115,7 @@ export default function IndiePulseEcoSystemPage() {
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 mb-2.5 text-left"
             />
             
-            <div className="flex gap-1.5 overflow-x-auto pb-1 text-left">
+            <div className="flex gap-1.5 overflow-x-auto pb-1 text-left w-full">
               {['All', 'Action', 'Adventure', 'Arcade', 'Shooter', 'Racing'].map((cat) => (
                 <button 
                   key={cat}
@@ -133,7 +128,7 @@ export default function IndiePulseEcoSystemPage() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-2.5 text-left">
+          <div className="flex flex-col gap-2.5 text-left w-full">
             {gamesList
               .filter(g => selectedCategory === 'All' || g.genre.toLowerCase().includes(selectedCategory.toLowerCase()))
               .filter(g => g.title.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -141,7 +136,7 @@ export default function IndiePulseEcoSystemPage() {
                 <div 
                   key={game.id} 
                   onClick={() => { setSelectedGame(game); setActiveView('gameDetail'); }}
-                  className="flex justify-between items-center p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-pink-500/40 transition-all cursor-pointer text-left"
+                  className="flex justify-between items-center p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-pink-500/40 transition-all cursor-pointer text-left w-full"
                 >
                   <div className="flex items-center gap-3 text-left">
                     <img src={game.banner} alt={game.title} className="w-11 h-11 rounded-xl object-cover border border-slate-700" />
@@ -163,17 +158,17 @@ export default function IndiePulseEcoSystemPage() {
       {/* VIEW 3: GAME DETAIL */}
       {/* ========================================================= */}
       {activeView === 'gameDetail' && selectedGame && (
-        <div className="flex flex-col gap-4 relative z-10 text-left">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-3xl shadow-2xl text-left">
+        <div className="flex flex-col gap-4 relative z-10 text-left w-full">
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-3xl shadow-2xl text-left w-full">
             <img src={selectedGame.banner} alt="Banner" className="w-full h-44 rounded-2xl object-cover mb-3.5 border border-slate-700 shadow-md" />
-            <div className="flex justify-between items-start mb-1.5 text-left">
+            <div className="flex justify-between items-start mb-1.5 text-left w-full">
               <h2 className="text-xl font-black text-left w-full">{selectedGame.title}</h2>
               <span className="bg-emerald-500/20 text-emerald-400 text-[11px] px-2.5 py-0.5 rounded-full font-bold shrink-0">{selectedGame.rating}</span>
             </div>
             <p className="text-[11px] text-pink-400 font-semibold mb-2.5 text-left w-full">Developed by {selectedGame.creator} • {selectedGame.genre}</p>
             <p className="text-slate-300 text-xs leading-relaxed mb-5 text-left w-full">{selectedGame.desc}</p>
 
-            <div className="flex flex-col gap-2.5 text-left">
+            <div className="flex flex-col gap-2.5 text-left w-full">
               <button 
                 onClick={() => setActiveView('playGame')}
                 className="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl shadow-lg shadow-pink-600/40 text-xs cursor-pointer text-center"
@@ -195,8 +190,8 @@ export default function IndiePulseEcoSystemPage() {
       {/* VIEW 4: PLAY GAME */}
       {/* ========================================================= */}
       {activeView === 'playGame' && (
-        <div className="flex flex-col gap-4 relative z-10 text-center">
-          <div className="bg-black border border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative h-[350px] flex flex-col items-center justify-center p-5">
+        <div className="flex flex-col gap-4 relative z-10 text-center w-full">
+          <div className="bg-black border border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative h-[350px] flex flex-col items-center justify-center p-5 w-full">
             <div className="absolute inset-0 bg-cover bg-center opacity-40 filter blur-xs" style={{ backgroundImage: `url(${selectedGame?.banner || gamesList[0].banner})` }}></div>
             <div className="relative z-10 flex flex-col items-center text-center">
               <span className="w-14 h-14 bg-pink-600/30 border border-pink-500 rounded-full flex items-center justify-center text-2xl mb-3 animate-pulse">🎮</span>
@@ -220,21 +215,21 @@ export default function IndiePulseEcoSystemPage() {
       {/* VIEW 5: PROJECT DETAIL (Dev Logs) */}
       {/* ========================================================= */}
       {activeView === 'projectDetail' && (
-        <div className="flex flex-col gap-4 relative z-10 text-left">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-xl text-left">
+        <div className="flex flex-col gap-4 relative z-10 text-left w-full">
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-xl text-left w-full">
             <h2 className="text-lg font-black mb-1 text-left w-full">📜 Dev Logs & Updates</h2>
             <p className="text-slate-400 text-xs mb-3.5 text-left w-full">Behind-the-scenes progress from indie creators.</p>
             
-            <div className="flex flex-col gap-2.5 text-left">
+            <div className="flex flex-col gap-2.5 text-left w-full">
               {devLogs.map((log) => (
-                <div key={log.id} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-left">
-                  <div className="flex justify-between items-center mb-1 text-left">
+                <div key={log.id} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-left w-full">
+                  <div className="flex justify-between items-center mb-1 text-left w-full">
                     <span className="font-bold text-pink-400 text-[11px] text-left">{log.author}</span>
                     <span className="text-[10px] text-slate-500 text-right">{log.time}</span>
                   </div>
                   <h4 className="font-bold text-white text-xs mb-1 text-left w-full">{log.title}</h4>
                   <p className="text-slate-300 text-[11px] mb-2.5 text-left w-full">{log.content}</p>
-                  <div className="flex gap-3 text-[10px] text-slate-400 border-t border-slate-900 pt-2 text-left">
+                  <div className="flex gap-3 text-[10px] text-slate-400 border-t border-slate-900 pt-2 text-left w-full">
                     <span>❤️ {log.likes} Likes</span>
                     <span>💬 {log.comments} Comments</span>
                   </div>
@@ -249,7 +244,7 @@ export default function IndiePulseEcoSystemPage() {
       {/* VIEW 6: SUBMIT GAME */}
       {/* ========================================================= */}
       {activeView === 'submitGame' && (
-        <div className="flex flex-col gap-4 relative z-10 text-center items-center justify-center py-12">
+        <div className="flex flex-col gap-4 relative z-10 text-center items-center justify-center py-12 w-full">
           <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-8 rounded-3xl shadow-2xl w-full max-w-sm flex flex-col items-center">
             <span className="text-4xl mb-3">🚀</span>
             <h2 className="text-xl font-black mb-2 text-center w-full">Publish Your Game</h2>
@@ -275,17 +270,17 @@ export default function IndiePulseEcoSystemPage() {
       {/* VIEW 7: PLAYTEST REQUESTS */}
       {/* ========================================================= */}
       {activeView === 'playtest' && (
-        <div className="flex flex-col gap-4 relative z-10 text-left">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-xl text-left">
+        <div className="flex flex-col gap-4 relative z-10 text-left w-full">
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-xl text-left w-full">
             <h2 className="text-lg font-black mb-1 text-left w-full">🧪 Playtest & Feedback Board</h2>
             <p className="text-slate-400 text-xs mb-3.5 text-left w-full">Request player feedback or test upcoming indie builds.</p>
             
-            <div className="flex flex-col gap-2.5 text-left">
+            <div className="flex flex-col gap-2.5 text-left w-full">
               {playtestRequests.map((req) => (
-                <div key={req.id} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-left">
+                <div key={req.id} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-left w-full">
                   <span className="text-[10px] text-pink-400 font-bold block mb-1 text-left w-full">Posted by {req.author}</span>
                   <h4 className="font-bold text-white text-xs mb-2 text-left w-full">{req.title}</h4>
-                  <div className="flex gap-1.5 flex-wrap mb-3 text-left">
+                  <div className="flex gap-1.5 flex-wrap mb-3 text-left w-full">
                     {req.tags.map((t, i) => (
                       <span key={i} className="px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-[10px]">{t}</span>
                     ))}
@@ -304,15 +299,15 @@ export default function IndiePulseEcoSystemPage() {
       {/* VIEW 8: TEAM FINDER */}
       {/* ========================================================= */}
       {activeView === 'teamFinder' && (
-        <div className="flex flex-col gap-4 relative z-10 text-left">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-xl text-center">
+        <div className="flex flex-col gap-4 relative z-10 text-left w-full">
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-xl text-center w-full">
             <div className="w-16 h-16 bg-gradient-to-tr from-pink-500 to-purple-500 rounded-full mx-auto flex items-center justify-center text-2xl font-black mb-2.5 shadow-lg">
               BP
             </div>
             <h2 className="text-lg font-black text-center w-full">Bharat Patil</h2>
             <p className="text-[11px] text-pink-400 font-semibold mb-3.5 text-center w-full">Solo Game Developer & Creator</p>
             
-            <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-left mb-3.5">
+            <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-left mb-3.5 w-full">
               <h4 className="text-[11px] font-bold text-slate-300 mb-1.5 text-left w-full">🛠️ Skills & Stack</h4>
               <p className="text-[10px] text-slate-400 text-left w-full">Next.js, TypeScript, Unity, C#, Tailwind CSS, WebGL</p>
             </div>
@@ -328,12 +323,12 @@ export default function IndiePulseEcoSystemPage() {
       {/* VIEW 9: CREATOR DASHBOARD & UPI */}
       {/* ========================================================= */}
       {activeView === 'dashboard' && (
-        <div className="flex flex-col gap-4 relative z-10 text-left">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-xl text-left">
+        <div className="flex flex-col gap-4 relative z-10 text-left w-full">
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-xl text-left w-full">
             <h2 className="text-lg font-black mb-1 text-left w-full">📊 Creator Dashboard & UPI</h2>
             <p className="text-slate-400 text-xs mb-3.5 text-left w-full">Track your plays, tips, and earnings.</p>
 
-            <div className="grid grid-cols-2 gap-2.5 mb-3.5 text-left">
+            <div className="grid grid-cols-2 gap-2.5 mb-3.5 text-left w-full">
               <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-800 text-center">
                 <span className="text-[10px] text-slate-400 block text-center w-full">Total Plays</span>
                 <span className="text-lg font-black text-emerald-400 text-center w-full block">10.5K</span>
@@ -344,7 +339,7 @@ export default function IndiePulseEcoSystemPage() {
               </div>
             </div>
 
-            <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-center">
+            <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-center w-full">
               <h4 className="text-xs font-bold text-white mb-1.5 text-left w-full">⚡ Setup UPI Donations</h4>
               <p className="text-[10px] text-slate-400 mb-2.5 text-left w-full">Allow players to tip you directly via UPI.</p>
               <div className="bg-slate-900 p-2.5 rounded-xl border border-slate-800 text-xs font-mono text-cyan-400 mb-2.5 text-center">
@@ -359,32 +354,32 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-      {/* FIXED BOTTOM NAVIGATION DOCK (Fully Visible & Un-truncated Names) */}
+      {/* FIXED BOTTOM NAVIGATION DOCK (Compact & Fully Visible) */}
       {/* ========================================================= */}
-      <div className="fixed bottom-0 inset-x-0 bg-slate-950/98 backdrop-blur-2xl border-t border-slate-800 py-2 px-0.5 z-50 max-w-xl mx-auto grid grid-cols-6 text-[7px] sm:text-[9.5px] font-bold text-slate-400">
+      <div className="fixed bottom-0 inset-x-0 bg-slate-950/98 backdrop-blur-2xl border-t border-slate-800 py-1.5 px-0 z-50 max-w-xl mx-auto grid grid-cols-6 text-[8px] font-bold text-slate-400">
         <button onClick={() => setActiveView('discover')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'discover' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-xs sm:text-base">🔥</span>
-          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Discover</span>
+          <span className="text-sm">🔥</span>
+          <span className="w-full text-center truncate">Discover</span>
         </button>
         <button onClick={() => setActiveView('browse')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'browse' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-xs sm:text-base">🎮</span>
-          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Browse</span>
+          <span className="text-sm">🎮</span>
+          <span className="w-full text-center truncate">Browse</span>
         </button>
         <button onClick={() => setActiveView('submitGame')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'submitGame' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-xs sm:text-base">🚀</span>
-          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Submit</span>
+          <span className="text-sm">🚀</span>
+          <span className="w-full text-center truncate">Submit</span>
         </button>
         <button onClick={() => setActiveView('playtest')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'playtest' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-xs sm:text-base">🧪</span>
-          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Playtest</span>
+          <span className="text-sm">🧪</span>
+          <span className="w-full text-center truncate">Playtest</span>
         </button>
         <button onClick={() => setActiveView('teamFinder')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'teamFinder' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-xs sm:text-base">👥</span>
-          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Team</span>
+          <span className="text-sm">👥</span>
+          <span className="w-full text-center truncate">Team</span>
         </button>
         <button onClick={() => setActiveView('dashboard')} className={`flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors py-1 px-0 ${activeView === 'dashboard' ? 'text-pink-400 font-black' : 'hover:text-white'}`}>
-          <span className="text-xs sm:text-base">📊</span>
-          <span className="w-full text-center whitespace-nowrap overflow-hidden text-ellipsis">Stats</span>
+          <span className="text-sm">📊</span>
+          <span className="w-full text-center truncate">Stats</span>
         </button>
       </div>
 
