@@ -13,9 +13,10 @@ export default function IndiePulseEcoSystemPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  // Team Finder Custom Message States Added
+  // Team Finder Custom Message States & Saved Requests
   const [collabMessage, setCollabMessage] = useState('');
   const [requestSent, setRequestSent] = useState(false);
+  const [savedRequests, setSavedRequests] = useState<any[]>([]);
 
   const [gamesList, setGamesList] = useState<any[]>([
     { id: '1', title: "Cyber Neon Runner", creator: "Aarav Dev", genre: "Action / Sci-Fi", plays: "3.4k plays", desc: "A fast-paced cyberpunk endless runner built with WebGL. Dodge obstacles and hack neon grids!", rating: "4.9 ⭐", banner: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80", link: "#" },
@@ -25,7 +26,7 @@ export default function IndiePulseEcoSystemPage() {
     { id: '5', title: "Speed Drift X", creator: "TurboGamer", genre: "Racing", plays: "5.2k plays", desc: "Next-gen arcade drifting simulator with neon tracks and multiplayer leaderboard support.", rating: "4.6 ⭐", banner: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80", link: "#" }
   ]);
 
-  // Load submitted games from localStorage automatically on page load
+  // Load submitted games and collaboration requests from localStorage automatically on page load
   useEffect(() => {
     const savedGames = localStorage.getItem('indiePulse_submitted_games');
     if (savedGames) {
@@ -36,6 +37,15 @@ export default function IndiePulseEcoSystemPage() {
         }
       } catch (e) {
         console.error("Failed to load submitted games", e);
+      }
+    }
+
+    const savedReqs = localStorage.getItem('indiePulse_collab_requests');
+    if (savedReqs) {
+      try {
+        setSavedRequests(JSON.parse(savedReqs));
+      } catch (e) {
+        console.error("Failed to load collaboration requests", e);
       }
     }
   }, []);
@@ -58,10 +68,15 @@ export default function IndiePulseEcoSystemPage() {
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-600/15 rounded-full blur-3xl pointer-events-none"></div>
 
       {/* Top Header Badge */}
-      <div className="w-full flex items-center justify-center mb-4 relative z-10">
+      <div className="w-full flex items-center justify-between mb-4 relative z-10 px-1">
         <span className="text-[11px] font-black tracking-widest text-pink-400 uppercase bg-slate-900/90 px-4 py-2 rounded-full border border-slate-800 shadow-md">
           🎮 INDIEPULSE ECOSYSTEM
         </span>
+        {/* Dapp Profile Linked Badge */}
+        <div className="bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded-full text-[10px] text-cyan-400 font-mono shadow-md flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Dapp Connected</span>
+        </div>
       </div>
 
       {/* ========================================================= */}
@@ -316,7 +331,7 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 8: TEAM FINDER (Updated with Custom Collaboration Message Box) */}
+      {/* VIEW 8: TEAM FINDER (Cleaned, Dapp Linked & Backend Storage) */}
       {/* ========================================================= */}
       {activeView === 'teamFinder' && (
         <div className="flex flex-col gap-4 relative z-10 text-left w-full">
@@ -327,9 +342,13 @@ export default function IndiePulseEcoSystemPage() {
             <h2 className="text-lg font-black text-center w-full">Bharat Patil</h2>
             <p className="text-[11px] text-pink-400 font-semibold mb-3.5 text-center w-full">Solo Game Developer & Creator</p>
             
+            {/* Cleaned up layout with Dapp Status indicator matching homepage */}
             <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-left mb-3.5 w-full">
-              <h4 className="text-[11px] font-bold text-slate-300 mb-1.5 text-left w-full">🛠️ Skills & Stack</h4>
-              <p className="text-[10px] text-slate-400 text-left w-full">Next.js, TypeScript, Unity, C#, Tailwind CSS, WebGL</p>
+              <div className="flex items-center justify-between text-[11px] font-bold text-slate-300 mb-1">
+                <span>🌐 Dapp Network Status</span>
+                <span className="text-emerald-400 font-mono text-[10px]">Active Node</span>
+              </div>
+              <p className="text-[10px] text-slate-400">Decentralized Collaboration Portal Connected</p>
             </div>
 
             {/* Custom Message Textarea for Collaboration Request */}
@@ -346,7 +365,7 @@ export default function IndiePulseEcoSystemPage() {
 
             {requestSent ? (
               <div className="p-3 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold rounded-xl w-full text-center">
-                ✓ Collaboration Request Sent Successfully!
+                ✓ Collaboration Request Saved & Sent Successfully!
               </div>
             ) : (
               <button 
@@ -355,10 +374,25 @@ export default function IndiePulseEcoSystemPage() {
                     alert('Please write a message before sending the request!');
                     return;
                   }
+
+                  // Save request to localStorage backend
+                  const newRequest = {
+                    id: Date.now().toString(),
+                    sender: "Guest Developer",
+                    message: collabMessage,
+                    timestamp: new Date().toLocaleString()
+                  };
+
+                  const updatedRequests = [newRequest, ...savedRequests];
+                  localStorage.setItem('indiePulse_collab_requests', JSON.stringify(updatedRequests));
+                  setSavedRequests(updatedRequests);
+
                   setRequestSent(true);
+                  // Clear textarea box instantly
+                  setCollabMessage('');
+
                   setTimeout(() => {
                     setRequestSent(false);
-                    setCollabMessage('');
                   }, 3500);
                 }} 
                 className="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl text-xs cursor-pointer shadow-md text-center"
