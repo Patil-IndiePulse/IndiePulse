@@ -13,6 +13,10 @@ export default function IndiePulseEcoSystemPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
+  // Team Finder Custom Message States Added
+  const [collabMessage, setCollabMessage] = useState('');
+  const [requestSent, setRequestSent] = useState(false);
+
   const [gamesList, setGamesList] = useState<any[]>([
     { id: '1', title: "Cyber Neon Runner", creator: "Aarav Dev", genre: "Action / Sci-Fi", plays: "3.4k plays", desc: "A fast-paced cyberpunk endless runner built with WebGL. Dodge obstacles and hack neon grids!", rating: "4.9 ⭐", banner: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80", link: "#" },
     { id: '2', title: "Mystic Quest RPG", creator: "Neha_Gamer", genre: "Adventure", plays: "2.8k plays", desc: "Immersive 2D pixel RPG featuring dungeon crawling and dynamic turn-based combat.", rating: "4.7 ⭐", banner: "https://images.unsplash.com/photo-1612287233002-81d0f53488d7?auto=format&fit=crop&w=800&q=80", link: "#" },
@@ -312,7 +316,7 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 8: TEAM FINDER */}
+      {/* VIEW 8: TEAM FINDER (Updated with Custom Collaboration Message Box) */}
       {/* ========================================================= */}
       {activeView === 'teamFinder' && (
         <div className="flex flex-col gap-4 relative z-10 text-left w-full">
@@ -328,9 +332,40 @@ export default function IndiePulseEcoSystemPage() {
               <p className="text-[10px] text-slate-400 text-left w-full">Next.js, TypeScript, Unity, C#, Tailwind CSS, WebGL</p>
             </div>
 
-            <button onClick={() => alert('Collab request sent!')} className="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl text-xs cursor-pointer shadow-md text-center">
-              🤝 Send Collaboration Request
-            </button>
+            {/* Custom Message Textarea for Collaboration Request */}
+            <div className="flex flex-col gap-1.5 mb-3.5 text-left w-full">
+              <label className="text-[11px] font-semibold text-slate-300">Your Message / Proposal:</label>
+              <textarea
+                rows={3}
+                value={collabMessage}
+                onChange={(e) => setCollabMessage(e.target.value)}
+                placeholder="Write what you want to collaborate on (e.g., I can help with C# scripting or UI design)..."
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 resize-none shadow-inner"
+              />
+            </div>
+
+            {requestSent ? (
+              <div className="p-3 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold rounded-xl w-full text-center">
+                ✓ Collaboration Request Sent Successfully!
+              </div>
+            ) : (
+              <button 
+                onClick={() => {
+                  if (!collabMessage.trim()) {
+                    alert('Please write a message before sending the request!');
+                    return;
+                  }
+                  setRequestSent(true);
+                  setTimeout(() => {
+                    setRequestSent(false);
+                    setCollabMessage('');
+                  }, 3500);
+                }} 
+                className="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl text-xs cursor-pointer shadow-md text-center"
+              >
+                🤝 Send Collaboration Request
+              </button>
+            )}
           </div>
         </div>
       )}
