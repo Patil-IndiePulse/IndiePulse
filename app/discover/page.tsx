@@ -67,16 +67,11 @@ export default function IndiePulseEcoSystemPage() {
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-600/15 rounded-full blur-3xl pointer-events-none"></div>
 
-      {/* Top Header Badge & Dapp Connected */}
-      <div className="w-full flex items-center justify-between mb-4 relative z-10 px-1">
+      {/* Top Header Badge */}
+      <div className="w-full flex items-center justify-center mb-4 relative z-10">
         <span className="text-[11px] font-black tracking-widest text-pink-400 uppercase bg-slate-900/90 px-4 py-2 rounded-full border border-slate-800 shadow-md">
           🎮 INDIEPULSE ECOSYSTEM
         </span>
-        {/* Dapp Profile Linked Badge */}
-        <div className="bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded-full text-[10px] text-cyan-400 font-mono shadow-md flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span>Dapp Connected</span>
-        </div>
       </div>
 
       {/* ========================================================= */}
@@ -331,18 +326,25 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 8: TEAM FINDER (Cleaned & Backend Storage) */}
+      {/* VIEW 8: TEAM FINDER (Synced with Homepage DP Image) */}
       {/* ========================================================= */}
       {activeView === 'teamFinder' && (
         <div className="flex flex-col gap-4 relative z-10 text-left w-full">
           <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-xl text-center w-full">
-            <div className="w-16 h-16 bg-gradient-to-tr from-pink-500 to-purple-500 rounded-full mx-auto flex items-center justify-center text-2xl font-black mb-2.5 shadow-lg">
-              BP
+            
+            {/* Synced Homepage DP Image with Glowing Border */}
+            <div className="w-20 h-20 rounded-full mx-auto p-[2px] bg-gradient-to-tr from-pink-500 to-purple-500 mb-2.5 shadow-lg">
+              <img 
+                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" 
+                alt="Bharat Patil DP" 
+                className="w-full h-full rounded-full object-cover border-2 border-slate-950"
+              />
             </div>
+
             <h2 className="text-lg font-black text-center w-full">Bharat Patil</h2>
             <p className="text-[11px] text-pink-400 font-semibold mb-3.5 text-center w-full">Solo Game Developer & Creator</p>
             
-            {/* Custom Message Textarea for Collaboration Request (Cleaned up, no unwanted text/box) */}
+            {/* Custom Message Textarea for Collaboration Request */}
             <div className="flex flex-col gap-1.5 mb-3.5 text-left w-full">
               <label className="text-[11px] font-semibold text-slate-300">Your Message / Proposal:</label>
               <textarea
@@ -379,7 +381,6 @@ export default function IndiePulseEcoSystemPage() {
                   setSavedRequests(updatedRequests);
 
                   setRequestSent(true);
-                  // Clear textarea box instantly
                   setCollabMessage('');
 
                   setTimeout(() => {
