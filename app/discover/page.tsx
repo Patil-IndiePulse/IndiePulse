@@ -67,7 +67,7 @@ export default function IndiePulseEcoSystemPage() {
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-600/15 rounded-full blur-3xl pointer-events-none"></div>
 
-      {/* Top Header Badge */}
+      {/* Top Header Badge & Dapp Connected */}
       <div className="w-full flex items-center justify-between mb-4 relative z-10 px-1">
         <span className="text-[11px] font-black tracking-widest text-pink-400 uppercase bg-slate-900/90 px-4 py-2 rounded-full border border-slate-800 shadow-md">
           🎮 INDIEPULSE ECOSYSTEM
@@ -331,7 +331,7 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 8: TEAM FINDER (Cleaned, Dapp Linked & Backend Storage) */}
+      {/* VIEW 8: TEAM FINDER (Cleaned & Backend Storage) */}
       {/* ========================================================= */}
       {activeView === 'teamFinder' && (
         <div className="flex flex-col gap-4 relative z-10 text-left w-full">
@@ -342,23 +342,14 @@ export default function IndiePulseEcoSystemPage() {
             <h2 className="text-lg font-black text-center w-full">Bharat Patil</h2>
             <p className="text-[11px] text-pink-400 font-semibold mb-3.5 text-center w-full">Solo Game Developer & Creator</p>
             
-            {/* Cleaned up layout with Dapp Status indicator matching homepage */}
-            <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-left mb-3.5 w-full">
-              <div className="flex items-center justify-between text-[11px] font-bold text-slate-300 mb-1">
-                <span>🌐 Dapp Network Status</span>
-                <span className="text-emerald-400 font-mono text-[10px]">Active Node</span>
-              </div>
-              <p className="text-[10px] text-slate-400">Decentralized Collaboration Portal Connected</p>
-            </div>
-
-            {/* Custom Message Textarea for Collaboration Request */}
+            {/* Custom Message Textarea for Collaboration Request (Cleaned up, no unwanted text/box) */}
             <div className="flex flex-col gap-1.5 mb-3.5 text-left w-full">
               <label className="text-[11px] font-semibold text-slate-300">Your Message / Proposal:</label>
               <textarea
                 rows={3}
                 value={collabMessage}
                 onChange={(e) => setCollabMessage(e.target.value)}
-                placeholder="Write what you want to collaborate on (e.g., I can help with C# scripting or UI design)..."
+                placeholder="Write what you want to collaborate on..."
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 resize-none shadow-inner"
               />
             </div>
