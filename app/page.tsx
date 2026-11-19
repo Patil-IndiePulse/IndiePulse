@@ -34,11 +34,18 @@ export default function Home() {
       setUser(currentUser);
     });
 
+    const syncProfilePic = () => {
+      const savedPic = localStorage.getItem('indiePulse_pic');
+      if (savedPic) {
+        setHomeProfilePic(savedPic);
+      }
+    };
+
     // Load saved profile picture from localStorage on homepage load
-    const savedPic = localStorage.getItem('indiePulse_pic');
-    if (savedPic) {
-      setHomeProfilePic(savedPic);
-    }
+    syncProfilePic();
+
+    // Listen for live updates to localStorage DP from other pages/tabs
+    window.addEventListener('storage', syncProfilePic);
 
     // Automatically fetch real submitted/trending games from localStorage
     const savedGames = localStorage.getItem('indiePulse_submitted_games');
@@ -81,8 +88,18 @@ export default function Home() {
       setTrendingGames(defaultDynamicGames);
     }
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      window.removeEventListener('storage', syncProfilePic);
+    };
   }, []);
+
+  // Keep localStorage synced whenever homeProfilePic changes
+  useEffect(() => {
+    if (homeProfilePic) {
+      localStorage.setItem('indiePulse_pic', homeProfilePic);
+    }
+  }, [homeProfilePic]);
 
   const mockSearchResults = [
     { id: '1', title: 'Cyber Nexus // RPG', type: 'Game', link: '/play/1' },
