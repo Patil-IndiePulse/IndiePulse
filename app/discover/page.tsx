@@ -13,6 +13,9 @@ export default function IndiePulseEcoSystemPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
+  // Synced DP from localStorage ('indiePulse_pic')
+  const [syncedProfilePic, setSyncedProfilePic] = useState<string | null>(null);
+
   // Team Finder Custom Message States & Saved Requests
   const [collabMessage, setCollabMessage] = useState('');
   const [requestSent, setRequestSent] = useState(false);
@@ -26,8 +29,16 @@ export default function IndiePulseEcoSystemPage() {
     { id: '5', title: "Speed Drift X", creator: "TurboGamer", genre: "Racing", plays: "5.2k plays", desc: "Next-gen arcade drifting simulator with neon tracks and multiplayer leaderboard support.", rating: "4.6 ⭐", banner: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80", link: "#" }
   ]);
 
-  // Load submitted games and collaboration requests from localStorage automatically on page load
+  // Load submitted games, collaboration requests, and synced DP from localStorage automatically on page load
   useEffect(() => {
+    const loadSyncedPic = () => {
+      const pic = localStorage.getItem('indiePulse_pic');
+      setSyncedProfilePic(pic);
+    };
+
+    loadSyncedPic();
+    window.addEventListener('storage', loadSyncedPic);
+
     const savedGames = localStorage.getItem('indiePulse_submitted_games');
     if (savedGames) {
       try {
@@ -48,6 +59,10 @@ export default function IndiePulseEcoSystemPage() {
         console.error("Failed to load collaboration requests", e);
       }
     }
+
+    return () => {
+      window.removeEventListener('storage', loadSyncedPic);
+    };
   }, []);
 
   const [devLogs, setDevLogs] = useState([
@@ -326,19 +341,23 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 8: TEAM FINDER (Synced with Homepage DP Image) */}
+      {/* VIEW 8: TEAM FINDER (Live DP from localStorage 'indiePulse_pic') */}
       {/* ========================================================= */}
       {activeView === 'teamFinder' && (
         <div className="flex flex-col gap-4 relative z-10 text-left w-full">
           <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-xl text-center w-full">
             
-            {/* Synced Homepage DP Image with Glowing Border */}
+            {/* Live DP Image synced from localStorage ('indiePulse_pic') with Glowing Border */}
             <div className="w-20 h-20 rounded-full mx-auto p-[2px] bg-gradient-to-tr from-pink-500 to-purple-500 mb-2.5 shadow-lg">
-              <img 
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" 
-                alt="Bharat Patil DP" 
-                className="w-full h-full rounded-full object-cover border-2 border-slate-950"
-              />
+              <div className="w-full h-full rounded-full bg-[#111827] overflow-hidden flex items-center justify-center border-2 border-slate-950">
+                {syncedProfilePic ? (
+                  <img src={syncedProfilePic} alt="Bharat Patil DP" className="w-full h-full object-cover" />
+                ) : (
+                  <svg className="w-10 h-10 text-[#9ca3af] translate-y-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                )}
+              </div>
             </div>
 
             <h2 className="text-lg font-black text-center w-full">Bharat Patil</h2>
