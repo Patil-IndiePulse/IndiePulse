@@ -21,6 +21,17 @@ export default function IndiePulseEcoSystemPage() {
   const [requestSent, setRequestSent] = useState(false);
   const [savedRequests, setSavedRequests] = useState<any[]>([]);
 
+  // Real Playtest & Feedback States
+  const [activeFeedbackReqId, setActiveFeedbackReqId] = useState<string | null>(null);
+  const [feedbackRating, setFeedbackRating] = useState<number>(5);
+  const [feedbackText, setFeedbackText] = useState('');
+  const [submittedFeedbacks, setSubmittedFeedbacks] = useState<Record<string, any[]>>({});
+
+  // New Playtest Request States
+  const [showNewPlaytestForm, setShowNewPlaytestForm] = useState(false);
+  const [newPlaytestTitle, setNewPlaytestTitle] = useState('');
+  const [newPlaytestTags, setNewPlaytestTags] = useState('#Playtest, #Feedback');
+
   const [gamesList, setGamesList] = useState<any[]>([
     { id: '1', title: "Cyber Neon Runner", creator: "Aarav Dev", genre: "Action / Sci-Fi", plays: "3.4k plays", desc: "A fast-paced cyberpunk endless runner built with WebGL. Dodge obstacles and hack neon grids!", rating: "4.9 ⭐", banner: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80", link: "#" },
     { id: '2', title: "Mystic Quest RPG", creator: "Neha_Gamer", genre: "Adventure", plays: "2.8k plays", desc: "Immersive 2D pixel RPG featuring dungeon crawling and dynamic turn-based combat.", rating: "4.7 ⭐", banner: "https://images.unsplash.com/photo-1612287233002-81d0f53488d7?auto=format&fit=crop&w=800&q=80", link: "#" },
@@ -29,7 +40,17 @@ export default function IndiePulseEcoSystemPage() {
     { id: '5', title: "Speed Drift X", creator: "TurboGamer", genre: "Racing", plays: "5.2k plays", desc: "Next-gen arcade drifting simulator with neon tracks and multiplayer leaderboard support.", rating: "4.6 ⭐", banner: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80", link: "#" }
   ]);
 
-  // Load submitted games, collaboration requests, and synced DP from localStorage automatically on page load
+  const [devLogs, setDevLogs] = useState([
+    { id: '1', title: "Day 45: Physics Bug Fix & Lighting Polish", author: "Bharat Patil", time: "2 hours ago", content: "Optimized collision detection and added bloom lighting to the neon platforms.", likes: 24, comments: 5 },
+    { id: '2', title: "Building the Inventory UI System", author: "Rahul Dev", time: "1 day ago", content: "Implemented drag-and-drop mechanics using TypeScript and Tailwind CSS.", likes: 41, comments: 12 }
+  ]);
+
+  const [playtestRequests, setPlaytestRequests] = useState([
+    { id: '1', title: "C# Coder needed for RPG Boss Battle Logic", author: "Aarav Dev", tags: ["#C#", "#Unity", "#TeamFinder"] },
+    { id: '2', title: "Playtest: Looking for 10 testers for Cyber Neon Runner v2", author: "Bharat Patil", tags: ["#Playtest", "#Feedback"] }
+  ]);
+
+  // Load submitted games, collaboration requests, synced DP, playtest requests, and playtest feedbacks from localStorage automatically on page load
   useEffect(() => {
     const loadSyncedPic = () => {
       const pic = localStorage.getItem('indiePulse_pic');
@@ -60,20 +81,93 @@ export default function IndiePulseEcoSystemPage() {
       }
     }
 
+    const savedPlaytests = localStorage.getItem('indiePulse_playtest_requests');
+    if (savedPlaytests) {
+      try {
+        const parsedPlaytests = JSON.parse(savedPlaytests);
+        if (Array.isArray(parsedPlaytests) && parsedPlaytests.length > 0) {
+          setPlaytestRequests(prev => [...parsedPlaytests, ...prev]);
+        }
+      } catch (e) {
+        console.error("Failed to load playtest requests", e);
+      }
+    }
+
+    const savedFeedbacks = localStorage.getItem('indiePulse_playtest_feedbacks');
+    if (savedFeedbacks) {
+      try {
+        setSubmittedFeedbacks(JSON.parse(savedFeedbacks));
+      } catch (e) {
+        console.error("Failed to load playtest feedbacks", e);
+      }
+    }
+
     return () => {
       window.removeEventListener('storage', loadSyncedPic);
     };
   }, []);
 
-  const [devLogs, setDevLogs] = useState([
-    { id: '1', title: "Day 45: Physics Bug Fix & Lighting Polish", author: "Bharat Patil", time: "2 hours ago", content: "Optimized collision detection and added bloom lighting to the neon platforms.", likes: 24, comments: 5 },
-    { id: '2', title: "Building the Inventory UI System", author: "Rahul Dev", time: "1 day ago", content: "Implemented drag-and-drop mechanics using TypeScript and Tailwind CSS.", likes: 41, comments: 12 }
-  ]);
+  const handleFeedbackSubmit = (reqId: string) => {
+    if (!feedbackText.trim()) {
+      return;
+    }
 
-  const [playtestRequests, setPlaytestRequests] = useState([
-    { id: '1', title: "C# Coder needed for RPG Boss Battle Logic", author: "Aarav Dev", tags: ["#C#", "#Unity", "#TeamFinder"] },
-    { id: '2', title: "Playtest: Looking for 10 testers for Cyber Neon Runner v2", author: "Bharat Patil", tags: ["#Playtest", "#Feedback"] }
-  ]);
+    const existingForReq = submittedFeedbacks[reqId] || [];
+    const newFeedback = {
+      id: Date.now().toString(),
+      tester: "Bharat Patil",
+      rating: feedbackRating,
+      comment: feedbackText.trim(),
+      time: "Just now"
+    };
+
+    const updatedFeedbacks = {
+      ...submittedFeedbacks,
+      [reqId]: [newFeedback, ...existingForReq]
+    };
+
+    setSubmittedFeedbacks(updatedFeedbacks);
+    localStorage.setItem('indiePulse_playtest_feedbacks', JSON.stringify(updatedFeedbacks));
+    setFeedbackText('');
+    setFeedbackRating(5);
+    setActiveFeedbackReqId(null);
+  };
+
+  const handleCreatePlaytestRequest = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPlaytestTitle.trim()) return;
+
+    const formattedTags = newPlaytestTags
+      .split(',')
+      .map(tag => tag.trim())
+      .filter(Boolean)
+      .map(tag => (tag.startsWith('#') ? tag : `#${tag}`));
+
+    const newReq = {
+      id: Date.now().toString(),
+      title: newPlaytestTitle.trim(),
+      author: "Bharat Patil",
+      tags: formattedTags.length > 0 ? formattedTags : ["#Playtest", "#Feedback"]
+    };
+
+    const updatedRequests = [newReq, ...playtestRequests];
+    setPlaytestRequests(updatedRequests);
+
+    const existingStored = localStorage.getItem('indiePulse_playtest_requests');
+    let storedList: any[] = [];
+    if (existingStored) {
+      try {
+        storedList = JSON.parse(existingStored);
+      } catch (err) {
+        storedList = [];
+      }
+    }
+    localStorage.setItem('indiePulse_playtest_requests', JSON.stringify([newReq, ...storedList]));
+
+    setNewPlaytestTitle('');
+    setNewPlaytestTags('#Playtest, #Feedback');
+    setShowNewPlaytestForm(false);
+  };
 
   return (
     <main className="min-h-screen bg-slate-950 text-white flex flex-col px-3 py-6 max-w-xl mx-auto w-full relative overflow-x-hidden select-none pb-28 text-left">
@@ -312,29 +406,130 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 7: PLAYTEST REQUESTS */}
+      {/* VIEW 7: PLAYTEST REQUESTS (Real Interactive Board) */}
       {/* ========================================================= */}
       {activeView === 'playtest' && (
         <div className="flex flex-col gap-4 relative z-10 text-left w-full">
           <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-xl text-left w-full">
-            <h2 className="text-lg font-black mb-1 text-left w-full">🧪 Playtest & Feedback Board</h2>
+            <div className="flex items-start justify-between gap-2 mb-1">
+              <h2 className="text-lg font-black text-left">🧪 Playtest & Feedback Board</h2>
+              <button
+                type="button"
+                onClick={() => setShowNewPlaytestForm(!showNewPlaytestForm)}
+                className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl text-[10px] cursor-pointer shrink-0 shadow"
+              >
+                {showNewPlaytestForm ? 'Close ✕' : '+ Post Request'}
+              </button>
+            </div>
             <p className="text-slate-400 text-xs mb-3.5 text-left w-full">Request player feedback or test upcoming indie builds.</p>
+
+            {showNewPlaytestForm && (
+              <form onSubmit={handleCreatePlaytestRequest} className="mb-4 p-3.5 rounded-xl bg-slate-950 border border-pink-500/40 flex flex-col gap-2.5 text-left">
+                <span className="text-[11px] font-bold text-pink-400">Create New Playtest Request</span>
+                <input
+                  type="text"
+                  value={newPlaytestTitle}
+                  onChange={(e) => setNewPlaytestTitle(e.target.value)}
+                  placeholder="e.g., Looking for testers for Neon Drift level 3..."
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500"
+                  required
+                />
+                <input
+                  type="text"
+                  value={newPlaytestTags}
+                  onChange={(e) => setNewPlaytestTags(e.target.value)}
+                  placeholder="Tags (comma separated, e.g., #Playtest, #BugHunt)"
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500"
+                />
+                <button
+                  type="submit"
+                  className="w-full py-2 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-lg text-xs cursor-pointer text-center"
+                >
+                  Publish Playtest Request 🚀
+                </button>
+              </form>
+            )}
             
-            <div className="flex flex-col gap-2.5 text-left w-full">
-              {playtestRequests.map((req) => (
-                <div key={req.id} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-left w-full">
-                  <span className="text-[10px] text-pink-400 font-bold block mb-1 text-left w-full">Posted by {req.author}</span>
-                  <h4 className="font-bold text-white text-xs mb-2 text-left w-full">{req.title}</h4>
-                  <div className="flex gap-1.5 flex-wrap mb-3 text-left w-full">
-                    {req.tags.map((t, i) => (
-                      <span key={i} className="px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-[10px]">{t}</span>
-                    ))}
+            <div className="flex flex-col gap-3 text-left w-full">
+              {playtestRequests.map((req) => {
+                const reqFeedbacks = submittedFeedbacks[req.id] || [];
+                const isFormOpen = activeFeedbackReqId === req.id;
+
+                return (
+                  <div key={req.id} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-left w-full">
+                    <span className="text-[10px] text-pink-400 font-bold block mb-1 text-left w-full">Posted by {req.author}</span>
+                    <h4 className="font-bold text-white text-xs mb-2 text-left w-full">{req.title}</h4>
+                    <div className="flex gap-1.5 flex-wrap mb-3 text-left w-full">
+                      {req.tags.map((t, i) => (
+                        <span key={i} className="px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-[10px]">{t}</span>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveFeedbackReqId(isFormOpen ? null : req.id);
+                        setFeedbackText('');
+                        setFeedbackRating(5);
+                      }}
+                      className="w-full py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-lg text-xs cursor-pointer text-center"
+                    >
+                      {isFormOpen ? 'Close Feedback Form ✕' : `Test Game & Give Feedback 💬 (${reqFeedbacks.length})`}
+                    </button>
+
+                    {isFormOpen && (
+                      <div className="mt-3 p-3 rounded-xl bg-slate-900 border border-cyan-500/30 flex flex-col gap-2.5 text-left">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-semibold text-slate-300">Rating (1–5 Stars):</span>
+                          <div className="flex gap-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => setFeedbackRating(star)}
+                                className={`text-sm cursor-pointer ${feedbackRating >= star ? 'text-yellow-400' : 'text-slate-600'}`}
+                              >
+                                ★
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <textarea
+                          rows={2}
+                          value={feedbackText}
+                          onChange={(e) => setFeedbackText(e.target.value)}
+                          placeholder='e.g., "Boss battle मध्ये frame drop होतोय" किंवा "Controls smooth आहेत"'
+                          className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 resize-none"
+                        />
+
+                        <button
+                          type="button"
+                          onClick={() => handleFeedbackSubmit(req.id)}
+                          className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs cursor-pointer text-center"
+                        >
+                          Submit Feedback ✓
+                        </button>
+                      </div>
+                    )}
+
+                    {reqFeedbacks.length > 0 && (
+                      <div className="mt-3 pt-2.5 border-t border-slate-800 flex flex-col gap-2">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Submitted Feedbacks</span>
+                        {reqFeedbacks.map((fb) => (
+                          <div key={fb.id} className="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800/80 text-left">
+                            <div className="flex items-center justify-between text-[10px] mb-1">
+                              <span className="font-bold text-cyan-400">{fb.tester} • {'★'.repeat(fb.rating)}{'☆'.repeat(5 - fb.rating)}</span>
+                              <span className="text-slate-500">{fb.time}</span>
+                            </div>
+                            <p className="text-[11px] text-slate-200 leading-relaxed">{fb.comment}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <button onClick={() => alert('Feedback submitted!')} className="w-full py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-lg text-xs cursor-pointer text-center">
-                    Test Game & Give Feedback 💬
-                  </button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
