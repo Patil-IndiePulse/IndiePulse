@@ -26,6 +26,7 @@ export default function IndiePulseEcoSystemPage() {
   const [feedbackRating, setFeedbackRating] = useState<number>(5);
   const [feedbackText, setFeedbackText] = useState('');
   const [submittedFeedbacks, setSubmittedFeedbacks] = useState<Record<string, any[]>>({});
+  const [feedbackSavedToast, setFeedbackSavedToast] = useState<string | null>(null);
 
   // New Playtest Request States
   const [showNewPlaytestForm, setShowNewPlaytestForm] = useState(false);
@@ -96,7 +97,10 @@ export default function IndiePulseEcoSystemPage() {
     const savedFeedbacks = localStorage.getItem('indiePulse_playtest_feedbacks');
     if (savedFeedbacks) {
       try {
-        setSubmittedFeedbacks(JSON.parse(savedFeedbacks));
+        const parsedFeedbacks = JSON.parse(savedFeedbacks);
+        if (parsedFeedbacks && typeof parsedFeedbacks === 'object') {
+          setSubmittedFeedbacks(parsedFeedbacks);
+        }
       } catch (e) {
         console.error("Failed to load playtest feedbacks", e);
       }
@@ -108,29 +112,47 @@ export default function IndiePulseEcoSystemPage() {
   }, []);
 
   const handleFeedbackSubmit = (reqId: string) => {
-    if (!feedbackText.trim()) {
+    const cleanText = feedbackText.trim();
+    if (!cleanText) {
       return;
     }
 
-    const existingForReq = submittedFeedbacks[reqId] || [];
+    let currentStorageMap: Record<string, any[]> = { ...submittedFeedbacks };
+    try {
+      const raw = localStorage.getItem('indiePulse_playtest_feedbacks');
+      if (raw) {
+        currentStorageMap = { ...currentStorageMap, ...JSON.parse(raw) };
+      }
+    } catch (e) {
+      // ignore parse error
+    }
+
+    const existingForReq = currentStorageMap[reqId] || [];
     const newFeedback = {
-      id: Date.now().toString(),
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       tester: "Bharat Patil",
       rating: feedbackRating,
-      comment: feedbackText.trim(),
+      comment: cleanText,
       time: "Just now"
     };
 
-    const updatedFeedbacks = {
-      ...submittedFeedbacks,
+    const updatedFeedbacks: Record<string, any[]> = {
+      ...currentStorageMap,
       [reqId]: [newFeedback, ...existingForReq]
     };
 
     setSubmittedFeedbacks(updatedFeedbacks);
-    localStorage.setItem('indiePulse_playtest_feedbacks', JSON.stringify(updatedFeedbacks));
+    try {
+      localStorage.setItem('indiePulse_playtest_feedbacks', JSON.stringify(updatedFeedbacks));
+    } catch (e) {
+      console.error("Failed to save feedback to localStorage", e);
+    }
+
     setFeedbackText('');
     setFeedbackRating(5);
     setActiveFeedbackReqId(null);
+    setFeedbackSavedToast(reqId);
+    setTimeout(() => setFeedbackSavedToast(null), 2500);
   };
 
   const handleCreatePlaytestRequest = (e: React.FormEvent) => {
@@ -167,6 +189,14 @@ export default function IndiePulseEcoSystemPage() {
     setNewPlaytestTitle('');
     setNewPlaytestTags('#Playtest, #Feedback');
     setShowNewPlaytestForm(false);
+  };
+
+  const ratingLabels: Record<number, string> = {
+    1: "Needs Work",
+    2: "Fair",
+    3: "Good",
+    4: "Great",
+    5: "Awesome"
   };
 
   return (
@@ -336,7 +366,7 @@ export default function IndiePulseEcoSystemPage() {
               <span className="w-14 h-14 bg-pink-600/30 border border-pink-500 rounded-full flex items-center justify-center text-2xl mb-3 animate-pulse">🎮</span>
               <h3 className="text-lg font-black mb-1">{selectedGame?.title || gamesList[0].title}</h3>
               <p className="text-[11px] text-slate-300 mb-5">Running live in IndiePulse Cloud Sandbox</p>
-              
+
               <div className="flex gap-2.5">
                 {selectedGame?.link && selectedGame.link !== '#' ? (
                   <a href={selectedGame.link} target="_blank" rel="noopener noreferrer" className="px-5 py-2.5 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded-xl text-xs shadow-lg cursor-pointer">
@@ -406,46 +436,44 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 7: PLAYTEST REQUESTS (Real Interactive Board) */}
+      {/* VIEW 7: PLAYTEST REQUESTS (Clean & Real Interactive Board) */}
       {/* ========================================================= */}
       {activeView === 'playtest' && (
-        <div className="flex flex-col gap-4 relative z-10 text-left w-full">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-xl text-left w-full">
-            <div className="flex items-start justify-between gap-2 mb-1">
-              <h2 className="text-lg font-black text-left">🧪 Playtest & Feedback Board</h2>
+        <div className="flex flex-col gap-3.5 relative z-10 text-left w-full">
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-4 rounded-2xl shadow-xl text-left w-full">
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <h2 className="text-base font-black text-white whitespace-nowrap">🧪 Playtest Board</h2>
               <button
                 type="button"
                 onClick={() => setShowNewPlaytestForm(!showNewPlaytestForm)}
-                className="px-3 py-1.5 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl text-[10px] cursor-pointer shrink-0 shadow"
+                className="px-2.5 py-1.5 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded-md text-[11px] cursor-pointer shrink-0 whitespace-nowrap"
               >
-                {showNewPlaytestForm ? 'Close ✕' : '+ Post Request'}
+                {showNewPlaytestForm ? '✕ Close' : '+ Post'}
               </button>
             </div>
-            <p className="text-slate-400 text-xs mb-3.5 text-left w-full">Request player feedback or test upcoming indie builds.</p>
 
             {showNewPlaytestForm && (
-              <form onSubmit={handleCreatePlaytestRequest} className="mb-4 p-3.5 rounded-xl bg-slate-950 border border-pink-500/40 flex flex-col gap-2.5 text-left">
-                <span className="text-[11px] font-bold text-pink-400">Create New Playtest Request</span>
+              <form onSubmit={handleCreatePlaytestRequest} className="mb-3.5 p-3 rounded-xl bg-slate-950 border border-slate-800 flex flex-col gap-2 text-left">
                 <input
                   type="text"
                   value={newPlaytestTitle}
                   onChange={(e) => setNewPlaytestTitle(e.target.value)}
-                  placeholder="e.g., Looking for testers for Neon Drift level 3..."
-                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500"
+                  placeholder="Playtest topic..."
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
                   required
                 />
                 <input
                   type="text"
                   value={newPlaytestTags}
                   onChange={(e) => setNewPlaytestTags(e.target.value)}
-                  placeholder="Tags (comma separated, e.g., #Playtest, #BugHunt)"
-                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500"
+                  placeholder="#Playtest, #Feedback"
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
                 />
                 <button
                   type="submit"
-                  className="w-full py-2 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-lg text-xs cursor-pointer text-center"
+                  className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs cursor-pointer text-center"
                 >
-                  Publish Playtest Request 🚀
+                  Post Request ✓
                 </button>
               </form>
             )}
@@ -457,13 +485,19 @@ export default function IndiePulseEcoSystemPage() {
 
                 return (
                   <div key={req.id} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-left w-full">
-                    <span className="text-[10px] text-pink-400 font-bold block mb-1 text-left w-full">Posted by {req.author}</span>
-                    <h4 className="font-bold text-white text-xs mb-2 text-left w-full">{req.title}</h4>
-                    <div className="flex gap-1.5 flex-wrap mb-3 text-left w-full">
+                    <span className="text-[10px] text-pink-400 font-bold block mb-0.5">{req.author}</span>
+                    <h4 className="font-bold text-white text-xs mb-2">{req.title}</h4>
+                    <div className="flex gap-1.5 flex-wrap mb-3">
                       {req.tags.map((t, i) => (
-                        <span key={i} className="px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-[10px]">{t}</span>
+                        <span key={i} className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300 text-[10px]">{t}</span>
                       ))}
                     </div>
+
+                    {feedbackSavedToast === req.id && (
+                      <div className="mb-2 px-2.5 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 text-[11px] font-bold">
+                        ✓ Feedback saved to localStorage
+                      </div>
+                    )}
 
                     <button
                       type="button"
@@ -474,20 +508,27 @@ export default function IndiePulseEcoSystemPage() {
                       }}
                       className="w-full py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-lg text-xs cursor-pointer text-center"
                     >
-                      {isFormOpen ? 'Close Feedback Form ✕' : `Test Game & Give Feedback 💬 (${reqFeedbacks.length})`}
+                      {isFormOpen ? 'Close ✕' : `Test Game & Give Feedback 💬 (${reqFeedbacks.length})`}
                     </button>
 
                     {isFormOpen && (
-                      <div className="mt-3 p-3 rounded-xl bg-slate-900 border border-cyan-500/30 flex flex-col gap-2.5 text-left">
+                      <div className="mt-3 p-3 rounded-xl bg-slate-900 border border-emerald-500/30 flex flex-col gap-2.5 text-left">
                         <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-semibold text-slate-300">Rating (1–5 Stars):</span>
-                          <div className="flex gap-1">
+                          <span className="text-[11px] font-bold text-emerald-400">
+                            {feedbackRating}★ • {ratingLabels[feedbackRating]}
+                          </span>
+                          <div className="flex items-center gap-1">
                             {[1, 2, 3, 4, 5].map((star) => (
                               <button
                                 key={star}
                                 type="button"
                                 onClick={() => setFeedbackRating(star)}
-                                className={`text-sm cursor-pointer ${feedbackRating >= star ? 'text-yellow-400' : 'text-slate-600'}`}
+                                className={`text-lg leading-none cursor-pointer transition-transform active:scale-125 ${
+                                  feedbackRating >= star
+                                    ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.7)]'
+                                    : 'text-slate-600 hover:text-emerald-300/60'
+                                }`}
+                                aria-label={`Rate ${star} stars`}
                               >
                                 ★
                               </button>
@@ -499,14 +540,19 @@ export default function IndiePulseEcoSystemPage() {
                           rows={2}
                           value={feedbackText}
                           onChange={(e) => setFeedbackText(e.target.value)}
-                          placeholder='e.g., "Boss battle मध्ये frame drop होतोय" किंवा "Controls smooth आहेत"'
-                          className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 resize-none"
+                          placeholder="Write feedback..."
+                          className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none"
                         />
 
                         <button
                           type="button"
                           onClick={() => handleFeedbackSubmit(req.id)}
-                          className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs cursor-pointer text-center"
+                          disabled={!feedbackText.trim()}
+                          className={`w-full py-2 font-bold rounded-lg text-xs text-center transition ${
+                            feedbackText.trim()
+                              ? 'bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer'
+                              : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                          }`}
                         >
                           Submit Feedback ✓
                         </button>
@@ -515,14 +561,18 @@ export default function IndiePulseEcoSystemPage() {
 
                     {reqFeedbacks.length > 0 && (
                       <div className="mt-3 pt-2.5 border-t border-slate-800 flex flex-col gap-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Submitted Feedbacks</span>
+                        <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
+                          Saved Feedbacks ({reqFeedbacks.length})
+                        </span>
                         {reqFeedbacks.map((fb) => (
-                          <div key={fb.id} className="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800/80 text-left">
+                          <div key={fb.id} className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 text-left">
                             <div className="flex items-center justify-between text-[10px] mb-1">
-                              <span className="font-bold text-cyan-400">{fb.tester} • {'★'.repeat(fb.rating)}{'☆'.repeat(5 - fb.rating)}</span>
+                              <span className="font-bold text-emerald-400">
+                                {fb.tester} • {'★'.repeat(fb.rating)}{'☆'.repeat(5 - fb.rating)}
+                              </span>
                               <span className="text-slate-500">{fb.time}</span>
                             </div>
-                            <p className="text-[11px] text-slate-200 leading-relaxed">{fb.comment}</p>
+                            <p className="text-[11px] text-slate-200 leading-snug">{fb.comment}</p>
                           </div>
                         ))}
                       </div>
