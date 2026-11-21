@@ -439,151 +439,166 @@ export default function IndiePulseEcoSystemPage() {
       {/* VIEW 7: PLAYTEST REQUESTS (Clean & Real Interactive Board) */}
       {/* ========================================================= */}
       {activeView === 'playtest' && (
-        <div className="flex flex-col gap-3.5 relative z-10 text-left w-full">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-4 rounded-2xl shadow-xl text-left w-full">
-            <div className="flex items-center justify-between gap-2 mb-3">
-              <h2 className="text-base font-black text-white whitespace-nowrap">🧪 Playtest Board</h2>
+       <div className="flex flex-col gap-3.5 relative z-10 text-left w-full align-left">
+         <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-4 rounded-2xl shadow-xl text-left w-full align-left">
+           <div className="flex items-center justify-between gap-2 mb-3 w-full">
+            <h2 className="text-base font-black text-white whitespace-nowrap">🧪 Playtest Board</h2>
+            <button
+             type="button"
+            onClick={() => setShowNewPlaytestForm(!showNewPlaytestForm)}
+            className="w-fit inline-flex items-center justify-center px-2 py-1 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded-sm text-[11px] cursor-pointer shrink-0 whitespace-nowrap"
+         >
+           {showNewPlaytestForm ? '✕ Close' : '+ Post'}
+         </button>
+      </div>
+
+      {showNewPlaytestForm && (
+        <form onSubmit={handleCreatePlaytestRequest} className="mb-3.5 p-3 rounded-xl bg-slate-950 border border-slate-800 flex flex-col gap-2 text-left w-full align-left">
+          <input
+            type="text"
+            value={newPlaytestTitle}
+            onChange={(e) => setNewPlaytestTitle(e.target.value)}
+            placeholder="Playtest topic..."
+            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-left"
+            required
+          />
+          <input
+            type="text"
+            value={newPlaytestTags}
+            onChange={(e) => setNewPlaytestTags(e.target.value)}
+            placeholder="#Playtest, #Feedback"
+            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-left"
+          />
+          <button
+            type="submit"
+            className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs cursor-pointer text-center"
+          >
+            Post Request ✓
+          </button>
+        </form>
+      )}
+      
+      <div className="flex flex-col gap-3 text-left w-full align-left">
+        {playtestRequests.map((req) => {
+          const reqFeedbacks = submittedFeedbacks[req.id] || [];
+          const isFormOpen = activeFeedbackReqId === req.id;
+
+          return (
+            <div key={req.id} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-left w-full align-left">
+              <div className="flex items-center gap-2 mb-1 text-left w-full align-left">
+                <div className="w-5 h-5 rounded-full bg-slate-800 border border-pink-500/60 overflow-hidden flex items-center justify-center shrink-0">
+                  {syncedProfilePic ? (
+                    <img src={syncedProfilePic} alt={req.author} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-[9px] font-bold text-pink-400">B</span>
+                  )}
+                </div>
+                <span className="text-[10px] text-pink-400 font-bold text-left">{req.author}</span>
+              </div>
+
+              <h4 className="font-bold text-white text-xs mb-2 text-left w-full align-left">{req.title}</h4>
+              <div className="flex gap-1.5 flex-wrap mb-3 text-left w-full align-left">
+                {req.tags.map((t, i) => (
+                  <span key={i} className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300 text-[10px]">{t}</span>
+                ))}
+              </div>
+
               <button
                 type="button"
-                onClick={() => setShowNewPlaytestForm(!showNewPlaytestForm)}
-                className="px-2.5 py-1.5 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded-md text-[11px] cursor-pointer shrink-0 whitespace-nowrap"
+                onClick={() => {
+                  setActiveFeedbackReqId(isFormOpen ? null : req.id);
+                  setFeedbackText('');
+                  setFeedbackRating(5);
+                }}
+                className="w-full py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-lg text-xs cursor-pointer text-center"
               >
-                {showNewPlaytestForm ? '✕ Close' : '+ Post'}
+                {isFormOpen ? 'Close ✕' : `Test Game & Give Feedback 💬 (${reqFeedbacks.length})`}
               </button>
-            </div>
 
-            {showNewPlaytestForm && (
-              <form onSubmit={handleCreatePlaytestRequest} className="mb-3.5 p-3 rounded-xl bg-slate-950 border border-slate-800 flex flex-col gap-2 text-left">
-                <input
-                  type="text"
-                  value={newPlaytestTitle}
-                  onChange={(e) => setNewPlaytestTitle(e.target.value)}
-                  placeholder="Playtest topic..."
-                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
-                  required
-                />
-                <input
-                  type="text"
-                  value={newPlaytestTags}
-                  onChange={(e) => setNewPlaytestTags(e.target.value)}
-                  placeholder="#Playtest, #Feedback"
-                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
-                />
-                <button
-                  type="submit"
-                  className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs cursor-pointer text-center"
-                >
-                  Post Request ✓
-                </button>
-              </form>
-            )}
-            
-            <div className="flex flex-col gap-3 text-left w-full">
-              {playtestRequests.map((req) => {
-                const reqFeedbacks = submittedFeedbacks[req.id] || [];
-                const isFormOpen = activeFeedbackReqId === req.id;
-
-                return (
-                  <div key={req.id} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-left w-full">
-                    <span className="text-[10px] text-pink-400 font-bold block mb-0.5">{req.author}</span>
-                    <h4 className="font-bold text-white text-xs mb-2">{req.title}</h4>
-                    <div className="flex gap-1.5 flex-wrap mb-3">
-                      {req.tags.map((t, i) => (
-                        <span key={i} className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300 text-[10px]">{t}</span>
+              {isFormOpen && (
+                <div className="mt-3 p-3 rounded-xl bg-slate-900 border border-emerald-500/30 flex flex-col gap-2.5 text-left w-full align-left">
+                  <div className="flex items-center justify-between w-full">
+                    <span className="text-[11px] font-bold text-emerald-400">
+                      {feedbackRating}★ • {ratingLabels[feedbackRating]}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setFeedbackRating(star)}
+                          className={`text-lg leading-none cursor-pointer transition-transform active:scale-125 ${
+                            feedbackRating >= star
+                              ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.7)]'
+                              : 'text-slate-600 hover:text-emerald-300/60'
+                          }`}
+                          aria-label={`Rate ${star} stars`}
+                        >
+                          ★
+                        </button>
                       ))}
                     </div>
-
-                    {feedbackSavedToast === req.id && (
-                      <div className="mb-2 px-2.5 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 text-[11px] font-bold">
-                        ✓ Feedback saved to localStorage
-                      </div>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveFeedbackReqId(isFormOpen ? null : req.id);
-                        setFeedbackText('');
-                        setFeedbackRating(5);
-                      }}
-                      className="w-full py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-lg text-xs cursor-pointer text-center"
-                    >
-                      {isFormOpen ? 'Close ✕' : `Test Game & Give Feedback 💬 (${reqFeedbacks.length})`}
-                    </button>
-
-                    {isFormOpen && (
-                      <div className="mt-3 p-3 rounded-xl bg-slate-900 border border-emerald-500/30 flex flex-col gap-2.5 text-left">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-bold text-emerald-400">
-                            {feedbackRating}★ • {ratingLabels[feedbackRating]}
-                          </span>
-                          <div className="flex items-center gap-1">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <button
-                                key={star}
-                                type="button"
-                                onClick={() => setFeedbackRating(star)}
-                                className={`text-lg leading-none cursor-pointer transition-transform active:scale-125 ${
-                                  feedbackRating >= star
-                                    ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.7)]'
-                                    : 'text-slate-600 hover:text-emerald-300/60'
-                                }`}
-                                aria-label={`Rate ${star} stars`}
-                              >
-                                ★
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        <textarea
-                          rows={2}
-                          value={feedbackText}
-                          onChange={(e) => setFeedbackText(e.target.value)}
-                          placeholder="Write feedback..."
-                          className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none"
-                        />
-
-                        <button
-                          type="button"
-                          onClick={() => handleFeedbackSubmit(req.id)}
-                          disabled={!feedbackText.trim()}
-                          className={`w-full py-2 font-bold rounded-lg text-xs text-center transition ${
-                            feedbackText.trim()
-                              ? 'bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer'
-                              : 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                          }`}
-                        >
-                          Submit Feedback ✓
-                        </button>
-                      </div>
-                    )}
-
-                    {reqFeedbacks.length > 0 && (
-                      <div className="mt-3 pt-2.5 border-t border-slate-800 flex flex-col gap-2">
-                        <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
-                          Saved Feedbacks ({reqFeedbacks.length})
-                        </span>
-                        {reqFeedbacks.map((fb) => (
-                          <div key={fb.id} className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 text-left">
-                            <div className="flex items-center justify-between text-[10px] mb-1">
-                              <span className="font-bold text-emerald-400">
-                                {fb.tester} • {'★'.repeat(fb.rating)}{'☆'.repeat(5 - fb.rating)}
-                              </span>
-                              <span className="text-slate-500">{fb.time}</span>
-                            </div>
-                            <p className="text-[11px] text-slate-200 leading-snug">{fb.comment}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
-                );
-              })}
+
+                  <textarea
+                    rows={2}
+                    value={feedbackText}
+                    onChange={(e) => setFeedbackText(e.target.value)}
+                    placeholder="Write feedback..."
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none text-left"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => handleFeedbackSubmit(req.id)}
+                    disabled={!feedbackText.trim()}
+                    className={`w-full py-2 font-bold rounded-lg text-xs text-center transition ${
+                      feedbackText.trim()
+                        ? 'bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer'
+                        : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                    }`}
+                  >
+                    Submit Feedback ✓
+                  </button>
+                </div>
+              )}
+
+              {reqFeedbacks.length > 0 && (
+                <div className="mt-3 pt-2.5 border-t border-slate-800 flex flex-col gap-2 text-left w-full align-left">
+                  <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider text-left w-full align-left">
+                    Saved Feedbacks ({reqFeedbacks.length})
+                  </span>
+                  {reqFeedbacks.map((fb) => (
+                    <div key={fb.id} className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 text-left w-full align-left">
+                      <div className="flex items-center justify-between text-[10px] mb-1 w-full">
+                        <div className="flex items-center gap-1.5 text-left">
+                          <div className="w-4 h-4 rounded-full bg-slate-800 border border-emerald-500/50 overflow-hidden flex items-center justify-center shrink-0">
+                            {syncedProfilePic ? (
+                              <img src={syncedProfilePic} alt={fb.tester} className="w-full h-full object-cover" />
+                            ) : (
+                              <span className="text-[8px] font-bold text-emerald-400">B</span>
+                            )}
+                          </div>
+                          <span className="font-bold text-emerald-400 text-left">
+                            {fb.tester} • {'★'.repeat(fb.rating)}{'☆'.repeat(5 - fb.rating)}
+                          </span>
+                        </div>
+                        <span className="text-slate-500">{fb.time}</span>
+                      </div>
+                      <p className="text-[11px] text-slate-200 leading-snug text-left w-full align-left break-words">
+                        {fb.comment}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        </div>
-      )}
+          );
+        })}
+      </div>
+    </div>
+  </div>
+)}
 
       {/* ========================================================= */}
       {/* VIEW 8: TEAM FINDER (Live DP from localStorage 'indiePulse_pic') */}
