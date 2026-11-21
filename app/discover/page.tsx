@@ -16,6 +16,9 @@ export default function IndiePulseEcoSystemPage() {
   // Synced DP from localStorage ('indiePulse_pic')
   const [syncedProfilePic, setSyncedProfilePic] = useState<string | null>(null);
 
+  // Synced Name from localStorage ('indiePulse_name' / profile name keys)
+  const [syncedProfileName, setSyncedProfileName] = useState<string>('Bharat Patil');
+
   // Team Finder Custom Message States & Saved Requests
   const [collabMessage, setCollabMessage] = useState('');
   const [requestSent, setRequestSent] = useState(false);
@@ -51,15 +54,52 @@ export default function IndiePulseEcoSystemPage() {
     { id: '2', title: "Playtest: Looking for 10 testers for Cyber Neon Runner v2", author: "Bharat Patil", tags: ["#Playtest", "#Feedback"] }
   ]);
 
-  // Load submitted games, collaboration requests, synced DP, playtest requests, and playtest feedbacks from localStorage automatically on page load
+  // Helper to resolve display name when a post/feedback belonged to the user's previous name
+  const resolveDisplayName = (name: string | undefined, currentName: string) => {
+    if (!name || name === "Bharat Patil" || name === "Guest Developer") {
+      return currentName;
+    }
+    return name;
+  };
+
+  // Load submitted games, collaboration requests, synced DP & Name, playtest requests, and playtest feedbacks from localStorage automatically on page load
   useEffect(() => {
-    const loadSyncedPic = () => {
-      const pic = localStorage.getItem('indiePulse_pic');
-      setSyncedProfilePic(pic);
+    const readNameFromStorage = () => {
+      const possibleKeys = [
+        'indiePulse_name',
+        'indiePulse_profile_name',
+        'indiePulse_user_name',
+        'indiePulse_username'
+      ];
+      for (const key of possibleKeys) {
+        const val = localStorage.getItem(key);
+        if (val && val.trim()) {
+          return val.trim();
+        }
+      }
+      const profileRaw = localStorage.getItem('indiePulse_profile');
+      if (profileRaw) {
+        try {
+          const parsedProfile = JSON.parse(profileRaw);
+          if (parsedProfile?.name && String(parsedProfile.name).trim()) {
+            return String(parsedProfile.name).trim();
+          }
+        } catch (e) {
+          // ignore parse error
+        }
+      }
+      return 'Bharat Patil';
     };
 
-    loadSyncedPic();
-    window.addEventListener('storage', loadSyncedPic);
+    const loadSyncedProfile = () => {
+      const pic = localStorage.getItem('indiePulse_pic');
+      setSyncedProfilePic(pic);
+      setSyncedProfileName(readNameFromStorage());
+    };
+
+    loadSyncedProfile();
+    window.addEventListener('storage', loadSyncedProfile);
+    window.addEventListener('focus', loadSyncedProfile);
 
     const savedGames = localStorage.getItem('indiePulse_submitted_games');
     if (savedGames) {
@@ -107,7 +147,8 @@ export default function IndiePulseEcoSystemPage() {
     }
 
     return () => {
-      window.removeEventListener('storage', loadSyncedPic);
+      window.removeEventListener('storage', loadSyncedProfile);
+      window.removeEventListener('focus', loadSyncedProfile);
     };
   }, []);
 
@@ -130,7 +171,7 @@ export default function IndiePulseEcoSystemPage() {
     const existingForReq = currentStorageMap[reqId] || [];
     const newFeedback = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      tester: "Bharat Patil",
+      tester: syncedProfileName || "Bharat Patil",
       rating: feedbackRating,
       comment: cleanText,
       time: "Just now"
@@ -168,7 +209,7 @@ export default function IndiePulseEcoSystemPage() {
     const newReq = {
       id: Date.now().toString(),
       title: newPlaytestTitle.trim(),
-      author: "Bharat Patil",
+      author: syncedProfileName || "Bharat Patil",
       tags: formattedTags.length > 0 ? formattedTags : ["#Playtest", "#Feedback"]
     };
 
@@ -300,7 +341,7 @@ export default function IndiePulseEcoSystemPage() {
                     <img src={game.banner || "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80"} alt={game.title} className="w-11 h-11 rounded-xl object-cover border border-slate-700" />
                     <div className="text-left">
                       <h3 className="font-bold text-white text-xs text-left w-full">{game.title}</h3>
-                      <p className="text-[10px] text-slate-400 text-left w-full">By {game.creator || game.developer || 'Bharat Patil'} • <span className="text-pink-400">{game.genre || 'Action / Indie'}</span></p>
+                      <p className="text-[10px] text-slate-400 text-left w-full">By {game.creator || game.developer || syncedProfileName} • <span className="text-pink-400">{game.genre || 'Action / Indie'}</span></p>
                     </div>
                   </div>
                   <div className="text-right shrink-0">
@@ -323,7 +364,7 @@ export default function IndiePulseEcoSystemPage() {
               <h2 className="text-xl font-black text-left w-full">{selectedGame.title}</h2>
               <span className="bg-emerald-500/20 text-emerald-400 text-[11px] px-2.5 py-0.5 rounded-full font-bold shrink-0">{selectedGame.rating || '5.0 ⭐'}</span>
             </div>
-            <p className="text-[11px] text-pink-400 font-semibold mb-2.5 text-left w-full">Developed by {selectedGame.creator || selectedGame.developer || 'Bharat Patil'} • {selectedGame.genre || 'Indie'}</p>
+            <p className="text-[11px] text-pink-400 font-semibold mb-2.5 text-left w-full">Developed by {selectedGame.creator || selectedGame.developer || syncedProfileName} • {selectedGame.genre || 'Indie'}</p>
             <p className="text-slate-300 text-xs leading-relaxed mb-5 text-left w-full">{selectedGame.desc || selectedGame.description}</p>
 
             <div className="flex flex-col gap-2.5 text-left w-full">
@@ -344,7 +385,7 @@ export default function IndiePulseEcoSystemPage() {
                   🎮 Play Game Now (WebGL)
                 </button>
               )}
-              <button 
+              <button
                 onClick={() => setActiveView('projectDetail')}
                 className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-[11px] cursor-pointer border border-slate-700 text-center"
               >
@@ -366,7 +407,7 @@ export default function IndiePulseEcoSystemPage() {
               <span className="w-14 h-14 bg-pink-600/30 border border-pink-500 rounded-full flex items-center justify-center text-2xl mb-3 animate-pulse">🎮</span>
               <h3 className="text-lg font-black mb-1">{selectedGame?.title || gamesList[0].title}</h3>
               <p className="text-[11px] text-slate-300 mb-5">Running live in IndiePulse Cloud Sandbox</p>
-
+              
               <div className="flex gap-2.5">
                 {selectedGame?.link && selectedGame.link !== '#' ? (
                   <a href={selectedGame.link} target="_blank" rel="noopener noreferrer" className="px-5 py-2.5 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded-xl text-xs shadow-lg cursor-pointer">
@@ -396,20 +437,23 @@ export default function IndiePulseEcoSystemPage() {
             <p className="text-slate-400 text-xs mb-3.5 text-left w-full">Behind-the-scenes progress from indie creators.</p>
             
             <div className="flex flex-col gap-2.5 text-left w-full">
-              {devLogs.map((log) => (
-                <div key={log.id} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-left w-full">
-                  <div className="flex justify-between items-center mb-1 text-left w-full">
-                    <span className="font-bold text-pink-400 text-[11px] text-left">{log.author}</span>
-                    <span className="text-[10px] text-slate-500 text-right">{log.time}</span>
+              {devLogs.map((log) => {
+                const displayAuthor = resolveDisplayName(log.author, syncedProfileName);
+                return (
+                  <div key={log.id} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-left w-full">
+                    <div className="flex justify-between items-center mb-1 text-left w-full">
+                      <span className="font-bold text-pink-400 text-[11px] text-left">{displayAuthor}</span>
+                      <span className="text-[10px] text-slate-500 text-right">{log.time}</span>
+                    </div>
+                    <h4 className="font-bold text-white text-xs mb-1 text-left w-full">{log.title}</h4>
+                    <p className="text-slate-300 text-[11px] mb-2.5 text-left w-full">{log.content}</p>
+                    <div className="flex gap-3 text-[10px] text-slate-400 border-t border-slate-900 pt-2 text-left w-full">
+                      <span>❤️ {log.likes} Likes</span>
+                      <span>💬 {log.comments} Comments</span>
+                    </div>
                   </div>
-                  <h4 className="font-bold text-white text-xs mb-1 text-left w-full">{log.title}</h4>
-                  <p className="text-slate-300 text-[11px] mb-2.5 text-left w-full">{log.content}</p>
-                  <div className="flex gap-3 text-[10px] text-slate-400 border-t border-slate-900 pt-2 text-left w-full">
-                    <span>❤️ {log.likes} Likes</span>
-                    <span>💬 {log.comments} Comments</span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
@@ -436,187 +480,191 @@ export default function IndiePulseEcoSystemPage() {
       )}
 
       {/* ========================================================= */}
-{/* VIEW 7: PLAYTEST REQUESTS (Clean & Real Interactive Board) */}
-{/* ========================================================= */}
-{activeView === 'playtest' && (
-  <div className="flex flex-col gap-3.5 relative z-10 text-left w-full align-left" style={{ textAlign: 'left' }}>
-    <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-4 rounded-2xl shadow-xl text-left w-full align-left" style={{ textAlign: 'left' }}>
-      <div className="flex flex-row items-center justify-between gap-2 mb-3 w-full">
-        <h2 className="text-base font-black text-white whitespace-nowrap min-w-0" style={{ textAlign: 'left' }}>
-          🧪 Playtest Board
-        </h2>
-        <div className="shrink-0" style={{ flex: '0 0 auto' }}>
-          <button
-            type="button"
-            onClick={() => setShowNewPlaytestForm(!showNewPlaytestForm)}
-            style={{ width: 'max-content', maxWidth: 'fit-content', flex: '0 0 auto', display: 'inline-flex' }}
-            className="w-fit inline-flex items-center justify-center px-2 py-1 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded-sm text-[11px] leading-none cursor-pointer shrink-0 whitespace-nowrap"
-          >
-            {showNewPlaytestForm ? '✕ Close' : '+ Post'}
-          </button>
-        </div>
-      </div>
-
-      {showNewPlaytestForm && (
-        <form onSubmit={handleCreatePlaytestRequest} className="mb-3.5 p-3 rounded-xl bg-slate-950 border border-slate-800 flex flex-col gap-2 text-left w-full align-left" style={{ textAlign: 'left' }}>
-          <input
-            type="text"
-            value={newPlaytestTitle}
-            onChange={(e) => setNewPlaytestTitle(e.target.value)}
-            placeholder="Playtest topic..."
-            style={{ textAlign: 'left' }}
-            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-left"
-            required
-          />
-          <input
-            type="text"
-            value={newPlaytestTags}
-            onChange={(e) => setNewPlaytestTags(e.target.value)}
-            placeholder="#Playtest, #Feedback"
-            style={{ textAlign: 'left' }}
-            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-left"
-          />
-          <button
-            type="submit"
-            className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs cursor-pointer text-center"
-          >
-            Post Request ✓
-          </button>
-        </form>
-      )}
-      
-      <div className="flex flex-col gap-3 text-left w-full align-left" style={{ textAlign: 'left' }}>
-        {playtestRequests.map((req) => {
-          const reqFeedbacks = submittedFeedbacks[req.id] || [];
-          const isFormOpen = activeFeedbackReqId === req.id;
-
-          return (
-            <div key={req.id} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-left w-full align-left" style={{ textAlign: 'left' }}>
-              <div className="flex items-center justify-start gap-2 mb-1 text-left w-full align-left">
-                <div className="w-6 h-6 rounded-full bg-slate-800 border border-pink-500/70 overflow-hidden flex items-center justify-center shrink-0">
-                  {syncedProfilePic ? (
-                    <img src={syncedProfilePic} alt={req.author} className="w-full h-full object-cover block" />
-                  ) : (
-                    <span className="text-[10px] font-bold text-pink-400">B</span>
-                  )}
-                </div>
-                <span className="text-[11px] text-pink-400 font-bold text-left" style={{ textAlign: 'left' }}>
-                  {req.author}
-                </span>
+      {/* VIEW 7: PLAYTEST REQUESTS (Clean & Real Interactive Board) */}
+      {/* ========================================================= */}
+      {activeView === 'playtest' && (
+        <div className="flex flex-col gap-3.5 relative z-10 text-left w-full align-left" style={{ textAlign: 'left' }}>
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-4 rounded-2xl shadow-xl text-left w-full align-left" style={{ textAlign: 'left' }}>
+            <div className="flex flex-row items-center justify-between gap-2 mb-3 w-full">
+              <h2 className="text-base font-black text-white whitespace-nowrap min-w-0" style={{ textAlign: 'left' }}>
+                🧪 Playtest Board
+              </h2>
+              <div className="shrink-0" style={{ flex: '0 0 auto' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowNewPlaytestForm(!showNewPlaytestForm)}
+                  style={{ width: 'max-content', maxWidth: 'fit-content', flex: '0 0 auto', display: 'inline-flex' }}
+                  className="w-fit inline-flex items-center justify-center px-2 py-1 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded-sm text-[11px] leading-none cursor-pointer shrink-0 whitespace-nowrap"
+                >
+                  {showNewPlaytestForm ? '✕ Close' : '+ Post'}
+                </button>
               </div>
+            </div>
 
-              <h4 className="font-bold text-white text-xs mb-2 text-left self-start w-full align-left" style={{ textAlign: 'left' }}>
-                {req.title}
-              </h4>
-              <div className="flex items-center justify-start gap-1.5 flex-wrap mb-3 text-left w-full align-left">
-                {req.tags.map((t, i) => (
-                  <span key={i} className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300 text-[10px]">{t}</span>
-                ))}
-              </div>
+            {showNewPlaytestForm && (
+              <form onSubmit={handleCreatePlaytestRequest} className="mb-3.5 p-3 rounded-xl bg-slate-950 border border-slate-800 flex flex-col gap-2 text-left w-full align-left" style={{ textAlign: 'left' }}>
+                <input
+                  type="text"
+                  value={newPlaytestTitle}
+                  onChange={(e) => setNewPlaytestTitle(e.target.value)}
+                  placeholder="Playtest topic..."
+                  style={{ textAlign: 'left' }}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-left"
+                  required
+                />
+                <input
+                  type="text"
+                  value={newPlaytestTags}
+                  onChange={(e) => setNewPlaytestTags(e.target.value)}
+                  placeholder="#Playtest, #Feedback"
+                  style={{ textAlign: 'left' }}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-left"
+                />
+                <button
+                  type="submit"
+                  className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs cursor-pointer text-center"
+                >
+                  Post Request ✓
+                </button>
+              </form>
+            )}
+            
+            <div className="flex flex-col gap-3 text-left w-full align-left" style={{ textAlign: 'left' }}>
+              {playtestRequests.map((req) => {
+                const reqFeedbacks = submittedFeedbacks[req.id] || [];
+                const isFormOpen = activeFeedbackReqId === req.id;
+                const displayReqAuthor = resolveDisplayName(req.author, syncedProfileName);
 
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveFeedbackReqId(isFormOpen ? null : req.id);
-                  setFeedbackText('');
-                  setFeedbackRating(5);
-                }}
-                className="w-full py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-lg text-xs cursor-pointer text-center"
-              >
-                {isFormOpen ? 'Close ✕' : `Test Game & Give Feedback 💬 (${reqFeedbacks.length})`}
-              </button>
+                return (
+                  <div key={req.id} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-left w-full align-left" style={{ textAlign: 'left' }}>
+                    <div className="flex items-center justify-start gap-2 mb-1 text-left w-full align-left">
+                      <div className="w-6 h-6 rounded-full bg-slate-800 border border-pink-500/70 overflow-hidden flex items-center justify-center shrink-0">
+                        {syncedProfilePic ? (
+                          <img src={syncedProfilePic} alt={displayReqAuthor} className="w-full h-full object-cover block" />
+                        ) : (
+                          <span className="text-[10px] font-bold text-pink-400">{displayReqAuthor.charAt(0).toUpperCase()}</span>
+                        )}
+                      </div>
+                      <span className="text-[11px] text-pink-400 font-bold text-left" style={{ textAlign: 'left' }}>
+                        {displayReqAuthor}
+                      </span>
+                    </div>
 
-              {isFormOpen && (
-                <div className="mt-3 p-3 rounded-xl bg-slate-900 border border-emerald-500/30 flex flex-col gap-2.5 text-left w-full align-left" style={{ textAlign: 'left' }}>
-                  <div className="flex items-center justify-between w-full">
-                    <span className="text-[11px] font-bold text-emerald-400 text-left" style={{ textAlign: 'left' }}>
-                      {feedbackRating}★ • {ratingLabels[feedbackRating]}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          onClick={() => setFeedbackRating(star)}
-                          className={`text-lg leading-none cursor-pointer transition-transform active:scale-125 ${
-                            feedbackRating >= star
-                              ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.7)]'
-                              : 'text-slate-600 hover:text-emerald-300/60'
-                          }`}
-                          aria-label={`Rate ${star} stars`}
-                        >
-                          ★
-                        </button>
+                    <h4 className="font-bold text-white text-xs mb-2 text-left self-start w-full align-left" style={{ textAlign: 'left' }}>
+                      {req.title}
+                    </h4>
+                    <div className="flex items-center justify-start gap-1.5 flex-wrap mb-3 text-left w-full align-left">
+                      {req.tags.map((t, i) => (
+                        <span key={i} className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300 text-[10px]">{t}</span>
                       ))}
                     </div>
-                  </div>
 
-                  <textarea
-                    rows={2}
-                    value={feedbackText}
-                    onChange={(e) => setFeedbackText(e.target.value)}
-                    placeholder="Write feedback..."
-                    style={{ textAlign: 'left' }}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none text-left"
-                  />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveFeedbackReqId(isFormOpen ? null : req.id);
+                        setFeedbackText('');
+                        setFeedbackRating(5);
+                      }}
+                      className="w-full py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-lg text-xs cursor-pointer text-center"
+                    >
+                      {isFormOpen ? 'Close ✕' : `Test Game & Give Feedback 💬 (${reqFeedbacks.length})`}
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => handleFeedbackSubmit(req.id)}
-                    disabled={!feedbackText.trim()}
-                    className={`w-full py-2 font-bold rounded-lg text-xs text-center transition ${
-                      feedbackText.trim()
-                        ? 'bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer'
-                        : 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                    }`}
-                  >
-                    Submit Feedback ✓
-                  </button>
-                </div>
-              )}
-
-              {reqFeedbacks.length > 0 && (
-                <div className="mt-3 pt-2.5 border-t border-slate-800 flex flex-col gap-2 text-left w-full align-left" style={{ textAlign: 'left' }}>
-                  <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider text-left self-start w-full align-left" style={{ textAlign: 'left' }}>
-                    Saved Feedbacks ({reqFeedbacks.length})
-                  </span>
-                  {reqFeedbacks.map((fb) => (
-                    <div key={fb.id} className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 flex flex-col items-start text-left w-full align-left" style={{ textAlign: 'left' }}>
-                      <div className="flex items-center justify-between text-[10px] mb-1 w-full">
-                        <div className="flex items-center justify-start gap-1.5 text-left">
-                          <div className="w-5 h-5 rounded-full bg-slate-800 border border-emerald-500/60 overflow-hidden flex items-center justify-center shrink-0">
-                            {syncedProfilePic ? (
-                              <img src={syncedProfilePic} alt={fb.tester} className="w-full h-full object-cover block" />
-                            ) : (
-                              <span className="text-[9px] font-bold text-emerald-400">B</span>
-                            )}
-                          </div>
-                          <span className="font-bold text-emerald-400 text-left" style={{ textAlign: 'left' }}>
-                            {fb.tester} • {'★'.repeat(fb.rating)}{'☆'.repeat(5 - fb.rating)}
+                    {isFormOpen && (
+                      <div className="mt-3 p-3 rounded-xl bg-slate-900 border border-emerald-500/30 flex flex-col gap-2.5 text-left w-full align-left" style={{ textAlign: 'left' }}>
+                        <div className="flex items-center justify-between w-full">
+                          <span className="text-[11px] font-bold text-emerald-400 text-left" style={{ textAlign: 'left' }}>
+                            {feedbackRating}★ • {ratingLabels[feedbackRating]}
                           </span>
+                          <div className="flex items-center gap-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => setFeedbackRating(star)}
+                                className={`text-lg leading-none cursor-pointer transition-transform active:scale-125 ${
+                                  feedbackRating >= star
+                                    ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.7)]'
+                                    : 'text-slate-600 hover:text-emerald-300/60'
+                                }`}
+                                aria-label={`Rate ${star} stars`}
+                              >
+                                ★
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                        <span className="text-slate-500">{fb.time}</span>
+
+                        <textarea
+                          rows={2}
+                          value={feedbackText}
+                          onChange={(e) => setFeedbackText(e.target.value)}
+                          placeholder="Write feedback..."
+                          style={{ textAlign: 'left' }}
+                          className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none text-left"
+                        />
+
+                        <button
+                          type="button"
+                          onClick={() => handleFeedbackSubmit(req.id)}
+                          disabled={!feedbackText.trim()}
+                          className={`w-full py-2 font-bold rounded-lg text-xs text-center transition ${
+                            feedbackText.trim()
+                              ? 'bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer'
+                              : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                          }`}
+                        >
+                          Submit Feedback ✓
+                        </button>
                       </div>
-                      <p
-                        style={{ textAlign: 'left', width: '100%' }}
-                        className="text-[11px] text-slate-200 leading-snug text-left self-start mr-auto w-full align-left break-words"
-                      >
-                        {fb.comment}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    )}
+
+                    {reqFeedbacks.length > 0 && (
+                      <div className="mt-3 pt-2.5 border-t border-slate-800 flex flex-col gap-2 text-left w-full align-left" style={{ textAlign: 'left' }}>
+                        <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider text-left self-start w-full align-left" style={{ textAlign: 'left' }}>
+                          Saved Feedbacks ({reqFeedbacks.length})
+                        </span>
+                        {reqFeedbacks.map((fb) => {
+                          const displayTester = resolveDisplayName(fb.tester, syncedProfileName);
+                          return (
+                            <div key={fb.id} className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 flex flex-col items-start text-left w-full align-left" style={{ textAlign: 'left' }}>
+                              <div className="flex items-center justify-between text-[10px] mb-1 w-full">
+                                <div className="flex items-center justify-start gap-1.5 text-left">
+                                  <div className="w-5 h-5 rounded-full bg-slate-800 border border-emerald-500/60 overflow-hidden flex items-center justify-center shrink-0">
+                                    {syncedProfilePic ? (
+                                      <img src={syncedProfilePic} alt={displayTester} className="w-full h-full object-cover block" />
+                                    ) : (
+                                      <span className="text-[9px] font-bold text-emerald-400">{displayTester.charAt(0).toUpperCase()}</span>
+                                    )}
+                                  </div>
+                                  <span className="font-bold text-emerald-400 text-left" style={{ textAlign: 'left' }}>
+                                    {displayTester} • {'★'.repeat(fb.rating)}{'☆'.repeat(5 - fb.rating)}
+                                  </span>
+                                </div>
+                                <span className="text-slate-500">{fb.time}</span>
+                              </div>
+                              <p
+                                style={{ textAlign: 'left', width: '100%' }}
+                                className="text-[11px] text-slate-200 leading-snug text-left self-start mr-auto w-full align-left break-words"
+                              >
+                                {fb.comment}
+                              </p>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-          );
-        })}
-      </div>
-    </div>
-  </div>
-)}
+          </div>
+        </div>
+      )}
 
       {/* ========================================================= */}
-      {/* VIEW 8: TEAM FINDER (Live DP from localStorage 'indiePulse_pic') */}
+      {/* VIEW 8: TEAM FINDER (Live DP & Name from localStorage) */}
       {/* ========================================================= */}
       {activeView === 'teamFinder' && (
         <div className="flex flex-col gap-4 relative z-10 text-left w-full">
@@ -626,7 +674,7 @@ export default function IndiePulseEcoSystemPage() {
             <div className="w-20 h-20 rounded-full mx-auto p-[2px] bg-gradient-to-tr from-pink-500 to-purple-500 mb-2.5 shadow-lg">
               <div className="w-full h-full rounded-full bg-[#111827] overflow-hidden flex items-center justify-center border-2 border-slate-950">
                 {syncedProfilePic ? (
-                  <img src={syncedProfilePic} alt="Bharat Patil DP" className="w-full h-full object-cover" />
+                  <img src={syncedProfilePic} alt={`${syncedProfileName} DP`} className="w-full h-full object-cover" />
                 ) : (
                   <svg className="w-10 h-10 text-[#9ca3af] translate-y-1" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
@@ -635,7 +683,7 @@ export default function IndiePulseEcoSystemPage() {
               </div>
             </div>
 
-            <h2 className="text-lg font-black text-center w-full">Bharat Patil</h2>
+            <h2 className="text-lg font-black text-center w-full">{syncedProfileName}</h2>
             <p className="text-[11px] text-pink-400 font-semibold mb-3.5 text-center w-full">Solo Game Developer & Creator</p>
             
             {/* Custom Message Textarea for Collaboration Request */}
@@ -665,7 +713,7 @@ export default function IndiePulseEcoSystemPage() {
                   // Save request to localStorage backend
                   const newRequest = {
                     id: Date.now().toString(),
-                    sender: "Guest Developer",
+                    sender: syncedProfileName || "Guest Developer",
                     message: collabMessage,
                     timestamp: new Date().toLocaleString()
                   };
