@@ -441,18 +441,20 @@ export default function IndiePulseEcoSystemPage() {
 {activeView === 'playtest' && (
   <div className="flex flex-col gap-3.5 relative z-10 text-left w-full align-left" style={{ textAlign: 'left' }}>
     <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-4 rounded-2xl shadow-xl text-left w-full align-left" style={{ textAlign: 'left' }}>
-      <div className="flex items-center justify-between gap-2 mb-3 w-full">
+      <div className="flex flex-row items-center justify-between gap-2 mb-3 w-full">
         <h2 className="text-base font-black text-white whitespace-nowrap min-w-0" style={{ textAlign: 'left' }}>
           🧪 Playtest Board
         </h2>
-        <button
-          type="button"
-          onClick={() => setShowNewPlaytestForm(!showNewPlaytestForm)}
-          style={{ width: 'auto', display: 'inline-flex' }}
-          className="w-fit inline-flex items-center justify-center px-2 py-1 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded-sm text-[11px] leading-none cursor-pointer shrink-0 whitespace-nowrap"
-        >
-          {showNewPlaytestForm ? '✕ Close' : '+ Post'}
-        </button>
+        <div className="shrink-0" style={{ flex: '0 0 auto' }}>
+          <button
+            type="button"
+            onClick={() => setShowNewPlaytestForm(!showNewPlaytestForm)}
+            style={{ width: 'max-content', maxWidth: 'fit-content', flex: '0 0 auto', display: 'inline-flex' }}
+            className="w-fit inline-flex items-center justify-center px-2 py-1 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded-sm text-[11px] leading-none cursor-pointer shrink-0 whitespace-nowrap"
+          >
+            {showNewPlaytestForm ? '✕ Close' : '+ Post'}
+          </button>
+        </div>
       </div>
 
       {showNewPlaytestForm && (
