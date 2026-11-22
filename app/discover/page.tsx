@@ -264,7 +264,12 @@ export default function IndiePulseEcoSystemPage() {
             <div className="relative z-10 flex flex-col items-start text-left py-6 w-full">
               <span className="px-3 py-1 rounded-full bg-pink-500/20 text-pink-400 text-[10px] font-bold mb-2 border border-pink-500/30">🔥 DISCOVER SWIPE FEED</span>
               <h2 className="text-2xl font-black mb-1.5 text-left w-full">{gamesList[0]?.title}</h2>
-              <p className="text-slate-300 text-xs max-w-xs mb-5 leading-relaxed text-left w-full">{gamesList[0]?.desc || gamesList[0]?.description}</p>
+              <p
+                style={{ width: '100%', textAlign: 'left' }}
+                className="text-slate-300 text-xs max-w-xs mb-5 leading-relaxed text-left self-start mr-auto w-full"
+              >
+                {gamesList[0]?.desc || gamesList[0]?.description}
+              </p>
               
               {/* Short & Compact Balanced Buttons */}
               <div className="flex items-center justify-start gap-2.5 w-full">
@@ -365,7 +370,12 @@ export default function IndiePulseEcoSystemPage() {
               <span className="bg-emerald-500/20 text-emerald-400 text-[11px] px-2.5 py-0.5 rounded-full font-bold shrink-0">{selectedGame.rating || '5.0 ⭐'}</span>
             </div>
             <p className="text-[11px] text-pink-400 font-semibold mb-2.5 text-left w-full">Developed by {selectedGame.creator || selectedGame.developer || syncedProfileName} • {selectedGame.genre || 'Indie'}</p>
-            <p className="text-slate-300 text-xs leading-relaxed mb-5 text-left w-full">{selectedGame.desc || selectedGame.description}</p>
+            <p
+              style={{ width: '100%', textAlign: 'left' }}
+              className="text-slate-300 text-xs leading-relaxed mb-5 text-left self-start mr-auto w-full"
+            >
+              {selectedGame.desc || selectedGame.description}
+            </p>
 
             <div className="flex flex-col gap-2.5 text-left w-full">
               {selectedGame.link && selectedGame.link !== '#' ? (
@@ -385,7 +395,7 @@ export default function IndiePulseEcoSystemPage() {
                   🎮 Play Game Now (WebGL)
                 </button>
               )}
-              <button
+              <button 
                 onClick={() => setActiveView('projectDetail')}
                 className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-[11px] cursor-pointer border border-slate-700 text-center"
               >
