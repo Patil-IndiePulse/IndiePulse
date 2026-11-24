@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 interface LeaderboardUser {
@@ -32,6 +31,7 @@ const STORAGE_KEYS = {
   SUBMITTED_GAMES: 'indiePulse_submitted_games',
   FEEDBACKS: 'indiePulse_playtest_feedbacks',
   COLLABS: 'indiePulse_collab_requests',
+  USERS_REGISTRY: 'indiePulse_verified_users_registry_v1',
 };
 
 export default function LeaderboardPage() {
@@ -95,6 +95,7 @@ export default function LeaderboardPage() {
   const [statusSummaryText, setStatusSummaryText] = useState('Live Sync Active • Verified Ledger');
   const [activityCounts, setActivityCounts] = useState({ games: 0, reviews: 0, collabs: 0 });
   const [highlightUserCard, setHighlightUserCard] = useState(false);
+  const [continuedBannerMessage, setContinuedBannerMessage] = useState<string | null>(null);
 
   const resolveUserName = useCallback(
     (user: LeaderboardUser) => {
@@ -106,7 +107,16 @@ export default function LeaderboardPage() {
     [syncedProfileName]
   );
 
-  // Autonomous Scoring & Safe Persistence Engine
+  // Native-like Back Navigation (steps back through browser history naturally)
+  const handleNativeBack = useCallback(() => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push('/');
+    }
+  }, [router]);
+
+  // Autonomous Scoring & Safe Persistence Engine (Never deletes existing valid data)
   const syncAndComputeAutonomousXP = useCallback(() => {
     try {
       // 1. Read live profile pic & name
@@ -154,13 +164,13 @@ export default function LeaderboardPage() {
 
       setActivityCounts({ games: gamesCount, reviews: feedbackCount, collabs: collabCount });
 
-      // 4. Load persistent verified ledger
+      // 4. Load persistent verified ledger safely
       let storedBonusXp = 0;
       let storedLogs: AuditLogEntry[] = [];
       const rawLedger = localStorage.getItem(STORAGE_KEYS.LEDGER);
       if (rawLedger) {
         const parsedLedger = JSON.parse(rawLedger);
-        if (typeof parsedLedger?.bonusXp === 'number') {
+        if (typeof parsedLedger?.bonusXp === 'number' && !Number.isNaN(parsedLedger.bonusXp)) {
           storedBonusXp = parsedLedger.bonusXp;
         }
         if (Array.isArray(parsedLedger?.logs)) {
@@ -173,8 +183,8 @@ export default function LeaderboardPage() {
       const totalVerifiedActions = gamesCount + feedbackCount + collabCount + storedLogs.length;
 
       setAuditLogs(storedLogs);
-      setUsers((prev) =>
-        prev.map((u) => {
+      setUsers((prev) => {
+        const computedUsers = prev.map((u) => {
           if (u.isCurrentUser) {
             const totalXp = u.baseXp + activityXp + storedBonusXp;
             return {
@@ -186,8 +196,31 @@ export default function LeaderboardPage() {
             };
           }
           return u;
-        })
-      );
+        });
+
+        // Persist immutable snapshot of verified users registry without ever wiping prior entries
+        try {
+          const existingRegistryRaw = localStorage.getItem(STORAGE_KEYS.USERS_REGISTRY);
+          const existingRegistry = existingRegistryRaw ? JSON.parse(existingRegistryRaw) : {};
+          const mergedRegistry = {
+            ...existingRegistry,
+            [resolvedName]: {
+              name: resolvedName,
+              xp: computedUsers.find((item) => item.isCurrentUser)?.xp ?? 1250,
+              gamesCount,
+              feedbackCount,
+              collabCount,
+              questsCompleted: storedLogs.length,
+              updatedAt: new Date().toISOString(),
+            },
+          };
+          localStorage.setItem(STORAGE_KEYS.USERS_REGISTRY, JSON.stringify(mergedRegistry));
+        } catch {
+          // ignore storage quota errors safely
+        }
+
+        return computedUsers;
+      });
 
       setStatusSummaryText(
         `Live Synced • ${gamesCount} Games, ${feedbackCount} Reviews, ${storedLogs.length} Quests Verified`
@@ -227,7 +260,7 @@ export default function LeaderboardPage() {
         xpDelta: 50,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
-      const updatedLogs = [newEntry, ...(Array.isArray(parsedLedger.logs) ? parsedLedger.logs : [])].slice(0, 10);
+      const updatedLogs = [newEntry, ...(Array.isArray(parsedLedger.logs) ? parsedLedger.logs : [])].slice(0, 25);
 
       localStorage.setItem(
         STORAGE_KEYS.LEDGER,
@@ -250,7 +283,10 @@ export default function LeaderboardPage() {
   const handleClaimAndContinue = () => {
     setIsModalOpen(false);
     setHighlightUserCard(true);
-    setTimeout(() => setHighlightUserCard(false), 2600);
+    setContinuedBannerMessage(
+      `Progress locked in for ${syncedProfileName}! Complete a game review (+40 XP) or publish a title (+150 XP) to climb even higher.`
+    );
+    setTimeout(() => setHighlightUserCard(false), 3000);
   };
 
   const sortedUsers = [...users]
@@ -276,12 +312,13 @@ export default function LeaderboardPage() {
 
       {/* Top Navigation & Verified Live Profile Pill */}
       <div style={{ textAlign: 'left' }} className="w-full flex items-center justify-between mb-5 relative z-10 text-left">
-        <Link
-          href="/"
+        <button
+          type="button"
+          onClick={handleNativeBack}
           className="px-6 py-2.5 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-sm font-bold shadow-[0_0_20px_rgba(236,72,153,0.5)] border border-pink-400/40 transition-all flex items-center justify-center cursor-pointer"
         >
           Back
-        </Link>
+        </button>
 
         <div className="flex items-center gap-2 bg-slate-900/90 border border-emerald-500/30 px-3 py-1.5 rounded-full shadow-md">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -295,6 +332,25 @@ export default function LeaderboardPage() {
           <span className="text-xs font-bold text-slate-100 truncate max-w-[125px]">{syncedProfileName}</span>
         </div>
       </div>
+
+      {/* Continued Reward & Next Step Banner (Shown after Claim & Continue) */}
+      {continuedBannerMessage && (
+        <div
+          style={{ textAlign: 'left' }}
+          className="mb-4 p-3.5 rounded-2xl bg-emerald-950/50 border border-emerald-400/40 text-left relative z-10 flex items-start justify-between gap-2"
+        >
+          <p style={{ textAlign: 'left' }} className="text-xs text-emerald-200 leading-relaxed text-left">
+            {continuedBannerMessage}
+          </p>
+          <button
+            type="button"
+            onClick={() => setContinuedBannerMessage(null)}
+            className="text-[11px] font-bold text-emerald-300 hover:text-white shrink-0 cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Main Arena Card */}
       <div style={{ textAlign: 'left' }} className="bg-slate-900/85 backdrop-blur-xl border border-slate-800 p-5 rounded-3xl w-full shadow-2xl relative z-10 text-left">
