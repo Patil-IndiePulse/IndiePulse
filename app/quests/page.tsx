@@ -14,6 +14,7 @@ interface QuestData {
   stepsRequired: number;
   stepsCompleted: number;
   category?: string;
+  taskPrompt?: string;
 }
 
 interface SponsorAd {
@@ -28,6 +29,7 @@ interface SponsorAd {
 
 const STORAGE_KEYS = {
   DAILY_QUESTS: 'indiePulse_daily_quests_v1',
+  PERMANENT_QUESTS: 'indiePulse_permanent_completed_quests_v1',
   LEDGER: 'indiePulse_leaderboard_ledger_v1',
   STREAK: 'indiePulse_quest_streak_v1',
   AD_IMPRESSIONS: 'indiePulse_ad_impressions_v1',
@@ -63,6 +65,49 @@ const SPONSOR_POOL: SponsorAd[] = [
   },
 ];
 
+const DAILY_QUEST_CATALOG: Omit<QuestData, 'completed' | 'stepsCompleted'>[] = [
+  {
+    id: 'q-publish',
+    title: '🚀 Publish Your First Indie Game',
+    xp: 500,
+    desc: 'Complete 2 build readiness checks to prepare your game release.',
+    actionText: 'Verify Build Check',
+    stepsRequired: 2,
+    category: 'Creator Mission',
+    taskPrompt: 'Tap below to verify each game build checkpoint manually.',
+  },
+  {
+    id: 'q-connect',
+    title: '🤝 Connect with 3 Nearby Developers',
+    xp: 150,
+    desc: 'Complete 3 developer outreach steps to grow your indie circle.',
+    actionText: 'Verify Outreach Step',
+    stepsRequired: 3,
+    category: 'Community',
+    taskPrompt: 'Tap 3 times to verify each developer connection step.',
+  },
+  {
+    id: 'q-devlog',
+    title: '📢 Share a DevLog Update in Community',
+    xp: 100,
+    desc: 'Complete 2 progress log checks for your daily developer update.',
+    actionText: 'Verify Log Step',
+    stepsRequired: 2,
+    category: 'Daily DevLog',
+    taskPrompt: 'Tap each step to confirm your devlog milestone.',
+  },
+  {
+    id: 'q-playtest',
+    title: '🧪 Daily Playtest Sprint (2 Builds)',
+    xp: 180,
+    desc: 'Test frame stability & controls across 2 interactive steps.',
+    actionText: 'Verify Playtest Check',
+    stepsRequired: 2,
+    category: 'Daily Sprint',
+    taskPrompt: 'Complete both playtest checks to unlock quest completion.',
+  },
+];
+
 function getTodayDateKey() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -76,76 +121,25 @@ function getDailySponsorForDate(dateKey: string): SponsorAd {
 }
 
 function generateDailyQuests(dateKey: string): QuestData[] {
-  let seed = 0;
+  let daySeed = 0;
   for (let i = 0; i < dateKey.length; i++) {
-    seed = (seed * 29 + dateKey.charCodeAt(i)) % 10000;
+    daySeed = (daySeed * 37 + dateKey.charCodeAt(i)) % 10000;
   }
 
-  const baseQuests: QuestData[] = [
-    {
-      id: 1,
-      title: '🚀 Publish Your First Indie Game',
-      xp: 500,
-      completed: false,
-      desc: 'Upload your game build or prototype to the IndiePulse discover catalog.',
-      actionText: 'Upload Game Build',
-      stepsRequired: 2,
-      stepsCompleted: 0,
-      category: 'Creator Mission',
-    },
-    {
-      id: 2,
-      title: '🤝 Connect with 3 Nearby Developers',
-      xp: 150,
-      completed: false,
-      desc: 'Interact and send connection requests to local game developers.',
-      actionText: 'Find Developers',
-      stepsRequired: 3,
-      stepsCompleted: 0,
-      category: 'Community',
-    },
-    {
-      id: 3,
-      title: '📢 Share a DevLog Update in Community',
-      xp: 100,
-      completed: true,
-      desc: 'Post your daily game dev progress in the community feed.',
-      actionText: 'Open Community',
-      stepsRequired: 2,
-      stepsCompleted: 2,
-      category: 'Daily DevLog',
-    },
-  ];
+  const startIndex = daySeed % DAILY_QUEST_CATALOG.length;
+  const selected: QuestData[] = [];
 
-  if (seed % 2 === 1) {
-    return [
-      {
-        ...baseQuests[1],
-        id: 21,
-        title: '🧪 Daily Playtest Sprint (2 Builds)',
-        xp: 180,
-        completed: false,
-        stepsRequired: 2,
-        stepsCompleted: 0,
-        category: 'Daily Sprint',
-      },
-      {
-        ...baseQuests[0],
-        id: 11,
-        stepsRequired: 2,
-        stepsCompleted: 0,
-      },
-      {
-        ...baseQuests[2],
-        id: 31,
-        completed: false,
-        stepsRequired: 2,
-        stepsCompleted: 0,
-      },
-    ];
+  for (let i = 0; i < 3; i++) {
+    const item = DAILY_QUEST_CATALOG[(startIndex + i) % DAILY_QUEST_CATALOG.length];
+    selected.push({
+      ...item,
+      id: `${dateKey}-${item.id}-${i}`,
+      completed: false,
+      stepsCompleted: 0,
+    });
   }
 
-  return baseQuests;
+  return selected;
 }
 
 export default function QuestsPage() {
@@ -164,6 +158,7 @@ export default function QuestsPage() {
       stepsRequired: 2,
       stepsCompleted: 0,
       category: 'Creator Mission',
+      taskPrompt: 'Tap each step to verify your build task.',
     },
     {
       id: 2,
@@ -175,6 +170,7 @@ export default function QuestsPage() {
       stepsRequired: 3,
       stepsCompleted: 0,
       category: 'Community',
+      taskPrompt: 'Tap each step to verify your developer connection.',
     },
     {
       id: 3,
@@ -186,6 +182,7 @@ export default function QuestsPage() {
       stepsRequired: 2,
       stepsCompleted: 2,
       category: 'Daily DevLog',
+      taskPrompt: 'DevLog milestone completed.',
     },
   ]);
 
@@ -195,12 +192,22 @@ export default function QuestsPage() {
   const [streakCount, setStreakCount] = useState<number>(1);
   const [adViewsCount, setAdViewsCount] = useState<number>(0);
   const [adViewedToday, setAdViewedToday] = useState<boolean>(false);
+  const [isSponsorModalOpen, setIsSponsorModalOpen] = useState<boolean>(false);
+  const [permanentCompletedCount, setPermanentCompletedCount] = useState<number>(0);
 
   const syncQuestsAndAds = useCallback(() => {
     try {
       const savedStreak = Number(localStorage.getItem(STORAGE_KEYS.STREAK) || '1');
       if (!Number.isNaN(savedStreak) && savedStreak > 0) {
         setStreakCount(savedStreak);
+      }
+
+      const rawPermanent = localStorage.getItem(STORAGE_KEYS.PERMANENT_QUESTS);
+      if (rawPermanent) {
+        const parsedPermanent = JSON.parse(rawPermanent);
+        if (Array.isArray(parsedPermanent)) {
+          setPermanentCompletedCount(parsedPermanent.length);
+        }
       }
 
       const rawAdStats = localStorage.getItem(STORAGE_KEYS.AD_IMPRESSIONS);
@@ -217,7 +224,11 @@ export default function QuestsPage() {
       const rawQuests = localStorage.getItem(STORAGE_KEYS.DAILY_QUESTS);
       if (rawQuests) {
         const parsedQuests = JSON.parse(rawQuests);
-        if (parsedQuests?.dateKey === todayKey && Array.isArray(parsedQuests?.quests) && parsedQuests.quests.length > 0) {
+        if (
+          parsedQuests?.dateKey === todayKey &&
+          Array.isArray(parsedQuests?.quests) &&
+          parsedQuests.quests.length > 0
+        ) {
           setQuests(parsedQuests.quests);
           return;
         }
@@ -252,13 +263,18 @@ export default function QuestsPage() {
 
   const handleStartQuest = (quest: QuestData) => {
     setSelectedQuest(quest);
-    setLoadingState('idle');
+    setLoadingState(quest.stepsCompleted >= quest.stepsRequired ? 'verified' : 'idle');
     setIsModalOpen(true);
   };
 
-  // Step-by-Step Verification Simulation
+  // Manual Step Verification (Only advances when user clicks Verify Step)
   const handleExecuteTask = () => {
-    if (!selectedQuest) return;
+    if (!selectedQuest || loadingState === 'scanning') return;
+    if (selectedQuest.stepsCompleted >= selectedQuest.stepsRequired) {
+      setLoadingState('verified');
+      return;
+    }
+
     setLoadingState('scanning');
     setTimeout(() => {
       const nextStep = Math.min(selectedQuest.stepsRequired, selectedQuest.stepsCompleted + 1);
@@ -275,11 +291,11 @@ export default function QuestsPage() {
       } else {
         setLoadingState('idle');
       }
-    }, 1200);
+    }, 600);
   };
 
   const handleCompleteQuest = () => {
-    if (selectedQuest) {
+    if (selectedQuest && selectedQuest.stepsCompleted >= selectedQuest.stepsRequired) {
       const updatedList = quests.map((q) =>
         q.id === selectedQuest.id
           ? { ...q, completed: true, stepsCompleted: q.stepsRequired }
@@ -287,8 +303,22 @@ export default function QuestsPage() {
       );
       saveQuestsToStorage(updatedList);
 
-      // Direct sync with Leaderboard Verified Ledger (indiePulse_leaderboard_ledger_v1)
+      // Save permanently in backend localStorage archive
       try {
+        const rawPermanent = localStorage.getItem(STORAGE_KEYS.PERMANENT_QUESTS);
+        const permanentArr = rawPermanent ? JSON.parse(rawPermanent) : [];
+        const record = {
+          questId: selectedQuest.id,
+          title: selectedQuest.title,
+          xp: selectedQuest.xp,
+          dateKey: todayKey,
+          completedAt: new Date().toISOString(),
+        };
+        const nextPermanent = [record, ...(Array.isArray(permanentArr) ? permanentArr : [])];
+        localStorage.setItem(STORAGE_KEYS.PERMANENT_QUESTS, JSON.stringify(nextPermanent));
+        setPermanentCompletedCount(nextPermanent.length);
+
+        // Direct sync with Leaderboard Verified Ledger (indiePulse_leaderboard_ledger_v1)
         const rawLedger = localStorage.getItem(STORAGE_KEYS.LEDGER);
         const parsedLedger = rawLedger ? JSON.parse(rawLedger) : { bonusXp: 0, logs: [] };
         const currentBonus = Number(parsedLedger?.bonusXp) || 0;
@@ -305,7 +335,7 @@ export default function QuestsPage() {
           STORAGE_KEYS.LEDGER,
           JSON.stringify({
             bonusXp: newBonus,
-            logs: [newLog, ...(Array.isArray(parsedLedger?.logs) ? parsedLedger.logs : [])].slice(0, 25),
+            logs: [newLog, ...(Array.isArray(parsedLedger?.logs) ? parsedLedger.logs : [])].slice(0, 50),
             lastUpdated: new Date().toISOString(),
           })
         );
@@ -326,8 +356,8 @@ export default function QuestsPage() {
     }
   };
 
-  // Daily Company Advertisement Impression & Bonus XP Sync
-  const handleSponsorEngage = () => {
+  // Open Sponsor Preview Modal & Record Impression Safely
+  const handleSponsorClick = () => {
     try {
       const rawAdStats = localStorage.getItem(STORAGE_KEYS.AD_IMPRESSIONS);
       const parsedAd = rawAdStats ? JSON.parse(rawAdStats) : { totalViews: 0, history: [] };
@@ -359,7 +389,7 @@ export default function QuestsPage() {
           STORAGE_KEYS.LEDGER,
           JSON.stringify({
             bonusXp: currentBonus + dailySponsor.bonusXp,
-            logs: [sponsorLog, ...(Array.isArray(parsedLedger?.logs) ? parsedLedger.logs : [])].slice(0, 25),
+            logs: [sponsorLog, ...(Array.isArray(parsedLedger?.logs) ? parsedLedger.logs : [])].slice(0, 50),
             lastUpdated: new Date().toISOString(),
           })
         );
@@ -368,7 +398,7 @@ export default function QuestsPage() {
       console.error('Sponsor impression error:', err);
     }
 
-    router.push(dailySponsor.targetUrl);
+    setIsSponsorModalOpen(true);
   };
 
   return (
@@ -423,7 +453,7 @@ export default function QuestsPage() {
         </p>
         <button
           type="button"
-          onClick={handleSponsorEngage}
+          onClick={handleSponsorClick}
           className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black text-xs cursor-pointer transition-all text-left flex items-center justify-between"
         >
           <span>{adViewedToday ? `${dailySponsor.ctaLabel} (Reward Claimed ✓)` : dailySponsor.ctaLabel}</span>
@@ -436,14 +466,20 @@ export default function QuestsPage() {
         style={{ textAlign: 'left' }}
         className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 p-6 sm:p-8 rounded-2xl w-full shadow-2xl shadow-amber-950/50 text-left relative z-10 mb-8"
       >
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold mb-3">
-          🌟 DAILY & SPECIAL QUESTS 🎯
+        <div className="flex items-center justify-between gap-2 mb-3 text-left">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold">
+            🌟 DAILY & SPECIAL QUESTS 🎯
+          </div>
+          <span className="text-[10px] text-emerald-400 font-bold">
+            {permanentCompletedCount} Saved Forever
+          </span>
         </div>
+
         <h2 style={{ textAlign: 'left' }} className="text-2xl font-black mb-2 tracking-tight text-left w-full">
           🗺️ IndiePulse Quests ⚔️
         </h2>
         <p style={{ textAlign: 'left' }} className="text-slate-400 text-sm mb-6 text-left w-full">
-          Complete real mission steps, level up your profile, and earn exciting XP rewards synced directly to the leaderboard! 🎁
+          Complete real mission steps manually, level up your profile, and earn exciting XP rewards synced directly to the leaderboard! 🎁
         </p>
 
         {/* Quests List */}
@@ -489,6 +525,51 @@ export default function QuestsPage() {
         </div>
       </div>
 
+      {/* Sponsor Spotlight Details Modal (No surprise redirect) */}
+      {isSponsorModalOpen && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div
+            style={{ textAlign: 'left' }}
+            className="bg-slate-900 border border-amber-400/40 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-left relative"
+          >
+            <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded bg-amber-400/20 text-amber-300 inline-block mb-2">
+              📢 DAILY PARTNER OFFER
+            </span>
+            <h3 style={{ textAlign: 'left' }} className="text-lg font-black text-white mb-1 text-left w-full">
+              {dailySponsor.companyName}
+            </h3>
+            <p style={{ textAlign: 'left' }} className="text-xs font-bold text-amber-300 mb-2 text-left w-full">
+              {dailySponsor.headline}
+            </p>
+            <p style={{ textAlign: 'left' }} className="text-xs text-slate-300 mb-4 leading-relaxed text-left w-full">
+              {dailySponsor.offerText}
+            </p>
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-bold mb-5 text-left">
+              Partner Bonus Logged: +{dailySponsor.bonusXp} XP saved to your ledger ✓
+            </div>
+            <div className="flex flex-col gap-2.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSponsorModalOpen(false);
+                  router.push(dailySponsor.targetUrl);
+                }}
+                className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black rounded-xl text-xs cursor-pointer text-center"
+              >
+                Open Partner Section →
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsSponsorModalOpen(false)}
+                className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs cursor-pointer text-center"
+              >
+                Stay on Quests
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Quest Interactive Popup Modal */}
       {isModalOpen && selectedQuest && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
@@ -500,11 +581,16 @@ export default function QuestsPage() {
             <h3 style={{ textAlign: 'left' }} className="text-lg font-black text-white mb-2 text-left w-full">
               {selectedQuest.title}
             </h3>
-            <p style={{ textAlign: 'left' }} className="text-slate-300 text-xs mb-3 leading-relaxed text-left w-full">
+            <p style={{ textAlign: 'left' }} className="text-slate-300 text-xs mb-2 leading-relaxed text-left w-full">
               {selectedQuest.desc}
             </p>
+            {selectedQuest.taskPrompt && (
+              <p style={{ textAlign: 'left' }} className="text-[11px] text-cyan-300 font-semibold mb-3 text-left w-full">
+                {selectedQuest.taskPrompt}
+              </p>
+            )}
 
-            {/* Step Progress Indicator */}
+            {/* Step Progress Indicator (Starts at actual stepsCompleted) */}
             <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl mb-4 text-left">
               <div className="flex items-center justify-between text-xs mb-1.5">
                 <span className="text-slate-300 font-bold">Mission Progress</span>
