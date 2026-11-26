@@ -25,8 +25,8 @@ export default function ProfilePage() {
   const [totalLikesCount, setTotalLikesCount] = useState<number>(0);
   const [totalXp, setTotalXp] = useState<number>(1250);
   const [streakDays, setStreakDays] = useState<number>(1);
+  const [questsCompletedCount, setQuestsCompletedCount] = useState<number>(0);
   const [recentLogs, setRecentLogs] = useState<ActivityItem[]>([]);
-  const [copiedSummary, setCopiedSummary] = useState<boolean>(false);
 
   const availableGenres = ['Action', 'RPG', 'Puzzle', 'Strategy', 'Sci-Fi', 'Adventure', 'Horror'];
 
@@ -58,7 +58,17 @@ export default function ProfilePage() {
         }
       }
 
-      let bonusXp = 50;
+      let completedQuests = 0;
+      const rawPermanentQuests = localStorage.getItem('indiePulse_permanent_completed_quests_v1');
+      if (rawPermanentQuests) {
+        const parsedPQ = JSON.parse(rawPermanentQuests);
+        if (Array.isArray(parsedPQ)) {
+          completedQuests = parsedPQ.length;
+        }
+      }
+      setQuestsCompletedCount(completedQuests);
+
+      let bonusXp = 0;
       let logsList: ActivityItem[] = [];
       const rawLedger = localStorage.getItem('indiePulse_leaderboard_ledger_v1');
       if (rawLedger) {
@@ -67,7 +77,7 @@ export default function ProfilePage() {
           bonusXp = parsedLedger.bonusXp;
         }
         if (Array.isArray(parsedLedger?.logs)) {
-          logsList = parsedLedger.logs.slice(0, 5);
+          logsList = parsedLedger.logs.slice(0, 6);
         }
       }
       setRecentLogs(logsList);
@@ -81,9 +91,9 @@ export default function ProfilePage() {
 
       let unlocked = 0;
       if (shippedGames >= 1) unlocked += 1;
-      if (logsList.length >= 1) unlocked += 1;
-      if (activeStreak >= 2 || logsList.length >= 2) unlocked += 1;
-      if (computedXp >= 1300) unlocked += 1;
+      if (completedQuests >= 1) unlocked += 1;
+      if (completedQuests >= 2 || activeStreak >= 2) unlocked += 1;
+      if (bonusXp >= 200 || gameLikes >= 1) unlocked += 1;
       setBadgesEarnedCount(unlocked);
     } catch (err) {
       console.error('Safe live stats sync notice:', err);
@@ -178,67 +188,61 @@ export default function ProfilePage() {
     setIsEditing(!isEditing);
   };
 
-  const handleCopyCreatorTag = () => {
-    const levelNum = Math.floor(totalXp / 250) + 1;
-    const text = `${name} • Level ${levelNum} Indie Creator (${totalXp} XP) on IndiePulse`;
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(text).catch(() => {});
-    }
-    setCopiedSummary(true);
-    setTimeout(() => setCopiedSummary(false), 2000);
-  };
-
   const currentLevel = Math.floor(totalXp / 250) + 1;
   const levelProgressPercent = Math.min(100, Math.round(((totalXp % 250) / 250) * 100));
 
   const badgesList = [
     { id: 'shipped', label: 'First Build Shipped', unlocked: gamesPublishedCount >= 1, note: 'Publish 1+ game' },
-    { id: 'quest', label: 'Mission Achiever', unlocked: recentLogs.length >= 1, note: 'Complete a quest/reward' },
-    { id: 'streak', label: 'Streak Champion', unlocked: streakDays >= 2 || recentLogs.length >= 2, note: 'Build active streak' },
-    { id: 'xp', label: 'Arena Rising Star', unlocked: totalXp >= 1300, note: 'Reach 1300+ XP' },
+    { id: 'quest', label: 'Mission Achiever', unlocked: questsCompletedCount >= 1, note: 'Complete 1+ quest on Quests page' },
+    { id: 'streak', label: 'Streak Champion', unlocked: questsCompletedCount >= 2 || streakDays >= 2, note: 'Complete 2+ quests or build streak' },
+    { id: 'xp', label: 'Arena Rising Star', unlocked: totalLikesCount >= 1 || recentLogs.length >= 2, note: 'Earn community likes or leaderboard XP' },
   ];
 
   return (
-    <div style={{ textAlign: 'left' }} className="min-h-screen bg-slate-950 text-white p-6 sm:p-8 text-left">
-      <div className="max-w-4xl mx-auto">
+    <div
+      style={{ textAlign: 'left' }}
+      className="min-h-screen bg-[#060913] text-white p-5 sm:p-8 text-left relative overflow-x-hidden"
+    >
+      {/* Subtle Professional Ambient Glows */}
+      <div className="fixed top-0 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="fixed bottom-0 right-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Navigation Buttons: Home & Settings (Replaced positions, pink color theme, and icons) */}
-        <div className="flex items-center justify-between gap-3 mb-6">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 border border-purple-500/50 flex items-center gap-2 text-white text-sm font-semibold shadow-lg shadow-purple-500/30 transition-all"
-            >
-              <span>🏡</span> Home
-            </Link>
+      <div className="max-w-4xl mx-auto relative z-10">
 
-            <Link
-              href="/menu"
-              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 border border-purple-500/50 flex items-center gap-2 text-white text-sm font-semibold shadow-lg shadow-purple-500/30 transition-all"
-            >
-              <span>⚙️</span> Settings
-            </Link>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleCopyCreatorTag}
-            className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-bold text-slate-200 cursor-pointer transition-colors"
+        {/* Navigation Buttons: Home & Settings (Copy Creator Tag removed as requested) */}
+        <div className="flex items-center gap-3 mb-6">
+          <Link
+            href="/"
+            className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 border border-purple-500/50 flex items-center gap-2 text-white text-sm font-semibold shadow-lg shadow-purple-500/30 transition-all"
           >
-            {copiedSummary ? 'Tag Copied ✓' : 'Copy Creator Tag'}
-          </button>
+            <span>🏡</span> Home
+          </Link>
+
+          <Link
+            href="/menu"
+            className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 border border-purple-500/50 flex items-center gap-2 text-white text-sm font-semibold shadow-lg shadow-purple-500/30 transition-all"
+          >
+            <span>⚙️</span> Settings
+          </Link>
         </div>
 
-        <h1 style={{ textAlign: 'left' }} className="text-3xl font-bold mb-4 text-left">Creator Profile</h1>
-        <p style={{ textAlign: 'left' }} className="text-slate-400 mb-8 text-left">Manage your submitted indie games and community activity.</p>
+        <h1 style={{ textAlign: 'left' }} className="text-3xl font-bold tracking-tight mb-2 text-left">
+          Creator Profile
+        </h1>
+        <p style={{ textAlign: 'left' }} className="text-slate-400 text-sm mb-8 text-left">
+          Manage your submitted indie games and community activity.
+        </p>
 
         {/* Profile Picture & Details Section */}
-        <div style={{ textAlign: 'left' }} className="bg-slate-900 border border-slate-800 rounded-xl p-6 mb-6 text-left">
+        <div
+          style={{ textAlign: 'left' }}
+          className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-6 mb-6 shadow-xl text-left"
+        >
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
 
             {/* Profile Picture & Name/Bio Edit Area */}
             <div className="flex items-center gap-6">
-              <div className="relative w-24 h-24 rounded-full bg-slate-800 border-2 border-slate-700 overflow-hidden flex items-center justify-center shrink-0">
+              <div className="relative w-24 h-24 rounded-full bg-slate-800 border-2 border-indigo-500/50 overflow-hidden flex items-center justify-center shrink-0 shadow-md">
                 {profilePic ? (
                   <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
@@ -255,11 +259,15 @@ export default function ProfilePage() {
                     className="bg-slate-800 border border-indigo-500 rounded px-3 py-1 text-xl font-semibold text-white focus:outline-none mb-2"
                   />
                 ) : (
-                  <h2 style={{ textAlign: 'left' }} className="text-2xl font-semibold mb-1 text-left">{name}</h2>
+                  <h2 style={{ textAlign: 'left' }} className="text-2xl font-semibold mb-1 text-left">
+                    {name}
+                  </h2>
                 )}
-                <p style={{ textAlign: 'left' }} className="text-xs text-slate-400 mb-3 text-left">Upload a picture and personalize your profile.</p>
+                <p style={{ textAlign: 'left' }} className="text-xs text-slate-400 mb-3 text-left">
+                  Upload a picture and personalize your profile.
+                </p>
 
-                <label className="cursor-pointer px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors inline-block">
+                <label className="cursor-pointer px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition-colors inline-block shadow-sm">
                   Upload Picture
                   <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                 </label>
@@ -270,7 +278,7 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={handleSaveProfile}
-              className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer"
+              className="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer shadow-md"
             >
               {isEditing ? 'Save Profile' : 'Edit Profile'}
             </button>
@@ -296,7 +304,9 @@ export default function ProfilePage() {
 
           {/* Bio Section */}
           <div style={{ textAlign: 'left' }} className="mt-6 pt-6 border-t border-slate-800 text-left">
-            <h3 style={{ textAlign: 'left' }} className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2 text-left">About Me / Bio</h3>
+            <h3 style={{ textAlign: 'left' }} className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2 text-left">
+              About Me / Bio
+            </h3>
             {isEditing ? (
               <textarea
                 value={bio}
@@ -306,13 +316,17 @@ export default function ProfilePage() {
                 placeholder="Write a short bio about yourself..."
               />
             ) : (
-              <p style={{ textAlign: 'left' }} className="text-slate-300 text-sm leading-relaxed text-left">{bio}</p>
+              <p style={{ textAlign: 'left' }} className="text-slate-300 text-sm leading-relaxed text-left">
+                {bio}
+              </p>
             )}
           </div>
 
           {/* Favorite Game Genres Section */}
           <div style={{ textAlign: 'left' }} className="mt-6 pt-6 border-t border-slate-800 text-left">
-            <h3 style={{ textAlign: 'left' }} className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3 text-left">Favorite Game Genres</h3>
+            <h3 style={{ textAlign: 'left' }} className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3 text-left">
+              Favorite Game Genres
+            </h3>
             {isEditing ? (
               <div className="flex flex-wrap gap-2">
                 {availableGenres.map((genre) => (
@@ -336,7 +350,7 @@ export default function ProfilePage() {
                   selectedGenres.map((genre) => (
                     <span
                       key={genre}
-                      className="px-3 py-1 bg-indigo-950 border border-indigo-800 text-indigo-300 rounded-full text-xs font-medium"
+                      className="px-3 py-1 bg-indigo-950/90 border border-indigo-700/70 text-indigo-200 rounded-full text-xs font-medium"
                     >
                       {genre}
                     </span>
@@ -350,52 +364,74 @@ export default function ProfilePage() {
         </div>
 
         {/* User Stats Section */}
-        <div style={{ textAlign: 'left' }} className="bg-slate-900 border border-slate-800 rounded-xl p-6 mb-6 text-left">
-          <h2 style={{ textAlign: 'left' }} className="text-xl font-semibold mb-2 text-left">User Stats</h2>
+        <div
+          style={{ textAlign: 'left' }}
+          className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-6 mb-6 shadow-xl text-left"
+        >
+          <h2 style={{ textAlign: 'left' }} className="text-xl font-semibold mb-2 text-left">
+            User Stats
+          </h2>
           <div className="grid grid-cols-3 gap-4 mt-4">
-            <div className="bg-slate-800 p-4 rounded-lg text-center">
+            <div className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl text-center">
               <p className="text-2xl font-bold text-indigo-400">{gamesPublishedCount}</p>
               <p className="text-xs text-slate-400 mt-1">Games Published</p>
             </div>
-            <div className="bg-slate-800 p-4 rounded-lg text-center">
-              <p className="text-2xl font-bold text-indigo-400">{badgesEarnedCount}</p>
+            <div className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl text-center">
+              <p className="text-2xl font-bold text-emerald-400">{badgesEarnedCount}</p>
               <p className="text-xs text-slate-400 mt-1">Badges Earned</p>
             </div>
-            <div className="bg-slate-800 p-4 rounded-lg text-center">
-              <p className="text-2xl font-bold text-indigo-400">{totalLikesCount}</p>
+            <div className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl text-center">
+              <p className="text-2xl font-bold text-violet-400">{totalLikesCount}</p>
               <p className="text-xs text-slate-400 mt-1">Total Likes</p>
             </div>
           </div>
         </div>
 
-        {/* Builder Badges Showcase */}
-        <div style={{ textAlign: 'left' }} className="bg-slate-900 border border-slate-800 rounded-xl p-6 mb-6 text-left">
-          <h2 style={{ textAlign: 'left' }} className="text-xl font-semibold mb-4 text-left">🏅 Builder Badges & Achievements</h2>
+        {/* Builder Badges Showcase (Live from Quests & Leaderboard) */}
+        <div
+          style={{ textAlign: 'left' }}
+          className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-6 mb-6 shadow-xl text-left"
+        >
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <h2 style={{ textAlign: 'left' }} className="text-xl font-semibold text-left">
+              🏅 Builder Badges & Achievements
+            </h2>
+            <span className="text-xs font-bold text-emerald-400">
+              {badgesEarnedCount} / {badgesList.length} Unlocked
+            </span>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {badgesList.map((badge) => (
               <div
                 key={badge.id}
                 style={{ textAlign: 'left' }}
-                className={`p-3.5 rounded-xl border text-left ${
+                className={`p-3.5 rounded-xl border text-left transition-all ${
                   badge.unlocked
-                    ? 'bg-emerald-950/30 border-emerald-500/40 text-white'
-                    : 'bg-slate-800/60 border-slate-700/60 text-slate-400'
+                    ? 'bg-emerald-950/25 border-emerald-500/40 text-white'
+                    : 'bg-slate-950/70 border-slate-800 text-slate-400'
                 }`}
               >
                 <p style={{ textAlign: 'left' }} className="text-sm font-bold text-left">
                   {badge.unlocked ? '✓ ' : '🔒 '}
                   {badge.label}
                 </p>
-                <p style={{ textAlign: 'left' }} className="text-xs text-slate-400 mt-0.5 text-left">{badge.note}</p>
+                <p style={{ textAlign: 'left' }} className="text-xs text-slate-400 mt-0.5 text-left">
+                  {badge.note}
+                </p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Recent Activity & Quick Actions */}
-        <div style={{ textAlign: 'left' }} className="bg-slate-900 border border-slate-800 rounded-xl p-6 text-left">
-          <div className="flex items-center justify-between mb-4">
-            <h2 style={{ textAlign: 'left' }} className="text-xl font-semibold text-left">⚡ Recent XP Activity</h2>
+        {/* Recent XP Activity & Quick Actions */}
+        <div
+          style={{ textAlign: 'left' }}
+          className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-6 shadow-xl text-left"
+        >
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <h2 style={{ textAlign: 'left' }} className="text-xl font-semibold text-left">
+              ⚡ Recent XP Activity
+            </h2>
             <div className="flex items-center gap-2">
               <Link
                 href="/quests"
@@ -417,7 +453,7 @@ export default function ProfilePage() {
               {recentLogs.map((entry) => (
                 <div
                   key={entry.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-slate-800/70 border border-slate-700/60 text-xs"
+                  className="flex items-center justify-between p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-xs"
                 >
                   <div className="text-left pr-2">
                     <span className="font-semibold text-slate-200 block">{entry.action}</span>
