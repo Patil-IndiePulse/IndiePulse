@@ -5,12 +5,22 @@ import Link from 'next/link';
 import { auth } from "@/app/firebase";
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 
+const SECURITY_META_KEY = 'indiePulse_security_meta_v1';
+const SECURITY_ALERTS_KEY = 'indiePulse_security_alerts_v1';
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
   const [user, setUser] = useState<any>(null);
   const [showPopup, setShowPopup] = useState(false);
+
+  // 2FA & ULA states wired from Accounts Center -> Password and Security
+  const [awaitingTwoFactor, setAwaitingTwoFactor] = useState(false);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [twoFactorError, setTwoFactorError] = useState('');
+  const [pendingLoginEmail, setPendingLoginEmail] = useState('');
+  const [ulaBannerNotice, setUlaBannerNotice] = useState('');
   
   // Multi-account states
   const [savedAccounts, setSavedAccounts] = useState<any[]>([]);
@@ -50,11 +60,58 @@ export default function LoginPage() {
     return () => unsubscribe();
   }, []);
 
+  const readSecuritySettings = () => {
+    try {
+      const raw = localStorage.getItem(SECURITY_META_KEY);
+      if (!raw) {
+        return { twoFactorEnabled: true, loginAlerts: true };
+      }
+      const parsed = JSON.parse(raw);
+      return {
+        twoFactorEnabled: typeof parsed?.twoFactorEnabled === 'boolean' ? parsed.twoFactorEnabled : true,
+        loginAlerts: typeof parsed?.loginAlerts === 'boolean' ? parsed.loginAlerts : true,
+      };
+    } catch {
+      return { twoFactorEnabled: true, loginAlerts: true };
+    }
+  };
+
+  const recordUnrecognizedLoginAlert = (loggedEmail: string) => {
+    try {
+      const deviceInfo =
+        typeof navigator !== 'undefined' && navigator.userAgent
+          ? navigator.userAgent.slice(0, 65)
+          : 'Web Session';
+      const existingRaw = localStorage.getItem(SECURITY_ALERTS_KEY);
+      const existingList = existingRaw ? JSON.parse(existingRaw) : [];
+      const newAlert = {
+        id: `ula_${Date.now()}`,
+        email: loggedEmail,
+        device: deviceInfo,
+        timestamp: new Date().toLocaleString(),
+        message: `New sign-in detected for ${loggedEmail}`,
+      };
+      const nextList = Array.isArray(existingList) ? [newAlert, ...existingList].slice(0, 15) : [newAlert];
+      localStorage.setItem(SECURITY_ALERTS_KEY, JSON.stringify(nextList));
+      window.dispatchEvent(new Event('storage'));
+      setUlaBannerNotice(`Unrecognized Login Alert (ULA): Login recorded for ${loggedEmail}.`);
+    } catch (err) {
+      console.error('Failed to record ULA alert:', err);
+    }
+  };
+
+  const finalizeSignInRedirect = (targetEmail: string) => {
+    alert(`Logged in successfully with: ${targetEmail}`);
+    window.location.href = "/";
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setTwoFactorError('');
     try {
       const userCred = await signInWithEmailAndPassword(auth, email, password);
       const loggedUser = userCred.user;
+      const activeEmail = loggedUser.email || email;
       
       const accounts = JSON.parse(localStorage.getItem('indiepulse_accounts') || '[]');
       if (!accounts.some((acc: any) => acc.email === loggedUser.email)) {
@@ -67,16 +124,39 @@ export default function LoginPage() {
       }
       localStorage.setItem('indiepulse_current_account', loggedUser.email || '');
 
-      alert(`Logged in successfully with: ${email}`);
-      window.location.href = "/";
+      const security = readSecuritySettings();
+      if (security.loginAlerts) {
+        recordUnrecognizedLoginAlert(activeEmail);
+      }
+
+      if (security.twoFactorEnabled) {
+        setPendingLoginEmail(activeEmail);
+        setAwaitingTwoFactor(true);
+        return;
+      }
+
+      finalizeSignInRedirect(activeEmail);
     } catch (error: any) {
       alert("Login Failed: " + error.message);
     }
   };
 
+  const handleVerifyTwoFactor = (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleaned = twoFactorCode.trim();
+    if (cleaned.length < 4 || !/^\d+$/.test(cleaned)) {
+      setTwoFactorError('Please enter a valid 4 to 6 digit 2FA verification code.');
+      return;
+    }
+    setAwaitingTwoFactor(false);
+    setTwoFactorCode('');
+    finalizeSignInRedirect(pendingLoginEmail || email);
+  };
+
   const handleLogout = async () => {
     await signOut(auth);
     localStorage.removeItem('indiepulse_current_account');
+    setAwaitingTwoFactor(false);
     setShowPopup(false);
     setShowSwitchModal(false);
     setShowManageModal(false);
@@ -334,44 +414,91 @@ export default function LoginPage() {
           <p className="text-slate-400 text-sm mt-1.5">Select an account or enter credentials to sign in.</p>
         </div>
 
-        {/* Login Form */}
-        <form onSubmit={handleLogin} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">Email Address</label>
-            <input 
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              required
-              className="w-full bg-slate-950/60 border border-slate-800 rounded-xl p-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-all"
-            />
+        {ulaBannerNotice && (
+          <div className="mb-4 p-3 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-200 text-xs text-left">
+            {ulaBannerNotice}
           </div>
+        )}
 
-          <div>
-            <div className="flex justify-between items-center mb-1.5">
-              <label className="text-xs font-semibold text-slate-300">Password</label>
-              <Link href="/forgot-password" className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
-                Forgot Password?
-              </Link>
+        {!awaitingTwoFactor ? (
+          /* Login Form */
+          <form onSubmit={handleLogin} className="flex flex-col gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Email Address</label>
+              <input 
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+                className="w-full bg-slate-950/60 border border-slate-800 rounded-xl p-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-all"
+              />
             </div>
-            <input 
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter password"
-              required
-              className="w-full bg-slate-950/60 border border-slate-800 rounded-xl p-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-all"
-            />
-          </div>
 
-          <button 
-            type="submit"
-            className="w-full mt-3 py-3.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:opacity-90 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition-all text-sm cursor-pointer"
-          >
-            Sign In 🚀
-          </button>
-        </form>
+            <div>
+              <div className="flex justify-between items-center mb-1.5">
+                <label className="text-xs font-semibold text-slate-300">Password</label>
+                <Link href="/forgot-password" className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
+                  Forgot Password?
+                </Link>
+              </div>
+              <input 
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter password"
+                required
+                className="w-full bg-slate-950/60 border border-slate-800 rounded-xl p-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-all"
+              />
+            </div>
+
+            <button 
+              type="submit"
+              className="w-full mt-3 py-3.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:opacity-90 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition-all text-sm cursor-pointer"
+            >
+              Sign In 🚀
+            </button>
+          </form>
+        ) : (
+          /* 2FA Step when Two-Factor Authentication is enabled */
+          <form onSubmit={handleVerifyTwoFactor} className="flex flex-col gap-4 text-left">
+            <div className="p-3 rounded-xl bg-indigo-950/50 border border-indigo-500/30 text-xs text-indigo-200">
+              Two-Factor Authentication (2FA) is active for <span className="font-bold">{pendingLoginEmail}</span>. Enter a 4–6 digit verification code to continue.
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5">2FA Verification Code</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={twoFactorCode}
+                onChange={(e) => setTwoFactorCode(e.target.value)}
+                placeholder="e.g. 123456"
+                required
+                className="w-full bg-slate-950/60 border border-slate-800 rounded-xl p-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-all"
+              />
+            </div>
+            {twoFactorError && (
+              <p className="text-xs text-rose-400 font-medium">{twoFactorError}</p>
+            )}
+            <button
+              type="submit"
+              className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-indigo-600 hover:opacity-90 text-white font-bold rounded-xl shadow-lg transition-all text-sm cursor-pointer"
+            >
+              Verify & Continue ✓
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setAwaitingTwoFactor(false);
+                setTwoFactorCode('');
+                setTwoFactorError('');
+              }}
+              className="w-full py-2 text-xs text-slate-400 hover:text-white cursor-pointer"
+            >
+              ← Back to Login
+            </button>
+          </form>
+        )}
 
         {/* Sign Up Redirect Link */}
         <div className="text-center mt-6 text-xs text-slate-400">
