@@ -11,10 +11,14 @@ import {
   updateProfile 
 } from "firebase/auth";
 
+const ACCOUNT_CENTER_KEY = 'indiePulse_account_center_v1';
+const SECURITY_META_KEY = 'indiePulse_security_meta_v1';
+
 export default function SignupPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [signupError, setSignupError] = useState('');
 
   // Helper function to save accounts locally so multiple accounts persist (Steam/Google style)
   const saveAccountLocally = (userEmail: string, userName: string, userPhoto: string = '') => {
@@ -35,14 +39,85 @@ export default function SignupPage() {
       }
       // Set active current account
       localStorage.setItem('indiepulse_current_account', userEmail);
+
+      // Sync with Accounts Center & Profile keys while keeping safe defaults
+      const cleanName = (userName || userEmail.split('@')[0] || 'Indie Creator').trim();
+      const cleanEmail = (userEmail || 'creator@indiepulse.com').trim();
+      localStorage.setItem('indiePulse_name', cleanName);
+      localStorage.setItem('indiePulse_profile_name', cleanName);
+      localStorage.setItem('indiePulse_user_name', cleanName);
+
+      const existingCenterRaw = localStorage.getItem(ACCOUNT_CENTER_KEY);
+      const existingCenter = existingCenterRaw ? JSON.parse(existingCenterRaw) : {};
+      localStorage.setItem(
+        ACCOUNT_CENTER_KEY,
+        JSON.stringify({
+          name: cleanName,
+          email: cleanEmail,
+          bio: existingCenter?.bio || 'Passionate developer',
+          updatedAt: new Date().toISOString(),
+        })
+      );
+
+      if (!localStorage.getItem(SECURITY_META_KEY)) {
+        localStorage.setItem(
+          SECURITY_META_KEY,
+          JSON.stringify({
+            lastChangedAt: 'Created on sign-up',
+            twoFactorEnabled: true,
+            loginAlerts: true,
+            passDigest: `signup_${Date.now().toString(36)}`,
+          })
+        );
+      }
+
+      window.dispatchEvent(new Event('storage'));
     } catch (error) {
       console.error("Error saving account locally:", error);
     }
   };
 
+  // Enterprise-style background sync hook for new sign-ups (safe fallback when offline)
+  const syncSignupToBackend = async (userEmail: string, userName: string, providerType: string) => {
+    try {
+      await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: userEmail,
+          name: userName,
+          provider: providerType,
+          createdAt: new Date().toISOString(),
+        }),
+      });
+    } catch {
+      // Safe fallback: local state remains intact if backend route is not yet live
+    }
+  };
+
+  const getPasswordStrength = (pwd: string) => {
+    if (!pwd) return { label: 'Create a password (min 6 chars)', color: 'text-slate-400', width: '0%' };
+    let score = 0;
+    if (pwd.length >= 6) score += 1;
+    if (pwd.length >= 10) score += 1;
+    if (/[A-Z]/.test(pwd) && /[0-9]/.test(pwd)) score += 1;
+    if (/[^A-Za-z0-9]/.test(pwd)) score += 1;
+
+    if (score <= 1) return { label: 'Weak Password', color: 'text-rose-400', width: '30%' };
+    if (score <= 2) return { label: 'Medium Strength', color: 'text-amber-300', width: '65%' };
+    return { label: 'Strong Password', color: 'text-emerald-400', width: '100%' };
+  };
+
   // 1. Email & Password Signup Handler
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSignupError('');
+
+    if (password.length < 6) {
+      setSignupError('Password must be at least 6 characters long for account security.');
+      return;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       // Update user display name
@@ -50,8 +125,9 @@ export default function SignupPage() {
         await updateProfile(auth.currentUser, { displayName: name });
       }
 
-      // Save to local multi-account storage
+      // Save to local multi-account storage & sync account defaults
       saveAccountLocally(email, name);
+      syncSignupToBackend(email, name, 'email');
 
       alert(`Account created successfully for: ${userCredential.user.email}`);
       window.location.href = "/login";
@@ -62,6 +138,7 @@ export default function SignupPage() {
 
   // 2. Google Signup Handler
   const handleGoogleSignup = async () => {
+    setSignupError('');
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
@@ -69,6 +146,7 @@ export default function SignupPage() {
 
       // Save Google account to local storage list
       saveAccountLocally(user.email || '', user.displayName || 'Google User', user.photoURL || '');
+      syncSignupToBackend(user.email || '', user.displayName || 'Google User', 'google');
 
       alert(`Successfully signed up with Google: ${user.email}`);
       window.location.href = "/login";
@@ -79,6 +157,7 @@ export default function SignupPage() {
 
   // 3. Apple Signup Handler
   const handleAppleSignup = async () => {
+    setSignupError('');
     const provider = new OAuthProvider('apple.com');
     try {
       const result = await signInWithPopup(auth, provider);
@@ -86,6 +165,7 @@ export default function SignupPage() {
 
       // Save Apple account to local storage list
       saveAccountLocally(user.email || '', user.displayName || 'Apple User');
+      syncSignupToBackend(user.email || '', user.displayName || 'Apple User', 'apple');
 
       alert(`Successfully signed up with Apple: ${user.email}`);
       window.location.href = "/login";
@@ -94,11 +174,19 @@ export default function SignupPage() {
     }
   };
 
+  const strength = getPasswordStrength(password);
+
   return (
     <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-4">
       <div className="bg-slate-900 border border-slate-800 p-8 rounded-2xl max-w-md w-full shadow-2xl">
         <h1 className="text-2xl font-bold mb-2">Create Account</h1>
         <p className="text-sm text-slate-400 mb-6">Sign up to get started with IndiePulse.</p>
+
+        {signupError && (
+          <div className="mb-4 p-3 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs font-medium">
+            {signupError}
+          </div>
+        )}
         
         {/* Social Login Buttons */}
         <div className="space-y-3 mb-6">
@@ -179,6 +267,18 @@ export default function SignupPage() {
               required
               className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white outline-none focus:border-indigo-500 transition-all"
             />
+            <div className="mt-1.5">
+              <div className="flex items-center justify-between text-[11px] mb-1">
+                <span className={`${strength.color} font-semibold`}>{strength.label}</span>
+                <span className="text-slate-400">Min 6 chars</span>
+              </div>
+              <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400 transition-all duration-300"
+                  style={{ width: strength.width }}
+                />
+              </div>
+            </div>
           </div>
           
           <button 
